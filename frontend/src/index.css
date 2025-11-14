@@ -1,0 +1,83 @@
+/* Import Google Font */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
+@import "tailwindcss";
+
+@font-face {
+  font-family: 'Clash Display';
+  src: url('/fonts/ClashDisplay-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+  font-style: normal;
+}
+
+:root {
+  --color-primary: #000529;
+  --color-primary-light: #171d45;
+  --color-accent: #ccd8ff;
+  --color-text-primary: #f3f3f3;
+  --color-text-secondary: #a5a5a5;
+  --color-text-body: #6d7792;
+  --color-bg-dark: #00020f;
+  --color-bg-card: #00041f;
+  --color-border-primary: #37393c;
+  --color-border-secondary: #23263a;
+  --color-syntask-bg: #17191c;
+  --color-syntask-border: #37393c;
+}
+
+body {
+  color: var(--color-text-primary); /* Default text color */
+  background-color: var(--color-bg-dark); /* Default background */
+  font-family: var(--font-dm-sans);
+  overflow-x: hidden;
+}
+
+/* === Theme variables from your original config === */
+@theme {
+  --color-primary: var(--color-primary);
+  --color-primary-light: var(--color-primary-light);
+  --color-accent: var(--color-accent);
+  --color-text-primary: var(--color-text-primary);
+  --color-text-secondary: var(--color-text-secondary);
+  --color-text-body: var(--color-text-body);
+  --color-bg-dark: var(--color-bg-dark);
+  --color-bg-card: var(--color-bg-card);
+  --color-border-primary: var(--color-border-primary);
+  --color-border-secondary: var(--color-border-secondary);
+  --color-syntask-bg: var(--color-syntask-bg);
+  --color-syntask-border: var(--color-syntask-border);
+
+  --font-clash-display: "Clash Display", system-ui, sans-serif;
+  --font-dm-sans: "DM Sans", system-ui, sans-serif;
+}
+
+/* Optional: dark mode variant */
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+/* Base layer applying fonts and body defaults */
+@layer base {
+  body {
+    font-family: var(--font-dm-sans);
+    color: var(--color-text-body);
+    background-color: var(--color-bg-card);
+  }
+}
+
+/* Optional: reusable utility classes if you want them */
+@layer components {
+  .font-clash-display { font-family: var(--font-clash-display); }
+  .font-dm-sans { font-family: var(--font-dm-sans); }
+
+  .text-primary { color: var(--color-text-primary); }
+  .text-secondary { color: var(--color-text-secondary); }
+  .text-body { color: var(--color-text-body); }
+
+  .bg-dark { background-color: var(--color-bg-dark); }
+  .bg-card { background-color: var(--color-bg-card); }
+
+  .border-primary { border-color: var(--color-border-primary); }
+  .border-secondary { border-color: var(--color-border-secondary); }
+
+  .bg-syntask { background-color: var(--color-syntask-bg); }
+  .border-syntask { border-color: var(--color-syntask-border); }
+}

@@ -1,16 +1,12 @@
-// import 'dotenv/config';
-// ... (rest of the debugging code)
-
-// above code is for debugging only, below is the final code
 import 'dotenv/config';
 import express from "express";
 import cors from "cors";
-import { clerkMiddleware, requireAuth, getAuth, clerkClient } from "@clerk/express"; // <-- 1. IMPORT clerkClient
+import { clerkMiddleware, requireAuth, getAuth } from "@clerk/express"; // <-- Removed clerkClient, not needed here
 import { connectRabbitMQ } from "./rabbitMQ.js"; 
 import { createRouteHandler } from "uploadthing/express"; 
 import { ourFileRouter } from "./UploadRouter.js"; 
 import connectDB from './config/db.js';
-import User from './models/user.models.js';
+import User from './models/user.models.js'; // <-- This now imports our NEW schema
 import PartialProfile from './models/partialProfile.models.js';
 
 const app = express();
@@ -32,7 +28,7 @@ app.get("/api/health", (_, res) => {
   res.json({ status: "ok", service: "api-gateway" });
 });
 
-// --- Onboarding Status Endpoint (No changes) ---
+// --- Onboarding Status Endpoint (Unchanged) ---
 app.get("/api/onboarding/status", requireAuth(), async (req, res) => {
   const { userId } = getAuth(req);
 
@@ -45,10 +41,11 @@ app.get("/api/onboarding/status", requireAuth(), async (req, res) => {
 
     const partialProfile = await PartialProfile.findOne(
       { user_id: userId, status: "validated" }
-    );
+    ).sort({ createdAt: -1 }); // Get the latest one
 
     if (partialProfile) {
       console.log(`[Status] Found validated partial profile for user: ${userId}`);
+      // Send the whole partial profile, including the new 'extracted_data'
       return res.json({ status: "validated", profile: partialProfile });
     }
     
@@ -62,7 +59,8 @@ app.get("/api/onboarding/status", requireAuth(), async (req, res) => {
 });
 
 
-// --- Partial Profile Endpoint (No changes) ---
+// --- Partial Profile Endpoint (Unchanged) ---
+// This now returns the new, detailed JSON from the 'extracted_data' field
 app.get("/api/profile/partial", requireAuth(), async (req, res) => {
   const { userId } = getAuth(req);
   console.log(`[API] Fetching partial profile for user: ${userId}`);
@@ -78,7 +76,7 @@ app.get("/api/profile/partial", requireAuth(), async (req, res) => {
     }
 
     console.log(`[API] Found partial profile. Returning data.`);
-    res.status(200).json(partialProfile);
+    res.status(200).json(partialProfile); // Send the full partialProfile doc
 
   } catch (error) {
     console.error("[API] Error fetching partial profile:", error);
@@ -87,10 +85,11 @@ app.get("/api/profile/partial", requireAuth(), async (req, res) => {
 });
 
 
-// --- Complete Profile Endpoint (FIXED) ---
+// --- *** MODIFIED: Complete Profile Endpoint *** ---
 app.post("/api/profile/complete", requireAuth(), async (req, res) => {
-  const { userId } = getAuth(req); // This part is correct
-  const { profileData } = req.body; 
+  const { userId } = getAuth(req);
+  // We now expect the full profile object AND the original AI suggestions
+  const { profileData, ai_suggestions } = req.body; 
 
   if (!profileData) {
     return res.status(400).json({ error: "No profile data provided." });
@@ -99,19 +98,16 @@ app.post("/api/profile/complete", requireAuth(), async (req, res) => {
   console.log(`[API] Completing profile for user: ${userId}`);
 
   try {
-    // This is the profile sub-document, matching your user.model.js
-    const newProfile = profileData;
+    // Get email and name from the user-verified data
+    const userEmail = profileData.personal_info?.email;
+    const userName = profileData.personal_info?.full_name;
 
-    // --- THIS IS THE FIX ---
-    // Use the userId to fetch the full user object from Clerk
-    const clerkUser = await clerkClient.users.getUser(userId); 
-    // --- END OF FIX ---
-
-    const userEmail = clerkUser.emailAddresses.find(e => e.id === clerkUser.primaryEmailAddressId)?.emailAddress;
-
-    if (!userEmail) {
-      return res.status(400).json({ error: "Could not find user email." });
+    if (!userEmail || !userName) {
+      return res.status(400).json({ error: "Missing required name or email in profile data." });
     }
+    
+    // Set the ai_suggestions field within the profile
+    profileData.ai_suggestions = ai_suggestions || {};
 
     const result = await User.updateOne(
       { clerkId: userId },
@@ -119,8 +115,8 @@ app.post("/api/profile/complete", requireAuth(), async (req, res) => {
         $set: {
           clerkId: userId,
           email: userEmail,
-          name: profileData.name,
-          profile: newProfile,
+          name: userName,
+          profile: profileData, // Save the entire new profile object
           onboarding_complete: true, 
         },
       },
@@ -137,7 +133,7 @@ app.post("/api/profile/complete", requireAuth(), async (req, res) => {
 });
 
 
-// --- *** NEW: GET FULL PROFILE ENDPOINT *** ---
+// --- GET FULL PROFILE ENDPOINT (Unchanged) ---
 app.get("/api/profile/full", requireAuth(), async (req, res) => {
   const { userId } = getAuth(req);
   console.log(`[API] Fetching FULL profile for user: ${userId}`);
@@ -154,7 +150,7 @@ app.get("/api/profile/full", requireAuth(), async (req, res) => {
   }
 });
 
-// --- *** NEW: UPDATE FULL PROFILE ENDPOINT *** ---
+// --- UPDATE FULL PROFILE ENDPOINT (Unchanged) ---
 app.put("/api/profile/full", requireAuth(), async (req, res) => {
   const { userId } = getAuth(req);
   const { profileData } = req.body;
@@ -171,7 +167,7 @@ app.put("/api/profile/full", requireAuth(), async (req, res) => {
       {
         $set: {
           "profile": profileData,
-          "name": profileData.name // Also update top-level name if it changed
+          "name": profileData.personal_info?.full_name // Also update top-level name if it changed
         }
       }
     );
@@ -191,7 +187,7 @@ app.put("/api/profile/full", requireAuth(), async (req, res) => {
 });
 
 
-// --- Start the server (No changes) ---
+// --- Start the server (Unchanged) ---
 const port = process.env.PORT || 8080;
 
 const startServer = async () => {

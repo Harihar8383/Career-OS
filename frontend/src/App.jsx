@@ -5,7 +5,7 @@ import LandingPage from './pages/LandingPage';
 import SignInPage from './pages/SignInPage';
 import SignUpPage from './pages/SignUpPage';
 import DashboardPage from './pages/DashboardPage';
-// import ProfileReviewPage from './pages/ProfileReviewPage'; // <-- No longer needed
+// import ProfileReviewPage from './pages/ProfileReviewPage'; // <-- DELETED
 import ProfileCompletePage from './pages/ProfileCompletePage';
 
 function App() {
@@ -30,6 +30,9 @@ function App() {
       <Route path="/sign-in/*" element={<SignInPage />} />
       <Route path="/sign-up/*" element={<SignUpPage />} />
 
+      {/* This is the new onboarding completion step.
+        The old '/onboarding/review' is removed.
+      */}
       <Route
         path="/onboarding/complete"
         element={

@@ -35,37 +35,97 @@ Document text:
 \"\"\"
 """
 
-# --- RENOVATED EXTRACTION PROMPT ---
+
 EXTRACTION_PROMPT = """
 You are an expert resume parsing agent. Your sole task is to extract structured information from the resume text provided.
 Your output MUST be only the valid JSON object and nothing else. Do not add any explanatory text, markdown formatting, or "Here is the JSON:" preamble.
 
-**Required JSON Schema:**
+**Required JSON Schema (Adhere strictly):**
 {{
-  "name": "string | null",
-  "emails": ["string", ...],
-  "phones": ["string", ...],
-  "linkedin_url": "string | null",
-  "github_url": "string | null",
-  "headline": "string | null",
-  "summary": "string | null",
-  "skills": ["string", ...],
+  "personal_info": {{
+    "full_name": "string | null",
+    "phone": "string | null",
+    "email": "string | null",
+    "location": "string | null",
+    "linkedin_url": "string | null",
+    "github_url": "string | null",
+    "portfolio_url": "string | null"
+  }},
+  "education": [
+    {{
+      "institution_name": "string | null",
+      "degree": "string | null",
+      "branch": "string | null",
+      "start_date": "string | null",
+      "end_date": "string | null",
+      "gpa": "string | null",
+      "relevant_coursework": ["string", ...]
+    }},
+    ...
+  ],
+  "skills": {{
+    "programming_languages": ["string", ...],
+    "frameworks_libraries": ["string", ...],
+    "databases": ["string", ...],
+    "developer_tools_platforms": ["string", ...],
+    "other_tech": ["string", ...]
+  }},
+  "projects": [
+    {{
+      "title": "string | null",
+      "description": "string | null",
+      "bullet_points": ["string", ...],
+      "tech_stack": ["string", ...],
+      "github_link": "string | null",
+      "live_demo_link": "string | null"
+    }},
+    ...
+  ],
   "experience": [
     {{
-      "company": "string | null",
       "role": "string | null",
-      "start": "string | null",
-      "end": "string | null",
+      "company": "string | null",
+      "location": "string | null",
+      "start_date": "string | null",
+      "end_date": "string | null",
+      "description_points": ["string", ...]
+    }},
+    ...
+  ],
+  "achievements": [
+    {{
+      "title": "string | null",
+      "issuer": "string | null",
+      "date": "string | null",
       "description": "string | null"
     }},
     ...
   ],
-  "education": [
+  "positions_of_responsibility": [
     {{
-      "institution": "string | null",
-      "degree": "string | null",
-      "start": "string | null",
-      "end": "string | null"
+      "role": "string | null",
+      "organization": "string | null",
+      "start_date": "string | null",
+      "end_date": "string | null",
+      "description_points": ["string", ...]
+    }},
+    ...
+  ],
+  "certifications": [
+    {{
+      "name": "string | null",
+      "issuer": "string | null",
+      "issue_date": "string | null",
+      "credential_url": "string | null"
+    }},
+    ...
+  ],
+  "publications": [
+    {{
+      "title": "string | null",
+      "conference_journal": "string | null",
+      "status": "string | null",
+      "link": "string | null"
     }},
     ...
   ]
@@ -73,17 +133,12 @@ Your output MUST be only the valid JSON object and nothing else. Do not add any 
 
 **Critical Extraction Rules:**
 1.  **Strict Schema:** Adhere strictly to the JSON schema provided above.
-2.  **Links:** Find `linkedin_url` and `github_url` if they are present. If not, use `null`.
-3.  **Missing Fields:** If information for a top-level field (like `summary`) is not found, use `null`. If information for an array field (like `emails` or `skills`) is not found, use an empty array `[]`.
-4.  **`experience` Array (Crucial):** This array MUST capture BOTH professional positions AND projects listed in the resume. Apply the following mapping:
-    * **If it is a professional position/job:**
-        * `company`: The name of the employer.
-        * `role`: The job title (e.g., "Software Engineer Intern").
-    * **If it is a project:**
-        * `company`: The institution (if academic, e.g., "XYZ University") or "Personal Project" (if independent). If no affiliation, use `null`.
-        * `role`: The name/title of the project (e.g., "Project: CareerOS" or "AI-Powered Job Agent").
-5.  **`education` Array:** Accurately extract all educational entries.
-6.  **Dates:** Extract `start` and `end` dates as strings, exactly as they appear.
+2.  **Null vs. Empty:** Use `null` for missing optional string fields. Use an empty array `[]` for missing array fields (e.g., if no projects are found, "projects": []).
+3.  **Distinguish Experience vs. Projects:**
+    * `experience`: Must be professional jobs, internships, or TA roles.
+    * `projects`: Must be personal, academic, or hackathon projects.
+4.  **Skills:** Categorize skills as best as possible. Put any unclassified skills in "other_tech".
+5.  **Descriptions:** For `experience`, `projects`, and `positions`, extract bullet points or descriptions into the `description_points` or `bullet_points` arrays.
 
 Return only the JSON.
 
@@ -92,7 +147,9 @@ Document:
 {document_text}
 \"\"\"
 """
-# --- END OF RENOVATED PROMPT ---
+
+
+
 
 # --- GEMINI AI SETUP ---
 try:

@@ -5,8 +5,10 @@ import { OnboardingGate } from "../components/Dashboard/OnBoardingGate";
 import { Sidenav } from "../components/Dashboard/Sidenav";
 import { Routes, Route } from "react-router-dom";
 
-// *** IMPORT THE REAL PROFILE PAGE ***
+// *** IMPORT THE REAL PAGES ***
 import ProfilePage from "./ProfilePage"; 
+import JDMatcherPage from "./JDMatcherPage"; // <-- IMPORT REAL PAGE
+import JobHunterPage from "./JobHunterPage"; // <-- IMPORT REAL PAGE
 
 // A placeholder for now
 const PlaceholderComponent = ({ title }) => (
@@ -16,9 +18,9 @@ const PlaceholderComponent = ({ title }) => (
   </div>
 );
 
-// const ProfilePage = () => <PlaceholderComponent title="My Profile Page" />; // <-- REMOVE THIS
-const JdMatcherPage = () => <PlaceholderComponent title="JD Matcher Page" />;
-const JobHunterPage = () => <PlaceholderComponent title="Job Hunter Agent Page" />;
+// --- REMOVE PLACEHOLDER CONSTS ---
+// const JdMatcherPage = () => <PlaceholderComponent title="JD Matcher Page" />;
+// const JobHunterPage = () => <PlaceholderComponent title="Job Hunter Agent Page" />;
 
 
 function DashboardPage() {
@@ -30,7 +32,9 @@ function DashboardPage() {
     const fetchStatus = async () => {
       try {
         const token = await getToken();
-        const response = await fetch("http://localhost:8080/api/onboarding/status", {
+        // --- FIX: Use API_URL ---
+        const API_URL = import.meta.env.VITE_API_GATEWAY_URL || "http://localhost:8080";
+        const response = await fetch(`${API_URL}/api/onboarding/status`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!response.ok) throw new Error("Failed to fetch status");
@@ -58,11 +62,12 @@ function DashboardPage() {
           {onboardingStatus.status === 'complete' ? (
             <>
               <Sidenav />
-              <main className="ml-64 p-10"> {/* Main content area is offset by sidenav width */}
+              {/* --- Use bg-bg-card for the main content area --- */}
+              <main className="ml-64 p-10 bg-bg-card min-h-screen"> 
                 <Routes>
                   <Route path="/" element={<ProfilePage />} />
-                  <Route path="/matcher" element={<JdMatcherPage />} />
-                  <Route path="/hunter" element={<JobHunterPage />} />
+                  <Route path="/matcher" element={<JDMatcherPage />} /> {/* <-- Now uses the real page */}
+                  <Route path="/hunter" element={<JobHunterPage />} /> {/* <-- Now uses the real page */}
                   {/* Add more dashboard-nested routes here */}
                 </Routes>
               </main>

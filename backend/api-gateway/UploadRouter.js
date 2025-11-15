@@ -2,7 +2,7 @@
 import { createUploadthing } from "uploadthing/express";
 import { UploadThingError } from "uploadthing/server";
 import { getAuth } from "@clerk/express";
-import { publishJob } from "./rabbitMQ.js";
+import { publishJob, QUEUES } from "./rabbitMQ.js"; // <-- Import QUEUES
 
 const f = createUploadthing();
 
@@ -33,7 +33,8 @@ export const ourFileRouter = {
       };
 
       try {
-        await publishJob(job);
+        // --- MODIFICATION: Use new publishJob format ---
+        await publishJob(QUEUES.RESUME_PROCESSING, job);
       } catch (error) {
         console.error("Failed to publish resume job:", error);
         throw new UploadThingError("Failed to queue processing job.");

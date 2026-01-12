@@ -3,7 +3,9 @@ import express from 'express';
 import { 
   analyzeJd,
   getAnalysisStatus,
-  getAnalysisResults
+  getAnalysisResults,
+  getAnalysisHistory,
+  deleteAnalysis
 } from '../controllers/matcher.controller.js';
 import { requireAuth } from '@clerk/express';
 
@@ -13,7 +15,9 @@ const router = express.Router();
 router.use(requireAuth());
 
 router.post('/analyze', analyzeJd);
+router.get('/history', getAnalysisHistory); // New Route
 router.get('/status/:runId', getAnalysisStatus);
 router.get('/results/:runId', getAnalysisResults);
+router.delete('/:runId', deleteAnalysis);
 
 export default router;

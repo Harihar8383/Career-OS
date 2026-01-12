@@ -6,7 +6,7 @@ import { Sidenav } from "../components/Dashboard/Sidenav";
 import { Routes, Route } from "react-router-dom";
 
 // *** IMPORT THE REAL PAGES ***
-import ProfilePage from "./ProfilePage"; 
+import ProfilePage from "./ProfilePage";
 import JDMatcherPage from "./JDMatcherPage"; // <-- IMPORT REAL PAGE
 import JobHunterPage from "./JobHunterPage"; // <-- IMPORT REAL PAGE
 
@@ -63,10 +63,10 @@ function DashboardPage() {
             <>
               <Sidenav />
               {/* --- Use bg-bg-card for the main content area --- */}
-              <main className="ml-64 p-10 bg-bg-card min-h-screen"> 
+              <main className="ml-64 p-10 bg-bg-card min-h-screen">
                 <Routes>
                   <Route path="/" element={<ProfilePage />} />
-                  <Route path="/matcher" element={<JDMatcherPage />} /> {/* <-- Now uses the real page */}
+                  <Route path="/matcher/*" element={<JDMatcherPage />} /> {/* <-- Now uses the real page */}
                   <Route path="/hunter" element={<JobHunterPage />} /> {/* <-- Now uses the real page */}
                   {/* Add more dashboard-nested routes here */}
                 </Routes>

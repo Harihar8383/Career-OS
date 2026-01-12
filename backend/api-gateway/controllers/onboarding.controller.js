@@ -9,10 +9,13 @@ import PartialProfile from '../models/partialProfile.models.js';
  */
 export const getOnboardingStatus = async (req, res) => {
   const { userId } = req.auth; // Comes from requireAuth middleware
+  const { reupload } = req.query; // Check for reupload flag
 
   try {
     const user = await User.findOne({ clerkId: userId });
-    if (user && user.onboarding_complete) {
+    
+    // If NOT re-uploading, check if already completed
+    if (!reupload && user && user.onboarding_complete) {
       console.log(`[Status] User already onboarded: ${userId}`);
       return res.json({ status: "complete" });
     }

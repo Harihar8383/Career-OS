@@ -1,25 +1,43 @@
 // frontend/src/components/Profile/ProfileCards.jsx
 import React from 'react';
 import { Briefcase, GraduationCap, BrainCircuit, Award, GitBranch, Sparkles, User, Link2 } from 'lucide-react';
+import { cn } from "@/lib/utils";
+import { motion } from "framer-motion"; // <-- 1. Import motion
 
 /**
  * Reusable card shell for profile sections
  */
-export const DataCard = ({ title, icon, children }) => (
-  <div className="bg-bg-dark/60 backdrop-blur-xl border border-white/10 rounded-xl p-6">
-    <div className="flex items-center mb-4">
-      {React.createElement(icon, { className: "text-blue-400 w-5 h-5" })}
-      <h3 className="text-xl font-clash-display text-white ml-3">{title}</h3>
-    </div>
+export const DataCard = ({ title, icon, children, className = "", ...props }) => ( // <-- 2. Accept ...props
+  // --- 3. Change from `div` to `motion.div` and spread props ---
+  <motion.div 
+    className={cn(
+          "relative transform-gpu overflow-hidden",
+          // Base Shape & Colors
+          "rounded-2xl p-8 bg-zinc-950",
+          // Borders & Shadows (The Glow Effect)
+          "border border-white/30 hover:scale-101 transition-transform duration-300 ease-in-out",
+          "shadow-[inset_0_-20px_80px_-20px_rgba(255,255,255,0.05),_0_0_20px_rgba(0,0,0,0.5)]",
+          className
+        )}
+    {...props} // <-- 4. Apply inherited props (like variants)
+  >
+    {/* Header */}
+        <div className="flex items-center gap-x-3 mb-6">
+          <span className="text-zinc-400">
+            {React.createElement(icon, { className: "w-6 h-6" })}
+          </span>
+          <h3 className="text-2xl font-clash-display text-shadow-neutral-500 text-shadow-xs text-white">{title}</h3>
+        </div>
+        
     <div className="font-dm-sans space-y-4">{children}</div>
-  </div>
+  </motion.div>
 );
 
 /**
  * A small, colored tag for skills
  */
 export const SkillTag = ({ children }) => (
-  <span className="bg-blue-500/20 text-blue-300 text-sm font-medium px-3 py-1 rounded-full">
+  <span className="bg-bg-card text-white border border-syntask-border text-sm font-bold px-3 py-1 rounded-full">
     {children}
   </span>
 );
@@ -27,6 +45,7 @@ export const SkillTag = ({ children }) => (
 /**
  * A component to display a single Experience item
  */
+// ... (rest of the file is unchanged) ...
 export const ExperienceItem = ({ item }) => (
   <div className="border-b border-white/10 pb-4 last:pb-0 last:border-b-0">
     <h4 className="font-semibold text-white">{item.role}</h4>

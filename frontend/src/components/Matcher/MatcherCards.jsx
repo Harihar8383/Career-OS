@@ -1,7 +1,8 @@
 // frontend/src/components/Matcher/MatcherCards.jsx
 import React from 'react';
-import { Check,Sparkles, X, AlertTriangle, Lightbulb, Clipboard, BrainCircuit } from 'lucide-react';
+import { Check, Sparkles, X, AlertTriangle, Lightbulb, Clipboard, BrainCircuit } from 'lucide-react';
 import { SkillTag } from '../Profile/ProfileCards'; // Re-using our skill tag!
+import ScoreGauge from './ScoreGauge';
 
 /**
  * Main Card Shell
@@ -9,7 +10,7 @@ import { SkillTag } from '../Profile/ProfileCards'; // Re-using our skill tag!
 const ResultCard = ({ title, icon, children, className = "" }) => (
   <div className={`bg-bg-dark/60 backdrop-blur-xl border border-white/10 rounded-xl p-6 ${className}`}>
     <div className="flex items-center mb-4">
-      {React.createElement(icon, { className: "text-blue-400 w-5 h-5" })}
+      {React.createElement(icon, { className: "text-white w-5 h-5" })}
       <h3 className="text-xl font-clash-display text-white ml-3">{title}</h3>
     </div>
     <div className="font-dm-sans space-y-4">{children}</div>
@@ -20,14 +21,9 @@ const ResultCard = ({ title, icon, children, className = "" }) => (
  * 1. The "Overall Match Score" Card
  */
 export const MatchScoreCard = ({ score }) => {
-  const color = score >= 75 ? "text-green-400" : score >= 50 ? "text-yellow-400" : "text-red-400";
   return (
     <ResultCard title="Overall Match Score" icon={BrainCircuit} className="col-span-1">
-      <div className="flex items-center justify-center h-full">
-        <p className={`font-clash-display ${color} text-7xl`}>
-          {score}%
-        </p>
-      </div>
+      <ScoreGauge score={score} />
     </ResultCard>
   );
 };
@@ -99,7 +95,10 @@ export const ComparisonMatrixCard = ({ matrix }) => (
 /**
  * 4. The "Actionable To-Do List" Card (Suggestion)
  */
-export const SuggestionCard = ({ suggestion }) => {
+/**
+ * 4. The "Actionable To-Do List" Card (Suggestion) - EDITABLE
+ */
+export const SuggestionCard = ({ suggestion, onEdit }) => {
   const Icon = {
     "Keyword Gap": AlertTriangle,
     "Highlight Opportunity": Lightbulb,
@@ -115,16 +114,26 @@ export const SuggestionCard = ({ suggestion }) => {
     "Hard Gap Warning": "border-red-500/30",
     "AI Summary": "border-green-500/30",
   }[suggestion.type] || "border-white/10";
-  
+
   return (
-    <div className={`bg-bg-dark/60 border ${color} rounded-lg p-5`}>
+    <div className={`bg-bg-dark/60 border ${color} rounded-lg p-5 transition-all hover:bg-bg-dark/80`}>
       <h4 className="flex items-center gap-2 text-lg font-clash-display text-white mb-2">
         <Icon className="w-5 h-5" />
         {suggestion.title}
       </h4>
-      <p className="text-text-body text-sm leading-relaxed">
-        {suggestion.suggestion}
-      </p>
+
+      {/* Editable Area */}
+      <div className="relative group">
+        <textarea
+          value={suggestion.suggestion}
+          onChange={(e) => onEdit(suggestion.id, e.target.value)}
+          className="w-full bg-slate-900/50 text-text-body text-sm leading-relaxed p-3 rounded border border-transparent focus:border-blue-500 outline-none resize-y min-h-[80px]"
+        />
+        <span className="absolute right-2 bottom-2 text-xs text-secondary opacity-0 group-hover:opacity-50 pointer-events-none">
+          Click to edit
+        </span>
+      </div>
+
       {suggestion.ai_generated_summary && (
         <div className="mt-4 p-4 bg-slate-900/50 border border-white/10 rounded-lg">
           <p className="text-text-secondary text-sm italic">
@@ -135,3 +144,29 @@ export const SuggestionCard = ({ suggestion }) => {
     </div>
   );
 };
+
+/**
+ * 5. The "Quick Win" Card
+ */
+export const QuickWinCard = ({ skill, isSelected, onToggle }) => (
+  <div
+    onClick={onToggle}
+    className={`
+      cursor-pointer border rounded-lg p-4 flex items-center justify-between transition-all select-none
+      ${isSelected ? 'bg-green-500/10 border-green-500/50' : 'bg-bg-dark/40 border-white/10 hover:border-white/20'}
+    `}
+  >
+    <div>
+      <h5 className={`font-bold ${isSelected ? 'text-green-400' : 'text-white'}`}>
+        + Add "{skill.skill}"
+      </h5>
+      <p className="text-xs text-text-secondary mt-1">{skill.reason}</p>
+    </div>
+    <div className={`
+      w-6 h-6 rounded-full border flex items-center justify-center
+      ${isSelected ? 'bg-green-500 border-green-500' : 'border-white/30'}
+    `}>
+      {isSelected && <Check size={14} className="text-black" />}
+    </div>
+  </div>
+);

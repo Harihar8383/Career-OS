@@ -1,66 +1,116 @@
-// frontend/src/components/Matcher/MatcherResults.jsx
-import React from 'react';
-import { MatchScoreCard, JdSummaryCard, ComparisonMatrixCard, SuggestionCard } from './MatcherCards';
-import { Sparkles } from 'lucide-react';
+import React, { useRef, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import JdMatcherHeader from './Report/JdMatcherHeader';
+import SectionBreakdown from './Report/SectionBreakdown';
+import KeywordGapReport from './Report/KeywordGapReport';
+import ActionableTodoList from './Report/ActionableTodoList';
+import BulletFeedback from './Report/BulletFeedback';
+import confetti from 'canvas-confetti';
 
 export const MatcherResults = ({ results, onReset }) => {
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    // Only fire confetti if score is high (e.g., >= 80)
+    if (results && results.match_score >= 80) {
+      const end = Date.now() + 2 * 1000; // 2 seconds
+      const colors = [
+  "#3b82f6", // Your Blue-500 (Brand consistency)
+  
+  "#eab308", // Achievement Gold (The "Reward" feeling)
+  
+];
+      const frame = () => {
+        if (Date.now() > end) return;
+
+        confetti({
+          particleCount: 2,
+          angle: 60,
+          spread: 55,
+          startVelocity: 60,
+          origin: { x: 0, y: 0.5 },
+          colors: colors,
+        });
+        confetti({
+          particleCount: 2,
+          angle: 120,
+          spread: 55,
+          startVelocity: 60,
+          origin: { x: 1, y: 0.5 },
+          colors: colors,
+        });
+
+        requestAnimationFrame(frame);
+      };
+
+      frame();
+    }
+  }, [results]);
+
   if (!results) return null;
 
-  const { actionable_todo_list = [], ...otherResults } = results;
-
-  // Find the AI Summary and separate it
-  const aiSummary = actionable_todo_list.find(s => s.type === "AI Summary");
-  const otherSuggestions = actionable_todo_list.filter(s => s.type !== "AI Summary");
-
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
-      
-      {/* --- Top Row: Score + Summary --- */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <MatchScoreCard score={otherResults.match_score_percent} />
-        <JdSummaryCard summary={otherResults.jd_summary} />
-      </div>
+    <div ref={containerRef} className="max-w-7xl mx-auto px-4 pb-24 space-y-12">
 
-      {/* --- Comparison Matrix --- */}
-      <ComparisonMatrixCard matrix={otherResults.comparison_matrix} />
+      {/* 1. Header Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <JdMatcherHeader data={results} />
+      </motion.div>
 
-      {/* --- AI Generated Summary --- */}
-      {aiSummary && (
-        <div className="bg-gradient-to-br from-blue-900/30 via-bg-dark/30 to-bg-dark/30 border border-blue-500/40 rounded-xl p-6">
-          <div className="flex items-center mb-4">
-            <Sparkles className="text-blue-400 w-5 h-5" />
-            <h3 className="text-xl font-clash-display text-white ml-3">AI-Generated Summary</h3>
-          </div>
-          <p className="font-dm-sans text-text-body italic">
-            {aiSummary.ai_generated_summary}
-          </p>
-          <p className="font-dm-sans text-sm text-text-secondary mt-3">
-            {aiSummary.suggestion}
-          </p>
-        </div>
-      )}
+      {/* 2. Section Breakdown */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ delay: 0.2 }}
+      >
+        <SectionBreakdown sections={results.sections} />
+      </motion.div>
 
-      {/* --- Actionable To-Do List --- */}
-      <div>
-        <h2 className="text-2xl font-clash-display text-white mb-4 mt-8">
-          Actionable To-Do List
-        </h2>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {otherSuggestions.map((suggestion, i) => (
-            <SuggestionCard key={i} suggestion={suggestion} />
-          ))}
-        </div>
-      </div>
-      
-      {/* --- Reset Button --- */}
-      <div className="flex justify-center pt-8">
+      {/* 3. Keyword Gap Report */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ delay: 0.3 }}
+      >
+        <KeywordGapReport data={results.keyword_gap} />
+      </motion.div>
+
+      {/* 4. Actionable To-Do List */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ delay: 0.4 }}
+      >
+        <ActionableTodoList data={results.actionable_todos} />
+      </motion.div>
+
+      {/* 5. Bullet Point Feedback */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ delay: 0.5 }}
+      >
+        <BulletFeedback bullets={results.bullet_feedback} />
+      </motion.div>
+
+      {/* Reset Button */}
+      <div className="flex justify-center pt-12">
         <button
           onClick={onReset}
-          className="px-6 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 transition text-white text-sm font-dm-sans"
+          className="px-8 py-3 bg-slate-800 text-white rounded-xl hover:bg-slate-700 transition font-medium border border-white/10"
         >
-          Analyze Another Job
+          Start New Analysis
         </button>
       </div>
+
     </div>
   );
 };

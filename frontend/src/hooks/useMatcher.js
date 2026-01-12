@@ -10,6 +10,7 @@ const STATUS_MESSAGES = {
   validating: "Validating job description...",
   parsing_jd: "Parsing key skills and requirements...",
   analyzing: "Running deep analysis against your profile...",
+  analyzing_with_graph: "Orchestrating AI Agents for deep analysis...",
 };
 
 export function useMatcher() {
@@ -21,6 +22,15 @@ export function useMatcher() {
   const [error, setError] = useState(null);
   const [results, setResults] = useState(null);
   const intervalRef = useRef(null);
+  
+  // --- 0. Load Analysis (History Support) ---
+  const loadAnalysis = (runId) => {
+      setRunId(runId);
+      setStatus("complete"); 
+      setStatusMessage("Loading from history...");
+      fetchResults(runId);
+  };
+
 
   // --- 1. Start Analysis ---
   const startAnalysis = async () => {
@@ -117,7 +127,7 @@ export function useMatcher() {
     };
 
     // Start polling if status is in a processing state
-    if (runId && (status === "pending" || status === "validating" || status === "parsing_jd" || status === "analyzing")) {
+    if (runId && (status === "pending" || status === "validating" || status === "parsing_jd" || status === "analyzing" || status === "analyzing_with_graph")) {
       if (!intervalRef.current) {
         intervalRef.current = setInterval(pollStatus, 3000); // Poll every 3 seconds
       }
@@ -151,5 +161,7 @@ export function useMatcher() {
     results,
     startAnalysis,
     resetMatcher,
+    loadAnalysis, // <-- Export this
+    runId // <-- Exposed for navigation
   };
 }

@@ -9,19 +9,18 @@ import docx
 import io
 import re
 from dotenv import load_dotenv
-import google.generativeai as genai
+from langchain_groq import ChatGroq
 from pymongo import MongoClient
 from pymongo.server_api import ServerApi
 
-# --- CONFIGURATION (Unchanged) ---
+# --- CONFIGURATION ---
 load_dotenv()
 MONGO_URI = os.getenv("MONGODB_URI") or os.getenv("MONGO_URI")
 RABBITMQ_URI = os.getenv("RABBITMQ_URI")
-GEMINI_API_KEY = os.getenv("GOOGLE_API_KEY")
 RESUME_QUEUE_NAME = "resume_processing_queue"
 JD_QUEUE_NAME = "jd_analysis_queue"
 
-# --- PROMPT TEMPLATES (Resume - Updated) ---
+# --- PROMPT TEMPLATES (Resume) ---
 VERIFICATION_PROMPT = """
 You are an assistant that inspects a document and determines whether it is a professional resume/CV.
 Return only a single JSON object in a ```json ... ``` code block.
@@ -63,88 +62,21 @@ Document:
 \"\"\"
 """
 
-# --- NEW PROMPT TEMPLATES (JD Matcher - Updated) ---
-
-VERIFY_JD_PROMPT = """
-You are an AI assistant. Your task is to determine if the following text is a job description.
-Respond only with a single, valid JSON object in a ```json ... ``` code block.
-{{"is_jd": true/false, "reason": "A brief explanation for your decision."}}
-
-Text:
-\"\"\"
-{document_text}
-\"\"\"
-"""
-
-PARSE_JD_PROMPT = """
-You are an expert parsing agent. Extract key information from this job description.
-Respond only with a single, valid JSON object in a ```json ... ``` code block.
-{{
-  "job_title": "string | null",
-  "company": "string | null",
-  "experience_level": "string | null (e.g., 'Senior', '5+ years', 'Entry-level')",
-  "hard_skills": ["list", "of", "key", "technical", "skills", "and", "keywords"],
-  "soft_skills": ["list", "of", "soft", "skills", "e.g.", "communication"],
-  "qualifications": ["list", "of", "degrees", "or", "certifications", "e.g.", "MBA", "PMP"]
-}}
-
-Text:
-\"\"\"
-{document_text}
-\"\"\"
-"""
-
-GAP_ANALYSIS_PROMPT = """
-You are "The Resume Tailoring Co-pilot," a world-class career coach.
-Your task is to perform a deep gap analysis between a user's professional profile and a job description (JD).
-Your output MUST be only a single valid JSON object in a ```json ... ``` code block. Do not add any explanatory text.
-
-**User's Profile (JSON):**
-{user_profile_json}
-
-**Parsed Job Description (JSON):**
-{parsed_jd_json}
-
-**Required Output Schema (JSON only):**
-{{
-  "match_score_percent": "integer (0-100)",
-  "jd_summary": {{
-    "job_title": "string",
-    "company": "string",
-    "experience": "string",
-    "top_3_must_have_skills": ["string", "string", "string"]
-  }},
-  "comparison_matrix": {{
-    "matched_keywords": ["Skills and experiences present in both the JD and the user's profile."],
-    "missing_keywords": ["Critical skills or qualifications required by the JD that are absent from the user's profile."],
-    "needs_highlighting": ["Skills present in the user's profile but not emphasized, which are crucial for the JD."]
-  }},
-  "actionable_todo_list": [
-    {{
-      "type": "Keyword Gap | Highlight Opportunity | Quantify Achievement | Hard Gap Warning | AI Summary",
-      "title": "Short title (e.g., 'Missing Skill: A/B Testing')",
-      "suggestion": "A specific, actionable suggestion. E.g., 'Your resume doesn't mention A/B Testing, which the JD requires. If you have this experience, add a bullet point like: \"Conducted A/B tests on new features, leading to a 10% increase in user engagement.\"'",
-      "ai_generated_summary": "string | null (Only for 'AI Summary' type. This should be a 2-3 sentence professional summary tailored for this job.)"
-    }},
-    ...
-  ]
-}}
-(Rest of prompt is the same as before...)
-"""
-
-# --- GEMINI AI SETUP (Unchanged) ---
+# --- GROQ AI SETUP ---
 try:
-    if not GEMINI_API_KEY:
-        raise Exception("GOOGLE_API_KEY not found in .env file.")
-    genai.configure(api_key=GEMINI_API_KEY)
-    ai_model_lite = genai.GenerativeModel('gemini-2.5-flash-lite')
-    ai_model_pro = genai.GenerativeModel('gemini-2.5-flash')
-    print("✅ Google Gemini AI Models configured (Lite & Pro).")
+    GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+    if not GROQ_API_KEY:
+        raise Exception("GROQ_API_KEY not found in .env file.")
+    
+    # Initialize Groq LLM (Llama 3.3) for general worker tasks (Resume Parsing)
+    worker_llm = ChatGroq(model="llama-3.3-70b-versatile", groq_api_key=GROQ_API_KEY, temperature=0.1)
+    
+    print("✅ Groq AI Model configured (Llama 3.3).")
 except Exception as e:
-    print(f"❌ CRITICAL: Failed to configure Gemini AI. Check GOOGLE_API_KEY. Error: {e}")
+    print(f"❌ CRITICAL: Failed to configure Groq AI. Check GROQ_API_KEY. Error: {e}")
     sys.exit(1)
 
-# --- MONGODB SETUP (Unchanged) ---
+# --- MONGODB SETUP ---
 try:
     if not MONGO_URI:
         raise Exception("MONGO_URI (or MONGODB_URI) not found in .env file.")
@@ -160,43 +92,50 @@ except Exception as e:
     sys.exit(1)
 
 
-# --- *** UPDATED: clean_json_response *** ---
+# --- HELPER: Clean JSON ---
 def clean_json_response(text):
-    """
-    Cleans the non-JSON text from Gemini's response.
-    Prioritizes finding a ```json ... ``` block.
-    """
-    # 1. Prioritize finding the ```json code block
-    match = re.search(r'```json\s*(.*?)\s*```', text, re.DOTALL)
-    if match:
-        return match.group(1).strip()
-
-    # 2. Fallback: find the first '{' and last '}'
-    start_match = re.search(r'\{', text)
-    end_match = re.search(r'\}', text[::-1]) 
-    if start_match and end_match:
-        start_index = start_match.start()
-        end_index = len(text) - end_match.start()
-        json_text = text[start_index:end_index].strip()
-        return json_text
-        
-    print(f"   [ai] ⚠️ Warning: Could not find JSON block. Returning raw text: {text[:100]}...")
-    return text.strip()
-# --- END OF UPDATE ---
-    
-def call_gemini(prompt, model, task_name="Task"):
-    """Calls the specified Gemini API and returns the text response."""
-    print(f"   [ai] Calling {model.model_name} for: {task_name}...")
     try:
-        response = model.generate_content(prompt)
-        return response.text
+        match = re.search(r'```json\s*(.*?)\s*```', text, re.DOTALL)
+        if match: return match.group(1).strip()
+        match = re.search(r'```\s*(.*?)\s*```', text, re.DOTALL)
+        if match: return match.group(1).strip()
+        start_match = re.search(r'\{', text)
+        end_match = re.search(r'\}', text[::-1]) 
+        if start_match and end_match:
+            start_index = start_match.start()
+            end_index = len(text) - end_match.start()
+            return text[start_index:end_index].strip()
+        print(f"   [ai] ⚠️ Warning: Could not find JSON block. Returning raw text.")
+        return text.strip()
     except Exception as e:
-        print(f"   [ai] ❌ Gemini API call failed: {e}")
+        print(f"   [ai] Error cleaning JSON: {e}")
+        return text
+
+# --- LLM HELPER ---
+def call_llm(prompt, task_name="Task"):
+    """Calls the Groq LLM and returns the text response."""
+    print(f"   [ai] Calling Groq Llama 3 for: {task_name}...")
+    try:
+        response = worker_llm.invoke(prompt)
+        return response.content
+    except Exception as e:
+        print(f"   [ai] ❌ LLM call failed: {e}")
         raise
 
-# --- PARSING FUNCTIONS (Unchanged) ---
+def call_llm_with_retry(prompt, task_name="Task", max_retries=2):
+    """Calls LLM with retry logic."""
+    for attempt in range(max_retries + 1):
+        try:
+            return call_llm(prompt, task_name)
+        except Exception as e:
+            print(f"   [ai] Attempt {attempt+1} failed for {task_name}: {e}")
+            if attempt < max_retries:
+                time.sleep(2)
+            else:
+                raise e
+
+# --- PARSING FUNCTIONS ---
 def extract_text_from_pdf(file_content):
-    # (code is the same)
     with io.BytesIO(file_content) as f:
         with pdfplumber.open(f) as pdf:
             text = ""
@@ -205,7 +144,6 @@ def extract_text_from_pdf(file_content):
             return text
 
 def extract_text_from_docx(file_content):
-    # (code is the same)
     with io.BytesIO(file_content) as f:
         doc = docx.Document(f)
         text = ""
@@ -213,7 +151,7 @@ def extract_text_from_docx(file_content):
             text += para.text + "\n"
         return text
 
-# --- CALLBACK 1: RESUME PROCESSING (Unchanged) ---
+# --- CALLBACK 1: RESUME PROCESSING ---
 def resume_callback(ch, method, properties, body):
     print("\n---------------------------------")
     print("✅ [worker] Received a new RESUME job!")
@@ -248,18 +186,18 @@ def resume_callback(ch, method, properties, body):
             raise Exception("Extracted text is too short or empty.")
         print(f"   [task] Text extracted successfully.")
 
-        # 3. AI Validation (Use LITE model)
+        # 3. AI Validation (Use Groq)
         validation_prompt = VERIFICATION_PROMPT.format(document_text=raw_text[:4000])
-        validation_response_text = call_gemini(validation_prompt, model=ai_model_lite, task_name="Resume Validation")
+        validation_response_text = call_llm_with_retry(validation_prompt, task_name="Resume Validation")
         validation_json = json.loads(clean_json_response(validation_response_text))
         
         print(f"   [ai] Validation complete: {validation_json.get('is_resume')}")
         if not validation_json.get('is_resume'):
             raise Exception(f"Document is not a resume. Reason: {validation_json.get('reasons')}")
 
-        # 4. AI Extraction (Use LITE model)
+        # 4. AI Extraction (Use Groq)
         extraction_prompt = EXTRACTION_PROMPT.format(document_text=raw_text)
-        extraction_response_text = call_gemini(extraction_prompt, model=ai_model_lite, task_name="Structured Extraction")
+        extraction_response_text = call_llm_with_retry(extraction_prompt, task_name="Structured Extraction")
         extracted_data = json.loads(clean_json_response(extraction_response_text))
         print(f"   [ai] Extraction complete! Found name: {extracted_data.get('personal_info', {}).get('full_name')}")
 
@@ -278,7 +216,16 @@ def resume_callback(ch, method, properties, body):
             {"$set": partial_profile},
             upsert=True
         )
-        print(f"   [db] ✅ Partial profile saved successfully.")
+
+        # --- CRITICAL UPDATE: Save RAW TEXT to Users Collection ---
+        print(f"   [db] Saving RAW RESUME TEXT to Users collection for user: {user_id}")
+        users_collection.update_one(
+            {"clerkId": user_id}, 
+            {"$set": {"profile.raw_resume_text": raw_text}},
+            upsert=True 
+        )
+
+        print(f"   [db] ✅ Partial profile and Raw Text saved successfully.")
         
         ch.basic_ack(delivery_tag=method.delivery_tag)
         print("✅ [worker] RESUME job finished and acknowledged.")
@@ -288,9 +235,8 @@ def resume_callback(ch, method, properties, body):
         ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
 
 
-# --- NEW HELPER: Update JD Analysis Status (Unchanged) ---
+# --- HELPER: Update JD Analysis Status ---
 def update_analysis_status(run_id, status, error=None, results=None):
-    # (code is the same)
     print(f"   [db] Updating job {run_id} to status: {status}")
     update_doc = {"$set": {"status": status, "updatedAt": time.time()}}
     if error:
@@ -299,10 +245,13 @@ def update_analysis_status(run_id, status, error=None, results=None):
         update_doc["$set"]["analysisResults"] = results
     jd_analysis_collection.update_one({"runId": run_id}, update_doc)
 
-# --- CALLBACK 2: JD ANALYSIS (Unchanged) ---
+# --- IMPORTS for LangGraph ---
+from matcher_graph import build_matcher_graph
+
+# --- CALLBACK 2: JD ANALYSIS ---
 def jd_analysis_callback(ch, method, properties, body):
     print("\n---------------------------------")
-    print("✅ [worker] Received a new JD ANALYSIS job!")
+    print("✅ [worker] Received a new JD ANALYSIS job! (LangGraph Edition)")
     job_data = {}
     run_id = None
     try:
@@ -319,41 +268,46 @@ def jd_analysis_callback(ch, method, properties, body):
         if not jd_text:
              raise Exception(f"JD text is empty for runId: {run_id}")
 
-        # 2. AI Validation (Use PRO model)
-        update_analysis_status(run_id, "validating")
-        verify_prompt = VERIFY_JD_PROMPT.format(document_text=jd_text[:4000])
-        verify_response_text = call_gemini(verify_prompt, model=ai_model_pro, task_name="JD Validation")
-        verify_json = json.loads(clean_json_response(verify_response_text))
-        
-        if not verify_json.get('is_jd'):
-            raise Exception(f"Text is not a JD. Reason: {verify_json.get('reason')}")
-        print(f"   [ai] JD Validation complete: {verify_json.get('is_jd')}")
-
-        # 3. AI Parsing (Use PRO model)
-        update_analysis_status(run_id, "parsing_jd")
-        parse_prompt = PARSE_JD_PROMPT.format(document_text=jd_text)
-        parse_response_text = call_gemini(parse_prompt, model=ai_model_pro, task_name="JD Parsing")
-        parsed_jd = json.loads(clean_json_response(parse_response_text))
-        print(f"   [ai] JD Parsing complete. Found title: {parsed_jd.get('job_title')}")
-
-        # 4. Fetch User's Full Profile
+        # 2. Fetch User's Raw Resume
         user_profile_doc = users_collection.find_one({"clerkId": clerk_id})
         if not user_profile_doc or 'profile' not in user_profile_doc:
             raise Exception(f"No full user profile found for clerkId: {clerk_id}")
         
-        # --- Convert profile to JSON string (with default=str for safety) ---
-        user_profile_json = json.dumps(user_profile_doc.get('profile', {}), default=str)
-        print(f"   [db] Fetched full profile for user: {clerk_id}")
+        user_raw_resume = user_profile_doc.get('profile', {}).get('raw_resume_text', "")
+        if not user_raw_resume:
+             print("   [warn] No raw resume text found! Using blank string.")
+             user_raw_resume = "No raw resume text available."
 
-        # 5. AI Gap Analysis (Use PRO model)
-        update_analysis_status(run_id, "analyzing")
-        analysis_prompt = GAP_ANALYSIS_PROMPT.format(user_profile_json=user_profile_json, parsed_jd_json=json.dumps(parsed_jd, default=str))
-        analysis_response_text = call_gemini(analysis_prompt, model=ai_model_pro, task_name="Gap Analysis")
-        analysis_results = json.loads(clean_json_response(analysis_response_text))
-        print(f"   [ai] Gap Analysis complete. Match Score: {analysis_results.get('match_score_percent')}%")
+        # 3. Invoke LangGraph
+        update_analysis_status(run_id, "analyzing_with_graph")
+        print("   [worker] Invoking Matcher Graph...")
+        
+        matcher_app = build_matcher_graph()
+        initial_state = {
+            "resume_text": user_raw_resume,
+            "jd_text": jd_text,
+            "parsed_jd": {},
+            "section_scores": {},
+            "keyword_gaps": {},
+            "actionable_todos": {},
+            "bullet_feedback": [],
+            "final_result": {},
+            "errors": []
+        }
+        
+        # Invoke the graph
+        final_state = matcher_app.invoke(initial_state)
+        
+        # Check for errors
+        if final_state.get("errors"):
+            print(f"   [worker] ⚠️ Graph reported errors: {final_state['errors']}")
 
-        # 6. Save final results to DB
-        update_analysis_status(run_id, "complete", results=analysis_results)
+        final_result = final_state.get("final_result", {})
+        
+        print(f"   [ai] Graph execution complete. Match Score: {final_result.get('match_score')}%")
+
+        # 4. Save final results to DB
+        update_analysis_status(run_id, "complete", results=final_result)
         
         ch.basic_ack(delivery_tag=method.delivery_tag)
         print("✅ [worker] JD ANALYSIS job finished and acknowledged.")
@@ -364,30 +318,42 @@ def jd_analysis_callback(ch, method, properties, body):
             update_analysis_status(run_id, "failed", error=str(e))
         ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
 
-# --- RABBITMQ WORKER (Unchanged) ---
+# --- RABBITMQ WORKER ---
 def main():
-    # (code is the same)
-    try:
-        connection = pika.BlockingConnection(pika.URLParameters(RABBITMQ_URI))
-    except pika.exceptions.AMQPConnectionError as e:
-        print(f"❌ Failed to connect to RabbitMQ: {e}\nRetrying in 5 seconds...")
-        time.sleep(5)
-        main()
-        return
-
-    channel = connection.channel()
-    channel.queue_declare(queue=RESUME_QUEUE_NAME, durable=True)
-    channel.queue_declare(queue=JD_QUEUE_NAME, durable=True)
+    print("🚀 [worker] Starting CareerCLI AI Worker...")
     
-    print("✅ Python Worker connected to RabbitMQ.")
-    print(f"[*] Subscribed to queue: {RESUME_QUEUE_NAME}")
-    print(f"[*] Subscribed to queue: {JD_QUEUE_NAME}")
-    print("[*] Waiting for messages. To exit press CTRL+C")
+    while True:
+        try:
+            params = pika.URLParameters(RABBITMQ_URI)
+            params.heartbeat = 600 
+            params.blocked_connection_timeout = 600
+            connection = pika.BlockingConnection(params)
+            channel = connection.channel()
+            channel.queue_declare(queue=RESUME_QUEUE_NAME, durable=True)
+            channel.queue_declare(queue=JD_QUEUE_NAME, durable=True)
+            
+            print("✅ Python Worker connected to RabbitMQ.")
+            print(f"[*] Subscribed to queue: {RESUME_QUEUE_NAME}")
+            print(f"[*] Subscribed to queue: {JD_QUEUE_NAME}")
+            print("[*] Waiting for messages. To exit press CTRL+C")
 
-    channel.basic_consume(queue=RESUME_QUEUE_NAME, on_message_callback=resume_callback)
-    channel.basic_consume(queue=JD_QUEUE_NAME, on_message_callback=jd_analysis_callback)
+            channel.basic_qos(prefetch_count=1) 
+            channel.basic_consume(queue=RESUME_QUEUE_NAME, on_message_callback=resume_callback)
+            channel.basic_consume(queue=JD_QUEUE_NAME, on_message_callback=jd_analysis_callback)
+            channel.start_consuming()
 
-    channel.start_consuming()
+        except pika.exceptions.AMQPConnectionError as e:
+            print(f"❌ [worker] RabbitMQ Connection Error: {e}")
+            print("   Retrying in 5 seconds...")
+            time.sleep(5)
+        except pika.exceptions.StreamLostError as e:
+             print(f"⚠️ [worker] Stream Lost (likely timeout): {e}")
+             print("   Restarting connection in 2 seconds...")
+             time.sleep(2)
+        except Exception as e:
+            print(f"❌ [worker] Unexpected Error: {e}")
+            print("   Retrying in 5 seconds...")
+            time.sleep(5)
 
 if __name__ == "__main__":
     try:

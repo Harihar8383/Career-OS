@@ -4,7 +4,7 @@ import { useAuth } from '@clerk/clerk-react';
 
 const API_URL = import.meta.env.VITE_API_GATEWAY_URL || "http://localhost:8080";
 
-export function useOnboardingStatus(shouldPoll) {
+export function useOnboardingStatus(shouldPoll, isReupload = false) {
   const [status, setStatus] = useState('pending');
   const [data, setData] = useState(null);
   const { getToken } = useAuth();
@@ -15,7 +15,10 @@ export function useOnboardingStatus(shouldPoll) {
       console.log("Polling for status...");
       try {
         const token = await getToken();
-        const response = await fetch(`${API_URL}/api/onboarding/status`, {
+        // Append reupload flag if needed
+        const url = `${API_URL}/api/onboarding/status${isReupload ? '?reupload=true' : ''}`;
+        
+        const response = await fetch(url, {
           headers: { Authorization: `Bearer ${token}` },
         });
 

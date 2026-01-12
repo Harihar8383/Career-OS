@@ -8,8 +8,7 @@ import { SubmitButton } from '../components/Forms/FormElements';
 
 const API_URL = import.meta.env.VITE_API_GATEWAY_URL || "http://localhost:8080";
 
-// This is a "blank" profile structure matching our new schema
-// It's used as a fallback if the AI somehow returns nothing
+// Blank profile acts as type/template defaults (no nulls)
 const BLANK_PROFILE = {
   personal_info: { full_name: "", phone: "", email: "", location: "", linkedin_url: "", github_url: "", portfolio_url: "" },
   education: [],
@@ -27,13 +26,112 @@ function ProfileCompletePage() {
   const navigate = useNavigate();
   const { getToken } = useAuth();
   
-  const [formData, setFormData] = useState(null); // This holds the *editable* data
-  const [aiSuggestions, setAiSuggestions] = useState(null); // This holds the *original* AI data
+  // Start with a sanitized blank profile so inputs are always controlled
+  const [formData, setFormData] = useState(() => structuredClone(BLANK_PROFILE));
+  const [aiSuggestions, setAiSuggestions] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Helper: ensure a value is a string (no null) 
+  const toSafeString = (v) => (v === null || v === undefined) ? "" : String(v);
+
+  // Helper: ensure something is an array; if string split by comma; if single value wrap in array
+  const toArray = (v) => {
+    if (Array.isArray(v)) return v;
+    if (v === null || v === undefined || v === "") return [];
+    if (typeof v === 'string') {
+      // If newline-separated list, keep as-is? We'll split by comma for generic lists.
+      return v.split(',').map(s => s.trim()).filter(Boolean);
+    }
+    // For number/boolean/object fallback to single-element string representation
+    return [String(v)];
+  };
+
+  // Sanitize the whole profile so fields are of expected types (strings/arrays)
+  const sanitizeProfile = (raw = {}) => {
+    const merged = {
+      ...structuredClone(BLANK_PROFILE),
+      ...raw,
+      personal_info: { ...structuredClone(BLANK_PROFILE.personal_info), ...(raw.personal_info || {}) },
+      skills: { ...structuredClone(BLANK_PROFILE.skills), ...(raw.skills || {}) },
+      career_preferences: { ...structuredClone(BLANK_PROFILE.career_preferences), ...(raw.career_preferences || {}) },
+      education: raw.education || [],
+      experience: raw.experience || [],
+      projects: raw.projects || [],
+      achievements: raw.achievements || [],
+      positions_of_responsibility: raw.positions_of_responsibility || [],
+      certifications: raw.certifications || [],
+      publications: raw.publications || [],
+    };
+
+    // Clean personal_info strings
+    Object.keys(merged.personal_info).forEach(k => {
+      merged.personal_info[k] = toSafeString(merged.personal_info[k]);
+    });
+
+    // Ensure each skill category is an array
+    Object.keys(merged.skills).forEach(k => {
+      merged.skills[k] = toArray(merged.skills[k]);
+    });
+
+    // Ensure career_preferences arrays plus availability string
+    merged.career_preferences.preferred_roles = toArray(merged.career_preferences.preferred_roles);
+    merged.career_preferences.job_type = toArray(merged.career_preferences.job_type);
+    merged.career_preferences.target_locations = toArray(merged.career_preferences.target_locations);
+    merged.career_preferences.availability = toSafeString(merged.career_preferences.availability);
+
+    // Ensure education items exist as array of objects (best-effort)
+    merged.education = Array.isArray(merged.education) ? merged.education.map(item => item || {}) : [];
+
+    // Normalize experience: ensure description_points is array (but don't mutate original structure accidentally)
+    merged.experience = Array.isArray(merged.experience)
+      ? merged.experience.map(exp => ({
+          ...exp,
+          // keep other fields; ensure strings for title/company
+          title: toSafeString(exp.title),
+          company: toSafeString(exp.company),
+          start_date: toSafeString(exp.start_date),
+          end_date: toSafeString(exp.end_date),
+          // description_points could be array or string or object — normalize to array of strings
+          description_points: (() => {
+            const rawPts = exp.description_points;
+            if (Array.isArray(rawPts)) return rawPts.map(p => toSafeString(p)).filter(Boolean);
+            if (rawPts === null || rawPts === undefined) return [];
+            if (typeof rawPts === 'string') {
+              // Split on newlines OR bullets (•). Keep it conservative.
+              return rawPts.split(/\r?\n|•/).map(p => p.trim()).filter(Boolean);
+            }
+            // If it's an object (rare), stringify values
+            if (typeof rawPts === 'object') {
+              return Object.values(rawPts).map(v => toSafeString(v)).filter(Boolean);
+            }
+            return [toSafeString(rawPts)];
+          })()
+        }))
+      : [];
+
+    // Normalize projects: tech_stack array, strings sanitized
+    merged.projects = Array.isArray(merged.projects)
+      ? merged.projects.map(p => ({
+          ...p,
+          name: toSafeString(p.name),
+          summary: toSafeString(p.summary),
+          tech_stack: Array.isArray(p.tech_stack) ? p.tech_stack.map(t => toSafeString(t)).filter(Boolean) : toArray(p.tech_stack)
+        }))
+      : [];
+
+    // Other lists — coerce to arrays of strings/objects
+    merged.achievements = Array.isArray(merged.achievements) ? merged.achievements.map(a => (typeof a === 'string' ? a : JSON.stringify(a))).map(toSafeString) : [];
+    merged.positions_of_responsibility = Array.isArray(merged.positions_of_responsibility) ? merged.positions_of_responsibility.map(toSafeString) : [];
+    merged.certifications = Array.isArray(merged.certifications) ? merged.certifications.map(toSafeString) : [];
+    merged.publications = Array.isArray(merged.publications) ? merged.publications.map(toSafeString) : [];
+
+    return merged;
+  };
+
   // --- 1. Fetch AI-extracted profile on page load ---
   useEffect(() => {
+    let mounted = true;
     const fetchPartialProfile = async () => {
       setIsLoading(true);
       try {
@@ -49,38 +147,25 @@ function ProfileCompletePage() {
         const data = await response.json();
         const aiData = data.extracted_data || {};
 
-        // Store the original AI data
-        setAiSuggestions(aiData);
+        // Store the original AI data (as-is)
+        if (mounted) setAiSuggestions(aiData);
 
-        // Pre-fill form data from AI, ensuring all keys from BLANK_PROFILE exist
-        // This merges AI data with our blank template to prevent errors
-        setFormData({
-          ...BLANK_PROFILE,
-          ...aiData,
-          personal_info: { ...BLANK_PROFILE.personal_info, ...aiData.personal_info },
-          skills: { ...BLANK_PROFILE.skills, ...aiData.skills },
-          career_preferences: { ...BLANK_PROFILE.career_preferences, ...aiData.career_preferences },
-          // Ensure arrays are arrays
-          education: aiData.education || [],
-          experience: aiData.experience || [],
-          projects: aiData.projects || [],
-          achievements: aiData.achievements || [],
-          positions_of_responsibility: aiData.positions_of_responsibility || [],
-          certifications: aiData.certifications || [],
-          publications: aiData.publications || [],
-        });
+        // Merge and sanitize so form inputs always receive strings/arrays (no null)
+        const sanitized = sanitizeProfile(aiData);
+        if (mounted) setFormData(sanitized);
 
       } catch (err) {
         console.error(err);
+        // redirect with error message
         navigate('/dashboard', { state: { error: "Could not load profile." } });
       } finally {
-        setIsLoading(false);
+        if (mounted) setIsLoading(false);
       }
     };
 
     fetchPartialProfile();
+    return () => { mounted = false; };
   }, [getToken, navigate]);
-
 
   // --- 2. Submit Handler ---
   const handleSubmit = async (e) => {
@@ -92,26 +177,56 @@ function ProfileCompletePage() {
     // --- Helper to clean up data before sending ---
     const cleanData = (data) => {
       const cleaned = { ...data };
-      
-      // Convert any skill "strings" back to arrays (just in case)
+
+      // Ensure skills are arrays (if user composed them as comma-strings)
       Object.keys(cleaned.skills).forEach(key => {
-        if (typeof cleaned.skills[key] === 'string') {
-          cleaned.skills[key] = cleaned.skills[key].split(',').map(s => s.trim()).filter(Boolean);
-        }
+        cleaned.skills[key] = Array.isArray(cleaned.skills[key])
+          ? cleaned.skills[key].map(s => toSafeString(s)).filter(Boolean)
+          : toArray(cleaned.skills[key]);
       });
       
-      // Convert experience description from string to array of bullets
-      cleaned.experience = cleaned.experience.map(exp => ({
-        ...exp,
-        description_points: (exp.description_points || "").split('\n').filter(Boolean)
-      }));
+      // Normalize experience description to arrays of strings
+      cleaned.experience = Array.isArray(cleaned.experience)
+        ? cleaned.experience.map(exp => {
+            const rawPts = exp.description_points;
+            let pts = [];
+            if (Array.isArray(rawPts)) {
+              pts = rawPts.map(p => toSafeString(p)).filter(Boolean);
+            } else if (typeof rawPts === 'string') {
+              pts = rawPts.split(/\r?\n|•/).map(p => p.trim()).filter(Boolean);
+            } else if (rawPts === null || rawPts === undefined) {
+              pts = [];
+            } else if (typeof rawPts === 'object') {
+              pts = Object.values(rawPts).map(v => toSafeString(v)).filter(Boolean);
+            } else {
+              pts = [toSafeString(rawPts)];
+            }
 
-      // Convert project tech_stack from string to array
-      cleaned.projects = cleaned.projects.map(proj => ({
-        ...proj,
-        tech_stack: Array.isArray(proj.tech_stack) ? proj.tech_stack : (proj.tech_stack || "").split(',').map(s => s.trim()).filter(Boolean)
-      }));
-      
+            return {
+              ...exp,
+              description_points: pts
+            };
+          })
+        : [];
+
+      // Convert project tech_stack to arrays
+      cleaned.projects = Array.isArray(cleaned.projects)
+        ? cleaned.projects.map(proj => ({
+            ...proj,
+            tech_stack: Array.isArray(proj.tech_stack) ? proj.tech_stack.map(t => toSafeString(t)).filter(Boolean) : toArray(proj.tech_stack)
+          }))
+        : [];
+
+      // Final safety: ensure strings are strings in personal_info and career_preferences.availability
+      Object.keys(cleaned.personal_info || {}).forEach(k => {
+        cleaned.personal_info[k] = toSafeString(cleaned.personal_info[k]);
+      });
+      cleaned.career_preferences = cleaned.career_preferences || {};
+      cleaned.career_preferences.availability = toSafeString(cleaned.career_preferences.availability);
+      cleaned.career_preferences.preferred_roles = toArray(cleaned.career_preferences.preferred_roles);
+      cleaned.career_preferences.job_type = toArray(cleaned.career_preferences.job_type);
+      cleaned.career_preferences.target_locations = toArray(cleaned.career_preferences.target_locations);
+
       return cleaned;
     };
 
@@ -137,8 +252,7 @@ function ProfileCompletePage() {
       
       navigate('/dashboard'); // Success!
 
-    } catch (err)
- {
+    } catch (err) {
       console.error(err);
       alert("Error saving profile. Please try again.");
       setIsSubmitting(false);
@@ -146,7 +260,7 @@ function ProfileCompletePage() {
   };
 
   // --- 3. Render Loading State ---
-  if (isLoading || !formData) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-bg-dark flex justify-center items-center">
         <Loader2 size={48} className="animate-spin text-blue-400" />

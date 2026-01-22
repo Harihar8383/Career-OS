@@ -3,7 +3,8 @@ import amqp from "amqplib";
 
 const RABBITMQ_URI = process.env.RABBITMQ_URI;
 const RESUME_QUEUE = "resume_processing_queue";
-const JD_QUEUE = "jd_analysis_queue"; // <-- New queue
+const JD_QUEUE = "jd_analysis_queue";
+const JOB_HUNTER_QUEUE = "job_hunter_queue"; // <-- New queue
 
 let connection = null;
 let channel = null;
@@ -12,9 +13,11 @@ export async function connectRabbitMQ() {
   try {
     connection = await amqp.connect(RABBITMQ_URI);
     channel = await connection.createChannel();
-    // Assert both queues to make sure they exist
+    // Assert all queues to make sure they exist
     await channel.assertQueue(RESUME_QUEUE, { durable: true });
-    await channel.assertQueue(JD_QUEUE, { durable: true }); // <-- Assert new queue
+    await channel.assertQueue(JD_QUEUE, { durable: true });
+    await channel.assertQueue(JOB_HUNTER_QUEUE, { durable: true }); // <-- Assert new queue
+    await channel.assertQueue("job_hunt_logs_queue", { durable: true }); // <-- Logs queue
     console.log("🐇 RabbitMQ Publisher connected and queues asserted.");
   } catch (error) {
     console.error("❌ Failed to connect to RabbitMQ:", error);
@@ -46,4 +49,11 @@ export async function publishJob(queueName, job) {
 export const QUEUES = {
   RESUME_PROCESSING: RESUME_QUEUE,
   JD_ANALYSIS: JD_QUEUE,
+  JOB_HUNTER: JOB_HUNTER_QUEUE, // <-- Export new queue
+  JOB_HUNT_LOGS: "job_hunt_logs_queue" // <-- Export logs queue
 };
+
+// Export channel getter for SSE consumers
+export function getChannel() {
+  return channel;
+}

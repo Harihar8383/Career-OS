@@ -19,6 +19,7 @@ MONGO_URI = os.getenv("MONGODB_URI") or os.getenv("MONGO_URI")
 RABBITMQ_URI = os.getenv("RABBITMQ_URI")
 RESUME_QUEUE_NAME = "resume_processing_queue"
 JD_QUEUE_NAME = "jd_analysis_queue"
+JOB_HUNTER_QUEUE_NAME = "job_hunter_queue"
 
 # --- PROMPT TEMPLATES (Resume) ---
 VERIFICATION_PROMPT = """
@@ -86,6 +87,8 @@ try:
     partial_profiles_collection = mongo_db['partial_profiles']
     users_collection = mongo_db['users']
     jd_analysis_collection = mongo_db['jd_analyses']
+    hunter_sessions_collection = mongo_db['huntersessions']
+    job_results_collection = mongo_db['jobresults']
     print("✅ MongoDB connected and all collections accessed.")
 except Exception as e:
     print(f"❌ CRITICAL: Failed to connect to MongoDB. Check your connection string. Error: {e}")
@@ -248,6 +251,9 @@ def update_analysis_status(run_id, status, error=None, results=None):
 # --- IMPORTS for LangGraph ---
 from matcher_graph import build_matcher_graph
 
+# --- IMPORTS for Job Hunter ---
+from hunt_orchestrator import HuntOrchestrator
+
 # --- CALLBACK 2: JD ANALYSIS ---
 def jd_analysis_callback(ch, method, properties, body):
     print("\n---------------------------------")
@@ -318,6 +324,122 @@ def jd_analysis_callback(ch, method, properties, body):
             update_analysis_status(run_id, "failed", error=str(e))
         ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
 
+# --- CALLBACK 3: JOB HUNTER ---
+def job_hunter_callback(ch, method, properties, body):
+    print("\n---------------------------------")
+    print("✅ [worker] Received a new JOB HUNTER job!")
+    session_id = None
+    user_id = None
+    
+    try:
+        job_data = json.loads(body.decode('utf-8'))
+        session_id = job_data.get('sessionId')
+        user_id = job_data.get('userId')
+        criteria = job_data.get('criteria', {})
+        
+        print(f"   [data] Session ID: {session_id} | User ID: {user_id}")
+        print(f"   [criteria] {criteria}")
+        
+        if not session_id or not user_id:
+            raise Exception("Missing sessionId or userId in job data")
+        
+        # 1. Update session status to "running"
+        print(f"   [db] Updating session {session_id} to 'running'")
+        hunter_sessions_collection.update_one(
+            {"sessionId": session_id},
+            {"$set": {"status": "running"}}
+        )
+        
+        # 2. Execute the tiered hunt using HuntOrchestrator
+        print(f"   [hunter] Initializing HuntOrchestrator...")
+        # Pass worker_llm for AI query generation
+        orchestrator = HuntOrchestrator(rabbitmq_channel=ch, llm_client=worker_llm)
+        
+        print(f"   [hunter] Starting tiered job hunt...")
+        hunt_result = orchestrator.execute_hunt(
+            session_id=session_id,
+            user_id=user_id,
+            criteria=criteria
+        )
+        
+        # 3. Save valid jobs to JobResult collection
+        valid_jobs = hunt_result.get("jobs", [])
+        if valid_jobs:
+            print(f"   [db] Saving {len(valid_jobs)} jobs to JobResult collection...")
+            for job in valid_jobs:
+                # Save complete enhanced job structure (Phase 4 fields included)
+                job_result_doc = {
+                    "userId": user_id,
+                    "sessionId": session_id,
+                    
+                    # Basic fields
+                    "title": job.get("title"),
+                    "company": job.get("company"),
+                    "location": job.get("location"),
+                    "description": job.get("description", ""),
+                    "applyLink": job.get("redirect_url") or job.get("applyLink"),  # Handle both field names
+                    "created": job.get("created"),
+                    
+                    # Scoring
+                    "matchScore": job.get("matchScore", 0),
+                    "relevance_score": job.get("relevance_score", 0),
+                    
+                    # Phase 4: Enhanced fields
+                    "tierLabel": job.get("tierLabel", "B-Tier"),
+                    "tier": job.get("tier", "B"),
+                    "badges": job.get("badges", []),
+                    "gapAnalysis": job.get("gapAnalysis", ""),
+                    "salary": job.get("salary", "Not disclosed"),
+                    "salary_min": job.get("salary_min", 0),
+                    "salary_max": job.get("salary_max", 0),
+                    "rank": job.get("rank", 0),
+                    
+                    # Metadata
+                    "source": job.get("source", "adzuna"),
+                    "status": "new"
+                }
+                
+                # Use update_one with upsert to handle duplicates (by applyLink only)
+                # Don't include sessionId in filter - same job can appear in multiple sessions
+                job_results_collection.update_one(
+                    {"applyLink": job_result_doc["applyLink"]},
+                    {"$set": job_result_doc},
+                    upsert=True
+                )
+            print(f"   [db] ✅ All jobs saved to database")
+        
+        # 4. Update session status to "completed"
+        hunter_sessions_collection.update_one(
+            {"sessionId": session_id},
+            {
+                "$set": {
+                    "status": "completed"
+                },
+                "$push": {
+                    "logs": f"Hunt completed: {len(valid_jobs)} jobs found using tiers: {', '.join(hunt_result.get('tierUsed', []))}"
+                }
+            }
+        )
+        
+        ch.basic_ack(delivery_tag=method.delivery_tag)
+        print("✅ [worker] JOB HUNTER job finished and acknowledged.")
+
+    except Exception as e:
+        print(f"❌ [worker] Error processing JOB HUNTER job: {e}")
+        import traceback
+        traceback.print_exc()
+        
+        if session_id:
+            hunter_sessions_collection.update_one(
+                {"sessionId": session_id},
+                {
+                    "$set": {"status": "failed"},
+                    "$push": {"logs": f"Error: {str(e)}"}
+                }
+            )
+        ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
+
+
 # --- RABBITMQ WORKER ---
 def main():
     print("🚀 [worker] Starting CareerCLI AI Worker...")
@@ -331,15 +453,18 @@ def main():
             channel = connection.channel()
             channel.queue_declare(queue=RESUME_QUEUE_NAME, durable=True)
             channel.queue_declare(queue=JD_QUEUE_NAME, durable=True)
+            channel.queue_declare(queue=JOB_HUNTER_QUEUE_NAME, durable=True)
             
             print("✅ Python Worker connected to RabbitMQ.")
             print(f"[*] Subscribed to queue: {RESUME_QUEUE_NAME}")
             print(f"[*] Subscribed to queue: {JD_QUEUE_NAME}")
+            print(f"[*] Subscribed to queue: {JOB_HUNTER_QUEUE_NAME}")
             print("[*] Waiting for messages. To exit press CTRL+C")
 
             channel.basic_qos(prefetch_count=1) 
             channel.basic_consume(queue=RESUME_QUEUE_NAME, on_message_callback=resume_callback)
             channel.basic_consume(queue=JD_QUEUE_NAME, on_message_callback=jd_analysis_callback)
+            channel.basic_consume(queue=JOB_HUNTER_QUEUE_NAME, on_message_callback=job_hunter_callback)
             channel.start_consuming()
 
         except pika.exceptions.AMQPConnectionError as e:

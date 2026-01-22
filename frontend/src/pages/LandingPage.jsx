@@ -6,14 +6,14 @@ import { LogoTicker } from '../components/Landing/LogoTicker';
 import { Features } from '../components/Landing/Features';
 import { Stats } from '../components/Landing/Stats';
 import { Testimonials } from '../components/Landing/Testimonials';
-import { CTA } from '../components/Landing/CTA';      
-import { Footer } from '../components/Landing/Footer'; 
+import { CTA } from '../components/Landing/CTA';
+import { Footer } from '../components/Landing/Footer';
 
 function LandingPage() {
   return (
     <div className="antialiased bg-bg-dark text-text-primary">
       <Header />
-      
+
       <main className="w-full max-w-full overflow-x-hidden">
         <Hero />
         <LogoTicker />
@@ -23,7 +23,7 @@ function LandingPage() {
         {/* <FAQ /> */}
         <CTA />
       </main>
-      
+
       <Footer />
     </div>
   );

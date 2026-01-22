@@ -1,0 +1,69 @@
+📡 API: Firing 20 queries concurrently...
+✅ API: Retrieved 47 unique raw jobs.
+🧹 CLEANUP: Running Soft Killswitch & Deduplication...
+✅ CLEANUP: 47 jobs remained after filtering.
+🧠 MATCHER: Scoring jobs based on keywords...
+🔗 LINKS: Verifying availability for 20 jobs (Head Request)...
+✅ LINKS: 14 jobs are active.
+
+🏆 FINAL TOP 10 RECOMMENDATIONS:
+
+1. Fullstack Engineer (GoLang) (75%)
+   🏢 Oneture Technologies
+   📍 Mumbai, Maharashtra
+   💰 700000
+   🔗 https://www.adzuna.in/details/5541806203?utm_medium=api&utm_source=e3cd6d1c
+
+2. Sr. Python Developer (Fullstack) (75%)
+   🏢 Whitefield Careers
+   📍 Mumbai, Maharashtra
+   💰 1400000
+   🔗 https://www.adzuna.in/details/5566691382?utm_medium=api&utm_source=e3cd6d1c
+
+3. .NET Fullstack Developer (75%)
+   🏢 ClanX
+   📍 Mumbai, Maharashtra
+   💰 2500000
+   🔗 https://www.adzuna.in/details/5555120221?utm_medium=api&utm_source=e3cd6d1c
+
+4. Software Engineer III- Java Fullstack (70%)
+   🏢 JPMorganChase
+   📍 Mumbai, Maharashtra
+   💰 Not Disclosed
+   🔗 https://www.adzuna.in/details/5576305403?utm_medium=api&utm_source=e3cd6d1c
+
+5. Java Fullstack Developer_Associate_Software Engineering (70%)
+   🏢 Morgan Stanley
+   📍 Mumbai, Maharashtra
+   💰 Not Disclosed
+   🔗 https://www.adzuna.in/details/5564336299?utm_medium=api&utm_source=e3cd6d1c
+
+6. Software Engineer I (MERN) (70%)
+   🏢 Us Diligent
+   📍 Bangalore, Karnataka
+   💰 Not Disclosed
+   🔗 https://www.adzuna.in/details/5576350527?utm_medium=api&utm_source=e3cd6d1c
+
+7. Lead FullStack Engineer - Contacts (60%)
+   🏢 HighLevel
+   📍 Delhi, India
+   💰 Not Disclosed
+   🔗 https://www.adzuna.in/details/5574414224?utm_medium=api&utm_source=e3cd6d1c
+
+8. Lead FullStack Engineer - Users (60%)
+   🏢 HighLevel
+   📍 Delhi, India
+   💰 Not Disclosed
+   🔗 https://www.adzuna.in/details/5574088805?utm_medium=api&utm_source=e3cd6d1c
+
+9. Senior PHP Fullstack Engineer (60%)
+   🏢 Monks
+   📍 Mumbai, Maharashtra
+   💰 Not Disclosed
+   🔗 https://www.adzuna.in/details/5579693617?utm_medium=api&utm_source=e3cd6d1c
+
+10. Golang Architect (60%)
+   🏢 Fractal
+   📍 Bangalore, Karnataka
+   💰 Not Disclosed
+   🔗 https://www.adzuna.in/details/5586479487?utm_medium=api&utm_source=e3cd6d1c

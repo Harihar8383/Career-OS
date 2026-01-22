@@ -2,7 +2,8 @@
 import express from 'express';
 import onboardingRoutes from './onboarding.routes.js';
 import profileRoutes from './profile.routes.js';
-import matcherRoutes from './matcher.routes.js'; // <-- 1. Import new routes
+import matcherRoutes from './matcher.routes.js';
+import hunterRoutes from './hunter.routes.js'; // <-- Import hunter routes
 
 const router = express.Router();
 
@@ -14,6 +15,7 @@ router.get("/health", (_, res) => {
 // Mount modular routers
 router.use('/onboarding', onboardingRoutes);
 router.use('/profile', profileRoutes);
-router.use('/matcher', matcherRoutes); // <-- 2. Mount new routes
+router.use('/matcher', matcherRoutes);
+router.use('/hunter', hunterRoutes); // <-- Mount hunter routes
 
 export default router;

@@ -17,7 +17,7 @@ export const MatcherResults = ({ results, onReset }) => {
       const colors = [
   "#3b82f6", // Your Blue-500 (Brand consistency)
   
-  "#eab308", // Achievement Gold (The "Reward" feeling)
+  "#ffffffda", // Achievement Gold (The "Reward" feeling)
   
 ];
       const frame = () => {

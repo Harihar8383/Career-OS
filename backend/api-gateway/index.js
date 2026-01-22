@@ -8,6 +8,7 @@ import { createRouteHandler } from "uploadthing/express";
 import { ourFileRouter } from "./UploadRouter.js"; 
 import connectDB from './config/db.js';
 import mainApiRouter from './routes/index.js'; // <-- 1. Import the new main router
+import logConsumer from './services/logConsumer.js'; // <-- Import log consumer
 
 const app = express();
 app.use(cors());
@@ -39,6 +40,10 @@ const startServer = async () => {
   try {
     await connectDB();
     await connectRabbitMQ(); 
+    
+    // Start the background log consumer service
+    const logConsumer = (await import('./services/logConsumer.js')).default;
+    await logConsumer.start();
     
     app.listen(port, () => {
       console.log(`🚀 API Gateway running on port ${port}`);

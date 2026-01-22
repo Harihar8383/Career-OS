@@ -15,33 +15,77 @@
   /* --- Primary Action Colors --- */
   /* Use for buttons, links, and main interactive elements */
   --color-primary: #3b82f6;
-  --color-primary-light: #60a5fa; /* For hover states */
+  --color-primary-light: #60a5fa;
+  /* For hover states */
 
   /* --- Secondary Accent Color --- */
   /* Use for tags, badges, highlights, or special icons */
   --color-accent: #a855f7;
 
   /* --- Text Colors --- */
-  --color-text-primary: #f4f4f5;   /* Main headings */
-  --color-text-body: #d4d4d8;      /* Paragraphs and main text */
-  --color-text-secondary: #71717a; /* Subtext, metadata, captions */
+  --color-text-primary: #f4f4f5;
+  /* Main headings */
+  --color-text-body: #d4d4d8;
+  /* Paragraphs and main text */
+  --color-text-secondary: #71717a;
+  /* Subtext, metadata, captions */
 
   /* --- Backgrounds (The "De-Blued" Neutrals) --- */
-  --color-bg-dark: #0a0a0a;        /* Main page background */
-  --color-bg-card: #171717;        /* Card backgrounds */
+  --color-bg-dark: #0a0a0a;
+  /* Main page background */
+  --color-bg-card: #171717;
+  /* Card backgrounds */
 
   /* --- Borders & Dividers --- */
-  --color-border-primary: #262626;   /* Main borders */
-  --color-border-secondary: #404040; /* Lighter/subtle borders */
+  --color-border-primary: #262626;
+  /* Main borders */
+  --color-border-secondary: #404040;
+  /* Lighter/subtle borders */
 
   /* --- Special Component Colors --- */
-  --color-syntask-bg: #171717;     /* Aligned with card background */
-  --color-syntask-border: #262626; /* Aligned with primary border */ --radius: 0.625rem; --background: oklch(1 0 0); --foreground: oklch(0.129 0.042 264.695); --card: oklch(1 0 0); --card-foreground: oklch(0.129 0.042 264.695); --popover: oklch(1 0 0); --popover-foreground: oklch(0.129 0.042 264.695); --primary: oklch(0.208 0.042 265.755); --primary-foreground: oklch(0.984 0.003 247.858); --secondary: oklch(0.968 0.007 247.896); --secondary-foreground: oklch(0.208 0.042 265.755); --muted: oklch(0.968 0.007 247.896); --muted-foreground: oklch(0.554 0.046 257.417); --accent: oklch(0.968 0.007 247.896); --accent-foreground: oklch(0.208 0.042 265.755); --destructive: oklch(0.577 0.245 27.325); --border: oklch(0.929 0.013 255.508); --input: oklch(0.929 0.013 255.508); --ring: oklch(0.704 0.04 256.788); --chart-1: oklch(0.646 0.222 41.116); --chart-2: oklch(0.6 0.118 184.704); --chart-3: oklch(0.398 0.07 227.392); --chart-4: oklch(0.828 0.189 84.429); --chart-5: oklch(0.769 0.188 70.08); --sidebar: oklch(0.984 0.003 247.858); --sidebar-foreground: oklch(0.129 0.042 264.695); --sidebar-primary: oklch(0.208 0.042 265.755); --sidebar-primary-foreground: oklch(0.984 0.003 247.858); --sidebar-accent: oklch(0.968 0.007 247.896); --sidebar-accent-foreground: oklch(0.208 0.042 265.755); --sidebar-border: oklch(0.929 0.013 255.508); --sidebar-ring: oklch(0.704 0.04 256.788);
+  --color-syntask-bg: #171717;
+  /* Aligned with card background */
+  --color-syntask-border: #262626;
+  /* Aligned with primary border */
+  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.129 0.042 264.695);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.129 0.042 264.695);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.129 0.042 264.695);
+  --primary: oklch(0.208 0.042 265.755);
+  --primary-foreground: oklch(0.984 0.003 247.858);
+  --secondary: oklch(0.968 0.007 247.896);
+  --secondary-foreground: oklch(0.208 0.042 265.755);
+  --muted: oklch(0.968 0.007 247.896);
+  --muted-foreground: oklch(0.554 0.046 257.417);
+  --accent: oklch(0.968 0.007 247.896);
+  --accent-foreground: oklch(0.208 0.042 265.755);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.929 0.013 255.508);
+  --input: oklch(0.929 0.013 255.508);
+  --ring: oklch(0.704 0.04 256.788);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: oklch(0.984 0.003 247.858);
+  --sidebar-foreground: oklch(0.129 0.042 264.695);
+  --sidebar-primary: oklch(0.208 0.042 265.755);
+  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-accent: oklch(0.968 0.007 247.896);
+  --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
+  --sidebar-border: oklch(0.929 0.013 255.508);
+  --sidebar-ring: oklch(0.704 0.04 256.788);
 }
 
 body {
-  color: var(--color-text-primary); /* Default text color */
-  background-color: var(--color-bg-dark); /* Default background */
+  color: var(--color-text-primary);
+  /* Default text color */
+  background-color: var(--color-bg-dark);
+  /* Default background */
   font-family: var(--font-dm-sans);
   overflow-x: hidden;
 }
@@ -79,21 +123,49 @@ body {
 
 /* Optional: reusable utility classes if you want them */
 @layer components {
-  .font-clash-display { font-family: var(--font-clash-display); }
-  .font-dm-sans { font-family: var(--font-dm-sans); }
+  .font-clash-display {
+    font-family: var(--font-clash-display);
+  }
 
-  .text-primary { color: var(--color-text-primary); }
-  .text-secondary { color: var(--color-text-secondary); }
-  .text-body { color: var(--color-text-body); }
+  .font-dm-sans {
+    font-family: var(--font-dm-sans);
+  }
 
-  .bg-dark { background-color: var(--color-bg-dark); }
-  .bg-card { background-color: var(--color-bg-card); }
+  .text-primary {
+    color: var(--color-text-primary);
+  }
 
-  .border-primary { border-color: var(--color-border-primary); }
-  .border-secondary { border-color: var(--color-border-secondary); }
+  .text-secondary {
+    color: var(--color-text-secondary);
+  }
 
-  .bg-syntask { background-color: var(--color-syntask-bg); }
-  .border-syntask { border-color: var(--color-syntask-border); }
+  .text-body {
+    color: var(--color-text-body);
+  }
+
+  .bg-dark {
+    background-color: var(--color-bg-dark);
+  }
+
+  .bg-card {
+    background-color: var(--color-bg-card);
+  }
+
+  .border-primary {
+    border-color: var(--color-border-primary);
+  }
+
+  .border-secondary {
+    border-color: var(--color-border-secondary);
+  }
+
+  .bg-syntask {
+    background-color: var(--color-syntask-bg);
+  }
+
+  .border-syntask {
+    border-color: var(--color-syntask-border);
+  }
 }
 
 @theme inline {
@@ -134,23 +206,30 @@ body {
   --color-sidebar-ring: var(--sidebar-ring);
   --animate-shimmer-slide: shimmer-slide var(--speed) ease-in-out infinite alternate;
   --animate-spin-around: spin-around calc(var(--speed) * 2) infinite linear;
+
   @keyframes shimmer-slide {
-  to {
-    transform: translate(calc(100cqw - 100%), 0);
+    to {
+      transform: translate(calc(100cqw - 100%), 0);
     }
   }
+
   @keyframes spin-around {
-  0% {
-    transform: translateZ(0) rotate(0);
+    0% {
+      transform: translateZ(0) rotate(0);
     }
-  15%, 35% {
-    transform: translateZ(0) rotate(90deg);
+
+    15%,
+    35% {
+      transform: translateZ(0) rotate(90deg);
     }
-  65%, 85% {
-    transform: translateZ(0) rotate(270deg);
+
+    65%,
+    85% {
+      transform: translateZ(0) rotate(270deg);
     }
-  100% {
-    transform: translateZ(0) rotate(360deg);
+
+    100% {
+      transform: translateZ(0) rotate(360deg);
     }
   }
 }
@@ -193,12 +272,39 @@ body {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
 }
 
-::view-transition-old(root), ::view-transition-new(root) {
-    animation: none;
-    mix-blend-mode: normal;
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* Custom dark scrollbar for terminal and other elements */
+.terminal-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.terminal-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.terminal-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.terminal-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* For Firefox */
+.terminal-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) rgba(0, 0, 0, 0.2);
 }

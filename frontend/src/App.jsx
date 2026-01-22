@@ -1,6 +1,7 @@
-import React from 'react'; 
+import React from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import { SignedIn, SignedOut, ClerkLoading } from '@clerk/clerk-react';
+import { ToastProvider } from './components/ui/Toast';
 import LandingPage from './pages/LandingPage';
 import SignInPage from './pages/SignInPage';
 import SignUpPage from './pages/SignUpPage';
@@ -10,60 +11,62 @@ import ProfileCompletePage from './pages/ProfileCompletePage';
 
 function App() {
   return (
-    <Routes>
-      <Route
-        path="/"
-        element={
-          <>
-            <ClerkLoading />
-            <SignedIn>
-              <RedirectToDashboard />
-            </SignedIn>
-            <SignedOut>
-              <LandingPage />
-            </SignedOut>
-          </>
-        }
-      />
+    <ToastProvider>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <>
+              <ClerkLoading />
+              <SignedIn>
+                <RedirectToDashboard />
+              </SignedIn>
+              <SignedOut>
+                <LandingPage />
+              </SignedOut>
+            </>
+          }
+        />
 
-      {/* Sign-in and Sign-up routes */}
-      <Route path="/sign-in/*" element={<SignInPage />} />
-      <Route path="/sign-up/*" element={<SignUpPage />} />
+        {/* Sign-in and Sign-up routes */}
+        <Route path="/sign-in/*" element={<SignInPage />} />
+        <Route path="/sign-up/*" element={<SignUpPage />} />
 
-      {/* This is the new onboarding completion step.
-        The old '/onboarding/review' is removed.
-      */}
-      <Route
-        path="/onboarding/complete"
-        element={
-          <>
-            <ClerkLoading />
-            <SignedIn>
-              <ProfileCompletePage />
-            </SignedIn>
-            <SignedOut>
-              <RedirectToSignIn />
-            </SignedOut>
-          </>
-        }
-      />
+        {/* This is the new onboarding completion step.
+          The old '/onboarding/review' is removed.
+        */}
+        <Route
+          path="/onboarding/complete"
+          element={
+            <>
+              <ClerkLoading />
+              <SignedIn>
+                <ProfileCompletePage />
+              </SignedIn>
+              <SignedOut>
+                <RedirectToSignIn />
+              </SignedOut>
+            </>
+          }
+        />
 
-      {/* Protected Dashboard route now catches all sub-paths */}
-      <Route
-        path="/dashboard/*" 
-        element={
-          <>
-            <ClerkLoading />
-            <SignedIn>
-              <DashboardPage />
-            </SignedIn>
-            <SignedOut>
-              <RedirectToSignIn />
-            </SignedOut>
-          </>
-        }
-      />
-    </Routes>
+        {/* Protected Dashboard route now catches all sub-paths */}
+        <Route
+          path="/dashboard/*"
+          element={
+            <>
+              <ClerkLoading />
+              <SignedIn>
+                <DashboardPage />
+              </SignedIn>
+              <SignedOut>
+                <RedirectToSignIn />
+              </SignedOut>
+            </>
+          }
+        />
+      </Routes>
+    </ToastProvider>
   );
 }
 

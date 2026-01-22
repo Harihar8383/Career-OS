@@ -9,6 +9,7 @@ import { Routes, Route } from "react-router-dom";
 import ProfilePage from "./ProfilePage";
 import JDMatcherPage from "./JDMatcherPage"; // <-- IMPORT REAL PAGE
 import JobHunterPage from "./JobHunterPage"; // <-- IMPORT REAL PAGE
+import JobHunterResultPage from "./JobHunterResultPage"; // <-- IMPORT RESULT PAGE
 
 // A placeholder for now
 const PlaceholderComponent = ({ title }) => (
@@ -68,6 +69,7 @@ function DashboardPage() {
                   <Route path="/" element={<ProfilePage />} />
                   <Route path="/matcher/*" element={<JDMatcherPage />} /> {/* <-- Now uses the real page */}
                   <Route path="/hunter" element={<JobHunterPage />} /> {/* <-- Now uses the real page */}
+                  <Route path="/hunter/result/:runId" element={<JobHunterResultPage />} /> {/* <-- Result page */}
                   {/* Add more dashboard-nested routes here */}
                 </Routes>
               </main>

@@ -6,11 +6,11 @@ const KeywordGapReport = ({ data = {} }) => {
 
     return (
         <div className="w-full">
-            <div className="border-l-4 border-blue-500 pl-4 mb-6">
-                <h2 className="text-2xl font-clash-display font-bold text-white">
+            <div className="border-l-4 border-[#2934FF] pl-6 mb-8">
+                <h2 className="text-3xl font-clash-display font-bold text-white">
                     Keyword & Skill Gap Report
                 </h2>
-                <p className="text-slate-400 text-sm mt-1">
+                <p className="text-gray-400 text-sm mt-1">
                     Beat ATS without keyword stuffing.
                 </p>
             </div>
@@ -18,46 +18,46 @@ const KeywordGapReport = ({ data = {} }) => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
                 {/* Matched */}
-                <div className="bg-[#0B1120] border border-green-500/20 rounded-xl p-6">
-                    <h3 className="flex items-center gap-2 text-green-400 font-bold mb-4 uppercase tracking-widest text-sm">
+                <div className="bg-[#18181B]/40 border border-green-500/20 rounded-2xl p-6 backdrop-blur-sm hover:bg-[#18181B]/60 transition-colors">
+                    <h3 className="flex items-center gap-2 text-green-400 font-bold mb-6 uppercase tracking-widest text-xs">
                         <CheckCircle2 size={16} /> Matched Keywords
                     </h3>
                     <div className="flex flex-wrap gap-2">
                         {matched.length > 0 ? matched.map((tag, i) => (
-                            <span key={i} className="px-3 py-1 bg-green-500/10 text-green-300 text-xs font-bold rounded border border-green-500/20">
+                            <span key={i} className="px-3 py-1.5 bg-green-500/10 text-green-300 text-xs font-bold rounded-lg border border-green-500/20 shadow-[0_0_10px_rgba(34,197,94,0.1)]">
                                 {tag}
                             </span>
-                        )) : <p className="text-slate-600 text-sm">None found.</p>}
+                        )) : <p className="text-gray-500 text-sm italic">None found.</p>}
                     </div>
                 </div>
 
                 {/* Missing */}
-                <div className="bg-[#0B1120] border border-red-500/20 rounded-xl p-6">
-                    <h3 className="flex items-center gap-2 text-red-400 font-bold mb-4 uppercase tracking-widest text-sm">
+                <div className="bg-[#18181B]/40 border border-red-500/20 rounded-2xl p-6 backdrop-blur-sm hover:bg-[#18181B]/60 transition-colors">
+                    <h3 className="flex items-center gap-2 text-red-400 font-bold mb-6 uppercase tracking-widest text-xs">
                         <XCircle size={16} /> Critical Missing
                     </h3>
                     <div className="flex flex-wrap gap-2">
                         {missing.length > 0 ? missing.map((tag, i) => (
-                            <span key={i} className="px-3 py-1 bg-red-500/10 text-red-300 text-xs font-bold rounded border border-red-500/20 decoration-dotted underline">
+                            <span key={i} className="px-3 py-1.5 bg-red-500/10 text-red-300 text-xs font-bold rounded-lg border border-red-500/20 decoration-dotted underline shadow-[0_0_10px_rgba(239,68,68,0.1)]">
                                 {tag}
                             </span>
-                        )) : <p className="text-slate-600 text-sm">No critical gaps.</p>}
+                        )) : <p className="text-gray-500 text-sm italic">No critical gaps.</p>}
                     </div>
                 </div>
 
                 {/* Weak */}
-                <div className="bg-[#0B1120] border border-yellow-500/20 rounded-xl p-6">
-                    <h3 className="flex items-center gap-2 text-yellow-400 font-bold mb-4 uppercase tracking-widest text-sm">
+                <div className="bg-[#18181B]/40 border border-orange-500/20 rounded-2xl p-6 backdrop-blur-sm hover:bg-[#18181B]/60 transition-colors">
+                    <h3 className="flex items-center gap-2 text-orange-400 font-bold mb-6 uppercase tracking-widest text-xs">
                         <AlertTriangle size={16} /> Weakly Implied
                     </h3>
                     <div className="flex flex-wrap gap-2">
                         {weak.length > 0 ? weak.map((tag, i) => (
-                            <span key={i} className="px-3 py-1 bg-yellow-500/10 text-yellow-300 text-xs font-bold rounded border border-yellow-500/20 border-dashed">
+                            <span key={i} className="px-3 py-1.5 bg-orange-500/10 text-orange-300 text-xs font-bold rounded-lg border border-orange-500/20 border-dashed shadow-[0_0_10px_rgba(249,115,22,0.1)]">
                                 {tag}
                             </span>
-                        )) : <p className="text-slate-600 text-sm">None detected.</p>}
+                        )) : <p className="text-gray-500 text-sm italic">None detected.</p>}
                     </div>
-                    <p className="text-slate-500 text-[10px] mt-4 italic">
+                    <p className="text-gray-500 text-[10px] mt-6 italic border-t border-white/5 pt-2">
                         *Consider adding specific evidence for these skills.
                     </p>
                 </div>

@@ -4,54 +4,54 @@ import { Zap, AlertCircle } from 'lucide-react';
 const BulletFeedback = ({ bullets = [] }) => {
     return (
         <div className="w-full">
-            <div className="border-l-4 border-blue-500 pl-4 mb-6">
-                <h2 className="text-2xl font-clash-display font-bold text-white">
+            <div className="border-l-4 border-[#2934FF] pl-6 mb-8">
+                <h2 className="text-3xl font-clash-display font-bold text-white">
                     Bullet-Point Feedback
                 </h2>
-                <p className="text-slate-400 text-sm mt-1">
+                <p className="text-gray-400 text-sm mt-1">
                     Advisory mode: Specific improvements without auto-editing.
                 </p>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-6">
                 {bullets.map((item, idx) => (
-                    <div key={idx} className="bg-[#0F1623] border border-white/5 rounded-xl overflow-hidden">
+                    <div key={idx} className="bg-[#18181B]/40 border border-white/5 rounded-2xl overflow-hidden shadow-lg backdrop-blur-sm group hover:border-blue-500/20 transition-all duration-300">
                         {/* Header Strip */}
-                        <div className="bg-[#131B2C] px-6 py-3 border-b border-white/5 flex justify-between items-center">
-                            <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">
+                        <div className="bg-[#18181B]/60 px-6 py-4 border-b border-white/5 flex justify-between items-center">
+                            <span className="text-xs font-bold text-gray-500 uppercase tracking-widest group-hover:text-blue-500 transition-colors">
                                 Suggestion #{idx + 1}
                             </span>
                             <div className="flex gap-2">
                                 {item.feedback_tag && (
-                                    <span className="px-2 py-0.5 bg-slate-800 text-slate-300 text-[10px] font-bold uppercase rounded border border-white/10">
+                                    <span className="px-3 py-1 bg-white/5 text-gray-300 text-[10px] font-bold uppercase rounded-lg border border-white/10 backdrop-blur-md">
                                         {item.feedback_tag}
                                     </span>
                                 )}
                             </div>
                         </div>
 
-                        <div className="p-6">
+                        <div className="p-8">
                             {/* Original Bullet */}
-                            <div className="relative pl-4 border-l-2 border-slate-700 mb-6">
-                                <p className="text-xl font-serif text-slate-300 italic leading-relaxed">
+                            <div className="relative pl-6 border-l-2 border-red-500/30 mb-8">
+                                <p className="text-xl font-serif text-gray-300 italic leading-relaxed">
                                     "{item.original_bullet}"
                                 </p>
                             </div>
 
                             {/* Explanation */}
-                            <div className="flex items-start gap-3 mb-4 bg-blue-500/5 p-4 rounded-lg border border-blue-500/10">
-                                <AlertCircle size={16} className="text-blue-400 mt-0.5 shrink-0" />
-                                <p className="text-blue-200/80 text-sm">
+                            <div className="flex items-start gap-4 mb-6 bg-blue-500/5 p-5 rounded-xl border border-blue-500/10">
+                                <AlertCircle size={20} className="text-blue-400 mt-0.5 shrink-0" />
+                                <p className="text-blue-200/90 text-sm leading-relaxed">
                                     {item.explanation}
                                 </p>
                             </div>
 
                             {/* Improvement */}
-                            <div className="flex items-start gap-3">
-                                <Zap size={16} className="text-green-400 mt-1 shrink-0" />
+                            <div className="flex items-start gap-4 p-5 bg-green-500/5 rounded-xl border border-green-500/10">
+                                <Zap size={20} className="text-green-400 mt-0.5 shrink-0" />
                                 <div>
-                                    <span className="text-green-400 font-bold text-sm uppercase tracking-wide mr-2">Try:</span>
-                                    <span className="text-white text-sm leading-relaxed">
+                                    <span className="text-green-400 font-bold text-sm uppercase tracking-wide mr-2 mb-1 block">Try:</span>
+                                    <span className="text-white text-md leading-relaxed font-medium">
                                         {item.improvement_example}
                                     </span>
                                 </div>
@@ -61,7 +61,7 @@ const BulletFeedback = ({ bullets = [] }) => {
                     </div>
                 ))}
                 {bullets.length === 0 && (
-                    <div className="text-center p-8 text-slate-500 italic bg-white/5 rounded-xl">
+                    <div className="text-center p-12 text-gray-500 italic bg-white/5 rounded-2xl border border-dashed border-white/10">
                         No critical bullet point issues found. Good job!
                     </div>
                 )}

@@ -132,15 +132,16 @@ export default function JobHunterForm({ onSubmit }) {
             <form onSubmit={handleSubmit} className="space-y-6 font-dm-sans">
 
                 {/* Section 1: What You're Looking For */}
-                <section className="space-y-5 p-6 bg-white/[0.03] rounded-2xl border border-white/5 backdrop-blur-sm">
+                <section className="space-y-5 p-6 bg-[#18181B]/60 backdrop-blur-xl rounded-2xl border border-white/10 shadow-xl overflow-hidden relative">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-blue-500 opacity-20" />
                     <div className="flex items-center gap-2 pb-2 border-b border-white/5">
-                        <Briefcase size={20} className="text-blue-400" />
-                        <h3 className="text-lg font-semibold text-white">What You're Looking For</h3>
+                        <Briefcase size={20} className="text-[#2934FF]" />
+                        <h3 className="text-lg font-bold text-white tracking-wide">What You're Looking For</h3>
                     </div>
 
                     {/* Job Titles */}
                     <div className="space-y-2">
-                        <label className="block text-sm font-medium text-text-primary">
+                        <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider">
                             Target Job Titles <span className="text-red-400">*</span>
                         </label>
                         <EnhancedTagInput
@@ -177,9 +178,9 @@ export default function JobHunterForm({ onSubmit }) {
                                     key={type}
                                     type="button"
                                     onClick={() => toggleSelection('employmentTypes', type.toLowerCase())}
-                                    className={`px-4 py-2.5 rounded-xl border text-sm font-medium transition-all duration-200 ${config.employmentTypes.includes(type.toLowerCase())
-                                        ? 'bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-600/30 scale-105'
-                                        : 'bg-white/5 border-white/10 text-text-secondary hover:bg-white/10 hover:text-text-primary hover:border-white/20'
+                                    className={`px-4 py-2.5 rounded-xl border text-sm font-medium transition-all duration-300 ${config.employmentTypes.includes(type.toLowerCase())
+                                        ? 'bg-[#2934FF] border-[#2934FF] text-white shadow-[0_0_15px_rgba(41,52,255,0.4)] scale-105'
+                                        : 'bg-white/5 border-white/5 text-gray-400 hover:bg-white/10 hover:text-white hover:border-white/10'
                                         }`}
                                 >
                                     {type}
@@ -196,10 +197,11 @@ export default function JobHunterForm({ onSubmit }) {
                 </section>
 
                 {/* Section 2: Location Preferences */}
-                <section className="space-y-5 p-6 bg-white/[0.03] rounded-2xl border border-white/5 backdrop-blur-sm">
+                <section className="space-y-5 p-6 bg-[#18181B]/60 backdrop-blur-xl rounded-2xl border border-white/10 shadow-xl relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 via-blue-500 to-purple-500 opacity-20" />
                     <div className="flex items-center gap-2 pb-2 border-b border-white/5">
-                        <MapPin size={20} className="text-blue-400" />
-                        <h3 className="text-lg font-semibold text-white">Location Preferences</h3>
+                        <MapPin size={20} className="text-[#A855F7]" />
+                        <h3 className="text-lg font-bold text-white tracking-wide">Location Preferences</h3>
                     </div>
 
                     {/* Location Types */}
@@ -213,9 +215,9 @@ export default function JobHunterForm({ onSubmit }) {
                                     key={type}
                                     type="button"
                                     onClick={() => toggleSelection('locationTypes', type.toLowerCase())}
-                                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium transition-all duration-200 ${config.locationTypes.includes(type.toLowerCase())
-                                        ? 'bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-600/30 scale-105'
-                                        : 'bg-white/5 border-white/10 text-text-secondary hover:bg-white/10 hover:text-text-primary hover:border-white/20'
+                                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium transition-all duration-300 ${config.locationTypes.includes(type.toLowerCase())
+                                        ? 'bg-[#A855F7] border-[#A855F7] text-white shadow-[0_0_15px_rgba(168,85,247,0.4)] scale-105'
+                                        : 'bg-white/5 border-white/5 text-gray-400 hover:bg-white/10 hover:text-white hover:border-white/10'
                                         }`}
                                 >
                                     {locationIcons[type.toLowerCase()]}
@@ -257,10 +259,11 @@ export default function JobHunterForm({ onSubmit }) {
                 </section>
 
                 {/* Section 3: Compensation */}
-                <section className="space-y-5 p-6 bg-white/[0.03] rounded-2xl border border-white/5 backdrop-blur-sm">
+                <section className="space-y-5 p-6 bg-[#18181B]/60 backdrop-blur-xl rounded-2xl border border-white/10 shadow-xl relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-500 via-blue-500 to-green-500 opacity-20" />
                     <div className="flex items-center gap-2 pb-2 border-b border-white/5">
-                        <DollarSign size={20} className="text-blue-400" />
-                        <h3 className="text-lg font-semibold text-white">Expected Salary (Annual)</h3>
+                        <DollarSign size={20} className="text-[#22C55E]" />
+                        <h3 className="text-lg font-bold text-white tracking-wide">Expected Salary (Annual)</h3>
                     </div>
 
                     <RangeSlider
@@ -354,31 +357,29 @@ export default function JobHunterForm({ onSubmit }) {
                     )}
                 </section>
 
-                {/* Submit Button - Sticky on scroll */}
-                <div className="sticky bottom-0 left-0 right-0 bg-gradient-to-t from-bg-card via-bg-card to-transparent pt-6 pb-2 -mx-6 px-6">
-                    <div className="flex items-center gap-4">
-                        <button
-                            type="submit"
-                            disabled={isSubmitting}
-                            className="flex-1 px-6 py-3.5 bg-blue-600 hover:bg-blue-500 disabled:bg-blue-600/50 text-white font-semibold rounded-xl shadow-lg shadow-blue-600/30 hover:shadow-blue-600/50 transition-all duration-300 transform hover:-translate-y-0.5 disabled:transform-none flex items-center justify-center gap-2"
-                        >
-                            {isSubmitting ? (
-                                <>
-                                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                    Configuring Your Agent...
-                                </>
-                            ) : (
-                                <>
-                                    <CheckCircle2 size={20} />
-                                    Start Job Hunter Agent
-                                </>
-                            )}
-                        </button>
-                    </div>
+                {/* Submit Button */}
+                <div className="pt-4 pb-8">
+                    <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="w-full py-4 bg-[#2934FF] hover:bg-[#1E28CC] disabled:bg-[#2934FF]/50 text-white font-bold rounded-xl shadow-[0_0_20px_rgba(41,52,255,0.4)] hover:shadow-[0_0_30px_rgba(41,52,255,0.6)] transition-all duration-300 transform hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 border border-[#2934FF]/50"
+                    >
+                        {isSubmitting ? (
+                            <>
+                                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                Configuring Your Agent...
+                            </>
+                        ) : (
+                            <>
+                                <Sparkles size={20} className="fill-white" />
+                                Start Job Hunter Agent
+                            </>
+                        )}
+                    </button>
 
                     {Object.keys(errors).length > 0 && (
-                        <p className="text-xs text-red-400 text-center mt-3">
-                            Please fix the errors above before submitting
+                        <p className="text-xs text-red-400 text-center mt-3 bg-red-500/10 border border-red-500/20 py-2 rounded-lg">
+                            Please fix all errors to proceed.
                         </p>
                     )}
                 </div>

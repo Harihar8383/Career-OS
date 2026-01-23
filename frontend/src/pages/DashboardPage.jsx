@@ -7,9 +7,9 @@ import { Routes, Route } from "react-router-dom";
 
 // *** IMPORT THE REAL PAGES ***
 import ProfilePage from "./ProfilePage";
-import JDMatcherPage from "./JDMatcherPage"; // <-- IMPORT REAL PAGE
-import JobHunterPage from "./JobHunterPage"; // <-- IMPORT REAL PAGE
-import JobHunterResultPage from "./JobHunterResultPage"; // <-- IMPORT RESULT PAGE
+import JDMatcherPage from "./JDMatcherPage";
+import JobHunterPage from "./JobHunterPage";
+import JobHunterResultPage from "./JobHunterResultPage";
 
 // A placeholder for now
 const PlaceholderComponent = ({ title }) => (
@@ -18,11 +18,6 @@ const PlaceholderComponent = ({ title }) => (
     <p className="mt-4 text-text-body text-lg font-dm-sans">This feature is coming soon.</p>
   </div>
 );
-
-// --- REMOVE PLACEHOLDER CONSTS ---
-// const JdMatcherPage = () => <PlaceholderComponent title="JD Matcher Page" />;
-// const JobHunterPage = () => <PlaceholderComponent title="Job Hunter Agent Page" />;
-
 
 function DashboardPage() {
   const { getToken } = useAuth();
@@ -64,12 +59,12 @@ function DashboardPage() {
             <>
               <Sidenav />
               {/* --- Use bg-bg-card for the main content area --- */}
-              <main className="ml-64 p-10 bg-bg-card min-h-screen">
+              <main className="ml-64 p-10 bg-[#0A0A0A] min-h-screen">
                 <Routes>
                   <Route path="/" element={<ProfilePage />} />
-                  <Route path="/matcher/*" element={<JDMatcherPage />} /> {/* <-- Now uses the real page */}
-                  <Route path="/hunter" element={<JobHunterPage />} /> {/* <-- Now uses the real page */}
-                  <Route path="/hunter/result/:runId" element={<JobHunterResultPage />} /> {/* <-- Result page */}
+                  <Route path="/matcher/*" element={<JDMatcherPage />} />
+                  <Route path="/hunter" element={<JobHunterPage />} />
+                  <Route path="/hunter/result/:runId" element={<JobHunterResultPage />} />
                   {/* Add more dashboard-nested routes here */}
                 </Routes>
               </main>

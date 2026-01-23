@@ -20,24 +20,24 @@ const JdMatcherHeader = ({ data }) => {
 
     // Verdict Color Logic (Badges)
     const getVerdictStyle = (v) => {
-        if (v.includes("Likely Filtered") || v.includes("Weak")) return "bg-red-500/10 text-red-500 border-red-500/20";
-        if (v.includes("Borderline")) return "bg-yellow-500/10 text-yellow-500 border-yellow-500/20";
-        if (v.includes("Competitive") || v.includes("Strong")) return "bg-green-500/10 text-green-500 border-green-500/20";
-        return "bg-slate-800 text-slate-400 border-slate-700";
+        if (v.includes("Likely Filtered") || v.includes("Weak")) return "bg-red-500/10 text-red-400 border-red-500/30 shadow-[0_0_15px_rgba(239,68,68,0.2)]";
+        if (v.includes("Borderline")) return "bg-orange-500/10 text-orange-400 border-orange-500/30 shadow-[0_0_15px_rgba(249,115,22,0.2)]";
+        if (v.includes("Competitive") || v.includes("Strong")) return "bg-[#2934FF]/10 text-[#8AA5FF] border-[#2934FF]/30 shadow-[0_0_15px_rgba(41,52,255,0.3)]";
+        return "bg-white/5 text-gray-400 border-white/10";
     };
 
     return (
-        <div className="w-full bg-[#0B1221] rounded-3xl border border-slate-800/60 shadow-2xl overflow-hidden flex flex-col md:flex-row min-h-[320px]">
+        <div className="w-full bg-[#18181B]/60 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl overflow-hidden flex flex-col md:flex-row min-h-[320px]">
 
             {/* LEFT PANEL: Score & Metrics (Darker bg) */}
-            <div className="md:w-[40%] bg-[#0f1629] relative p-8 flex flex-col items-center justify-center text-center border-b md:border-b-0 md:border-r border-slate-800/50">
+            <div className="md:w-[40%] bg-[#0A0A0A]/80 relative p-8 flex flex-col items-center justify-center text-center border-b md:border-b-0 md:border-r border-white/10">
                 {/* Gauge */}
                 <div className="scale-90 mb-4">
                     <ScoreGauge score={match_score} />
                 </div>
 
                 {/* Verdict Badge */}
-                <div className={`mt-[-20px] mb-6 px-5 py-2 rounded-full border text-sm font-bold uppercase tracking-widest flex items-center gap-2 ${getVerdictStyle(verdict)}`}>
+                <div className={`mt-[-20px] mb-6 px-6 py-2 rounded-full border text-sm font-bold uppercase tracking-widest flex items-center gap-2 ${getVerdictStyle(verdict)}`}>
                     {verdict.includes("Borderline") && <span>⚠️</span>}
                     {verdict.includes("Competitive") && <span>✅</span>}
                     {verdict.includes("Filtered") && <span>❌</span>}
@@ -46,43 +46,49 @@ const JdMatcherHeader = ({ data }) => {
 
                 {/* Summary Text */}
                 <div>
-                    <h3 className="text-white font-bold text-lg mb-2 leading-tight">
+                    <h3 className="text-white font-bold text-xl mb-3 leading-tight font-clash-display">
                         {header_summary}
                     </h3>
-                    <p className="text-slate-500 text-sm italic font-dm-sans px-4">
+                    <p className="text-gray-400 text-sm italic font-dm-sans px-4 leading-relaxed">
                         "{emotional_line}"
                     </p>
                 </div>
             </div>
 
             {/* RIGHT PANEL: Job Details & Info */}
-            <div className="md:w-[60%] p-10 flex flex-col justify-center relative">
+            <div className="md:w-[60%] p-10 flex flex-col justify-center relative bg-gradient-to-br from-[#18181B]/50 to-transparent">
+
+                {/* Background Glow */}
+                <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 blur-[80px] pointer-events-none" />
 
                 {/* Job Title & Company */}
-                <div className="mb-8">
-                    <h1 className="text-4xl font-clash-display font-bold text-white mb-3">
+                <div className="mb-8 relative z-10">
+                    <h1 className="text-4xl md:text-5xl font-clash-display font-medium text-white mb-4 leading-tight">
                         {job_title}
                     </h1>
-                    <div className="flex items-center gap-2 text-slate-400 font-bold uppercase tracking-wider text-sm">
-                        <span className="text-slate-500">at</span>
-                        <span className="text-blue-400">{company}</span>
+                    <div className="flex items-center gap-3 text-sm font-bold uppercase tracking-widest">
+                        <span className="text-gray-500">at</span>
+                        <div className="flex items-center gap-2 text-[#8AA5FF]">
+                            <Building2 size={16} />
+                            <span className="text-lg tracking-normal capitalize">{company}</span>
+                        </div>
                     </div>
                 </div>
 
                 {/* Tags Row */}
-                <div className="flex flex-wrap gap-3 mb-12">
-                    <span className="px-4 py-2 bg-[#1e293b] text-blue-300 text-xs font-bold rounded-lg border border-slate-700 flex items-center gap-2">
+                <div className="flex flex-wrap gap-3 mb-12 relative z-10">
+                    <span className="px-4 py-2 bg-white/5 text-gray-300 text-xs font-bold rounded-xl border border-white/10 flex items-center gap-2 backdrop-blur-md">
                         <BriefcaseIcon size={14} /> {experience_level}
                     </span>
                     {top_skills.map((skill, idx) => (
-                        <span key={idx} className="px-4 py-2 bg-[#1e293b] text-slate-300 text-xs font-bold rounded-lg border border-slate-700 uppercase">
+                        <span key={idx} className="px-4 py-2 bg-blue-500/10 text-blue-200 text-xs font-bold rounded-xl border border-blue-500/20 uppercase backdrop-blur-md">
                             {skill}
                         </span>
                     ))}
                 </div>
 
                 {/* File Info Footer */}
-                <div className="absolute bottom-6 right-8 flex items-center gap-3 text-xs text-slate-600">
+                <div className="absolute bottom-6 right-8 flex items-center gap-3 text-xs text-gray-500 font-mono">
                     <FileText size={14} />
                     <span>{data.meta?.fileName || "resume.pdf"}</span>
                     <span>•</span>

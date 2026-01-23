@@ -34,17 +34,13 @@ const ScoreGauge = ({ score = 0 }) => {
                             <stop offset="50%" stopColor="#eab308" />
                             <stop offset="100%" stopColor="#22c55e" />
                         </linearGradient>
-                        <linearGradient id="track-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                            <stop offset="0%" stopColor="#334155" />
-                            <stop offset="100%" stopColor="#334155" />
-                        </linearGradient>
                     </defs>
 
                     {/* Background Track (Full Semi-Circle) */}
                     <path
                         d={`M ${width / 2 - radius} ${height - 10} A ${radius} ${radius} 0 0 1 ${width / 2 + radius} ${height - 10}`}
                         fill="none"
-                        stroke="#1e293b"
+                        stroke="rgba(255,255,255,0.05)"
                         strokeWidth={strokeWidth}
                         strokeLinecap="round"
                     />
@@ -58,14 +54,14 @@ const ScoreGauge = ({ score = 0 }) => {
                         strokeLinecap="round"
                         strokeDasharray={arcLength}
                         strokeDashoffset={dashOffset}
-                        className="transition-all duration-1000 ease-out"
+                        className="transition-all duration-1000 ease-out drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]"
                     />
                 </svg>
 
                 {/* Score Text Overlay (Positioned absolutely to center in the bottom) */}
                 <div className="absolute bottom-0 text-center transform translate-y-2">
-                    <p className="text-text-secondary text-sm font-bold uppercase tracking-widest mb-1">Match Score</p>
-                    <p className="text-7xl font-clash-display font-bold text-white drop-shadow-2xl">
+                    <p className="text-gray-400 text-sm font-bold uppercase tracking-widest mb-1">Match Score</p>
+                    <p className="text-7xl font-clash-display font-bold text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.15)]">
                         {Math.round(safeScore)}%
                     </p>
                 </div>

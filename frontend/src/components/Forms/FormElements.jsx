@@ -5,10 +5,13 @@ import { Loader2 } from 'lucide-react';
 /**
  * A sleek, reusable Input component
  */
+/**
+ * A sleek, reusable Input component
+ */
 export const Input = (props) => (
   <input
     {...props}
-    className="w-full h-11 bg-slate-800/50 border border-white/10 rounded-lg px-4 text-white font-dm-sans placeholder:text-text-body focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+    className="w-full h-11 bg-[#18181B]/60 backdrop-blur-sm border border-white/10 rounded-xl px-4 text-white font-dm-sans placeholder:text-gray-500 focus:ring-2 focus:ring-[#2934FF]/50 focus:border-[#2934FF] outline-none transition-all shadow-inner"
   />
 );
 
@@ -18,7 +21,7 @@ export const Input = (props) => (
 export const Textarea = (props) => (
   <textarea
     {...props}
-    className="w-full bg-slate-800/50 border border-white/10 rounded-lg p-4 text-white font-dm-sans placeholder:text-text-body focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+    className="w-full bg-[#18181B]/60 backdrop-blur-sm border border-white/10 rounded-xl p-4 text-white font-dm-sans placeholder:text-gray-500 focus:ring-2 focus:ring-[#2934FF]/50 focus:border-[#2934FF] outline-none transition-all shadow-inner"
   />
 );
 
@@ -26,9 +29,9 @@ export const Textarea = (props) => (
  * A sleek, reusable Label component
  */
 export const Label = ({ children, htmlFor }) => (
-  <label 
-    htmlFor={htmlFor} 
-    className="block text-sm font-medium text-text-secondary mb-2 font-dm-sans"
+  <label
+    htmlFor={htmlFor}
+    className="block text-xs font-semibold text-gray-400 mb-2 font-dm-sans uppercase tracking-wider"
   >
     {children}
   </label>
@@ -37,24 +40,21 @@ export const Label = ({ children, htmlFor }) => (
 /**
  * The main "Submit" button
  */
-export const SubmitButton = ({ children, isLoading, ...props }) => (
+export const SubmitButton = ({ children, isLoading, className = "", ...props }) => (
   <button
     type="submit"
     disabled={isLoading}
     {...props}
-    className="relative inline-flex items-center justify-center gap-2 px-6 py-3
-               rounded-[30px] transition-colors cursor-pointer
-               before:content-[''] before:absolute before:-top-px before:-left-px before:-z-1 before:w-[calc(100%+2px)] before:h-[calc(100%+2px)] before:rounded-[30px] before:p-[1px]
-               bg-[#044fc7] hover:bg-[#0956d4] before:bg-gradient-to-b before:from-[#598ffa] before:to-[#044fc7]
-               disabled:opacity-50 disabled:cursor-not-allowed"
-    style={{ backgroundImage: 'linear-gradient(to bottom, rgba(108,108,108,0.15), transparent)' }}
+    className={`inline-flex items-center justify-center gap-2 px-6 py-3
+               rounded-xl transition-all duration-300 cursor-pointer
+               bg-[#2934FF] hover:bg-[#1E28CC] disabled:bg-[#2934FF]/50
+               text-white font-bold shadow-[0_0_20px_rgba(41,52,255,0.4)] hover:shadow-[0_0_30px_rgba(41,52,255,0.6)]
+               hover:-translate-y-0.5 active:translate-y-0 disabled:transform-none disabled:cursor-not-allowed ${className}`}
   >
     {isLoading ? (
       <Loader2 size={20} className="animate-spin text-white" />
     ) : (
-      <span className="relative w-fit font-normal text-[16px] leading-[20px] whitespace-nowrap flex items-center gap-2 transition-colors text-white [text-shadow:0px_0px_0.5px_#ffffff]">
-        {children}
-      </span>
+      children
     )}
   </button>
 );

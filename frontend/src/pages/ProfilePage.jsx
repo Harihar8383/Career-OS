@@ -175,15 +175,16 @@ function ProfilePage() {
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setShowUploadModal(true)}
-                className="flex items-center gap-2 text-sm text-text-secondary hover:text-white transition-colors"
+                className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
               >
                 <Upload size={16} /> Update Resume
               </button>
 
               <ShimmerButton
                 onClick={() => alert('This will be wired up later.')}
-                className="flex items-center gap-2 text-md text-white transition-colors "
-                background="rgba(10, 10, 10, 1)"
+                className="flex items-center gap-2 text-md text-white transition-colors"
+                background="#2934FF"
+                shimmerColor="#8AA5FF"
               >
                 <BrainCircuit size={16} /> Analyse Profile
               </ShimmerButton>
@@ -219,7 +220,7 @@ function ProfilePage() {
 
       <button
         onClick={() => alert('This will open the Mentor AI chat.')}
-        className="fixed bottom-10 right-10 z-50 w-16 h-16 bg-blue-600 hover:bg-blue-500 rounded-full flex items-center justify-center shadow-lg transition-all"
+        className="fixed bottom-10 right-10 z-50 w-16 h-16 bg-[#A855F7] hover:bg-[#9333EA] rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(168,85,247,0.4)] transition-all hover:scale-110"
         title="Ask AI Mentor"
       >
         <Bot size={28} className="text-white" />

@@ -15,11 +15,10 @@ export const MatcherResults = ({ results, onReset }) => {
     if (results && results.match_score >= 80) {
       const end = Date.now() + 2 * 1000; // 2 seconds
       const colors = [
-  "#3b82f6", // Your Blue-500 (Brand consistency)
-  
-  "#ffffffda", // Achievement Gold (The "Reward" feeling)
-  
-];
+        "#2934FF", // Design System Blue
+        
+        "#ffffff"
+      ];
       const frame = () => {
         if (Date.now() > end) return;
 
@@ -105,7 +104,7 @@ export const MatcherResults = ({ results, onReset }) => {
       <div className="flex justify-center pt-12">
         <button
           onClick={onReset}
-          className="px-8 py-3 bg-slate-800 text-white rounded-xl hover:bg-slate-700 transition font-medium border border-white/10"
+          className="px-8 py-3.5 bg-white/5 hover:bg-white/10 text-white rounded-xl transition-all duration-300 font-bold border border-white/10 hover:border-white/20 hover:scale-105 shadow-lg backdrop-blur-sm"
         >
           Start New Analysis
         </button>

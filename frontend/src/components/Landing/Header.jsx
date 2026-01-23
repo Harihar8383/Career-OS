@@ -7,7 +7,7 @@ export const Header = () => {
     <header className="fixed top-3 sm:top-4 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-[95%] sm:max-w-4xl pl-2 pr-2 sm:pl-8 sm:pr-4">
       <div className="backdrop-blur-[10px] backdrop-filter bg-syntask-bg/70  relative rounded-[500px] w-full h-14 sm:h-14 border border-syntask-border">
         <div className="block w-[129px] sm:w-[259px] absolute top-0 left-[75%] transform -translate-x-1/2 -translate-y-1/2" style={{ height: '1px', background: 'linear-gradient(270deg, rgba(115, 116, 116, 0.00) 2.51%, #939393 55.12%, rgba(111, 111, 112, 0.00) 94.61%)' }}></div>
-        
+
         {/* Logo */}
         <div className="absolute left-4 sm:left-[4.464%] top-1/2 transform -translate-y-1/2 flex items-center gap-[5px] sm:gap-[7px]">
           <div className="font-normal text-text-primary text-[14px] sm:text-[16px] tracking-[1.4px] sm:tracking-[1.76px] uppercase">
@@ -49,18 +49,18 @@ export const Header = () => {
         <div className="absolute right-2 sm:right-4 top-1/2 transform -translate-y-1/2 hidden sm:block">
           <div className="scale-75 sm:scale-100 origin-right">
             <div className="z-10 select-none">
-            <Link to="/sign-up" className="z-10 select-none">
-              
-              <button type="button" className="relative inline-flex items-center justify-center gap-2 px-4 py-[9px] 
+              <Link to="/sign-up" className="z-10 select-none">
+
+                <button type="button" className="relative inline-flex items-center justify-center gap-2 px-4 py-[9px] 
                 rounded-[30px] transition-colors cursor-pointer
                 before:content-[''] before:absolute before:-top-px before:-left-px before:-z-1 before:w-[calc(100%+2px)] before:h-[calc(100%+2px)] before:rounded-[30px] before:p-[1px]
                 bg-[#044fc7] hover:bg-[#0956d4] before:bg-gradient-to-b before:from-[#598ffa] before:to-[#044fc7] " style={{ backgroundImage: 'linear-gradient(to bottom, rgba(108,108,108,0.15), transparent)' }}>
-                <span className="relative w-fit font-normal text-[14px] leading-[20px] whitespace-nowrap flex items-center gap-2 transition-colors text-white [text-shadow:0px_0px_0.5px_#ffffff]">
-                  <span className="hidden sm:inline">Sign Up Now</span>
-                  <span className="sm:hidden">Sign Up</span>
-                </span>
-              </button>
-            </Link>
+                  <span className="relative w-fit font-normal text-[14px] leading-[20px] whitespace-nowrap flex items-center gap-2 transition-colors text-white [text-shadow:0px_0px_0.5px_#ffffff]">
+                    <span className="hidden sm:inline">Sign Up Now</span>
+                    <span className="sm:hidden">Sign Up</span>
+                  </span>
+                </button>
+              </Link>
             </div>
           </div>
         </div>

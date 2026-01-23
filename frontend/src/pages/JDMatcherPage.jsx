@@ -6,7 +6,7 @@ import { MatcherPolling } from '../components/Matcher/MatcherPolling';
 import { MatcherResults } from '../components/Matcher/MatcherResults';
 import { MatcherHistory } from '../components/Matcher/MatcherHistory';
 import { SubmitButton } from '../components/Forms/FormElements';
-import { AlertTriangle, Plus, History, ArrowLeft, Loader2 } from 'lucide-react';
+import { AlertTriangle, Plus, History, ArrowLeft, Loader2, Sparkles } from 'lucide-react';
 
 /* -------------------------------------------------------------------------- */
 /*                                SUB-COMPONENTS                              */
@@ -24,18 +24,13 @@ const MatcherInputView = () => {
     startAnalysis,
     resetMatcher,
     results,
-    runId // Make sure useMatcher returns this, or we get it from results
+    runId
   } = useMatcher();
 
   // Auto-navigate to results when complete
   useEffect(() => {
     if (status === 'complete' && results) {
-      // Need runId to navigate. If useMatcher doesn't expose runId in results directly,
-      // we might rely on the internal 'runId' state of useMatcher if exposed.
-      // Let's assume useMatcher returns 'runId' or we extract it from results.meta/etc (not reliable for ID).
-      // Better: update useMatcher to expose runId state.
-      // Assuming useMatcher exports runId based on previous file read.
-      navigate(`results/${results.runId || results.meta?.runId || results._id || runId}`);
+      navigate(`results/${results.runId || runId}`);
     }
   }, [status, results, navigate, runId]);
 
@@ -44,14 +39,14 @@ const MatcherInputView = () => {
   if (status === 'failed') {
     return (
       <div className="flex flex-col items-center justify-center h-96 max-w-2xl mx-auto text-center">
-        <AlertTriangle className="text-red-400 mb-6" size={48} />
+        <AlertTriangle className="text-red-500 mb-6" size={48} />
         <h2 className="text-2xl font-clash-display text-white mb-2">Analysis Failed</h2>
-        <p className="text-lg text-red-300 bg-red-500/10 p-4 rounded-lg font-dm-sans">
+        <p className="text-lg text-red-300 bg-red-500/10 border border-red-500/20 p-4 rounded-xl font-dm-sans">
           {error || "An unknown error occurred."}
         </p>
         <button
           onClick={resetMatcher}
-          className="mt-8 px-6 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 transition text-white text-sm font-dm-sans"
+          className="mt-8 px-8 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 transition-all text-white text-sm font-medium"
         >
           Try Again
         </button>
@@ -65,29 +60,40 @@ const MatcherInputView = () => {
 
   return (
     <div className="max-w-3xl mx-auto">
-      <div className="flex items-center gap-3 mb-6">
-        <h1 className="text-3xl font-clash-display text-white">Researcher & Matcher</h1>
-        <span className="px-3 py-1 bg-blue-500/20 text-blue-300 text-xs font-bold rounded-full border border-blue-500/30">
-          AI POWERED
+      <div className="flex items-center gap-3 mb-8">
+        <h1 className="text-4xl font-clash-display font-medium text-white tracking-wide">
+          JD Matcher
+        </h1>
+        <span className="px-3 py-1 bg-[#A855F7]/10 text-[#A855F7] text-xs font-bold rounded-full border border-[#A855F7]/30 flex items-center gap-1 shadow-[0_0_10px_rgba(168,85,247,0.2)]">
+          <Sparkles size={12} />
+          AI AGENT
         </span>
       </div>
 
-      <p className="mt-4 text-text-body text-lg font-dm-sans mb-6">
-        Paste a full job description below. Our AI will analyze it against your
-        profile and give you a master prompt to bridge the gap.
-      </p>
+      <div className="relative group rounded-2xl p-[1px] bg-gradient-to-b from-white/10 to-transparent">
+        <div className="bg-[#18181B]/80 backdrop-blur-xl rounded-2xl p-6 sm:p-8 relative overflow-hidden">
+          {/* Background Glow */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/10 blur-[100px] pointer-events-none" />
 
-      <textarea
-        value={jdText}
-        onChange={(e) => setJdText(e.target.value)}
-        placeholder="Paste the full job description here..."
-        className="w-full h-80 bg-slate-800/50 border border-white/10 rounded-xl p-4 text-white font-dm-sans placeholder:text-text-body focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-      />
+          <p className="relative z-10 text-gray-400 text-lg font-dm-sans mb-6">
+            Paste a job description below. Our AI will analyze it against your profile to find gaps and generate a tailored resume strategy.
+          </p>
 
-      <div className="mt-6 flex justify-end">
-        <SubmitButton onClick={startAnalysis} isLoading={isLoading}>
-          Analyze Job Description
-        </SubmitButton>
+          <div className="relative z-10">
+            <textarea
+              value={jdText}
+              onChange={(e) => setJdText(e.target.value)}
+              placeholder="Paste job description..."
+              className="w-full h-80 bg-black/40 border border-white/10 rounded-xl p-5 text-gray-200 font-dm-sans placeholder:text-gray-600 focus:ring-2 focus:ring-[#A855F7]/50 focus:border-[#A855F7] outline-none transition-all resize-none shadow-inner"
+            />
+          </div>
+
+          <div className="mt-8 flex justify-end relative z-10">
+            <SubmitButton onClick={startAnalysis} isLoading={isLoading}>
+              Start Analysis
+            </SubmitButton>
+          </div>
+        </div>
       </div>
     </div>
   );

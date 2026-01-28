@@ -27,7 +27,10 @@ const JobTrackerPage = () => {
         updateStage,
         deleteJob,
         bulkUpdateStage,
-        refreshJobs
+        refreshJobs,
+        addNote,
+        addReminder,
+        addInterview
     } = useJobTracker();
 
     const [view, setView] = useState('kanban'); // 'kanban' or 'list'
@@ -109,6 +112,22 @@ const JobTrackerPage = () => {
     };
 
     const hasActiveFilters = searchQuery || filters.stage || filters.priority || filters.company;
+
+    // Wrappers to update selected job after adding note/interview
+    const handleAddNote = async (jobId, content) => {
+        const updatedJob = await addNote(jobId, content);
+        if (selectedJob && selectedJob._id === jobId) setSelectedJob(updatedJob);
+    };
+
+    const handleAddReminder = async (jobId, data) => {
+        const updatedJob = await addReminder(jobId, data);
+        if (selectedJob && selectedJob._id === jobId) setSelectedJob(updatedJob);
+    };
+
+    const handleAddInterview = async (jobId, data) => {
+        const updatedJob = await addInterview(jobId, data);
+        if (selectedJob && selectedJob._id === jobId) setSelectedJob(updatedJob);
+    };
 
     return (
         <div className="min-h-screen pb-12">
@@ -272,28 +291,28 @@ const JobTrackerPage = () => {
             </div>
 
             {/* Stats Bar */}
-            <div className="grid grid-cols-4 gap-4 mb-8">
-                <div className="p-4 bg-bg-card/60 backdrop-blur-xl border border-border-primary rounded-2xl">
-                    <p className="text-xs text-text-secondary mb-1 uppercase tracking-wider">Total Jobs</p>
-                    <p className="text-2xl font-bold text-text-primary">{filteredJobs.length}</p>
+            <div className="grid grid-cols-4 gap-4 mb-6">
+                <div className="flex items-center justify-between px-4 py-3 bg-bg-card/60 backdrop-blur-xl border border-border-primary rounded-xl">
+                    <span className="text-xs font-medium text-text-secondary uppercase tracking-wider">Total</span>
+                    <span className="text-xl font-bold text-text-primary">{filteredJobs.length}</span>
                 </div>
-                <div className="p-4 bg-bg-card/60 backdrop-blur-xl border border-border-primary rounded-2xl">
-                    <p className="text-xs text-text-secondary mb-1 uppercase tracking-wider">Applied</p>
-                    <p className="text-2xl font-bold text-purple-400">
+                <div className="flex items-center justify-between px-4 py-3 bg-bg-card/60 backdrop-blur-xl border border-border-primary rounded-xl">
+                    <span className="text-xs font-medium text-text-secondary uppercase tracking-wider">Applied</span>
+                    <span className="text-xl font-bold text-purple-400">
                         {filteredJobs.filter(j => j.stage === 'applied').length}
-                    </p>
+                    </span>
                 </div>
-                <div className="p-4 bg-bg-card/60 backdrop-blur-xl border border-border-primary rounded-2xl">
-                    <p className="text-xs text-text-secondary mb-1 uppercase tracking-wider">Interviewing</p>
-                    <p className="text-2xl font-bold text-orange-400">
+                <div className="flex items-center justify-between px-4 py-3 bg-bg-card/60 backdrop-blur-xl border border-border-primary rounded-xl">
+                    <span className="text-xs font-medium text-text-secondary uppercase tracking-wider">Interviewing</span>
+                    <span className="text-xl font-bold text-orange-400">
                         {filteredJobs.filter(j => j.stage === 'interview').length}
-                    </p>
+                    </span>
                 </div>
-                <div className="p-4 bg-bg-card/60 backdrop-blur-xl border border-border-primary rounded-2xl">
-                    <p className="text-xs text-text-secondary mb-1 uppercase tracking-wider">Offers</p>
-                    <p className="text-2xl font-bold text-green-400">
+                <div className="flex items-center justify-between px-4 py-3 bg-bg-card/60 backdrop-blur-xl border border-border-primary rounded-xl">
+                    <span className="text-xs font-medium text-text-secondary uppercase tracking-wider">Offers</span>
+                    <span className="text-xl font-bold text-green-400">
                         {filteredJobs.filter(j => j.stage === 'offer').length}
-                    </p>
+                    </span>
                 </div>
             </div>
 
@@ -363,6 +382,9 @@ const JobTrackerPage = () => {
                 onClose={handleCloseDetailModal}
                 onUpdate={handleUpdateJob}
                 onDelete={handleDelete}
+                onAddNote={handleAddNote}
+                onAddReminder={handleAddReminder}
+                onAddInterview={handleAddInterview}
             />
 
             <AddJobModal

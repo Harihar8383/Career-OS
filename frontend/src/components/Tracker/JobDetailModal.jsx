@@ -22,10 +22,36 @@ import { format } from 'date-fns';
  * Job Detail Modal - Sliding modal from right with tabs
  * Based on inspiration image 3
  */
-export const JobDetailModal = ({ job, isOpen, onClose, onUpdate, onDelete }) => {
+export const JobDetailModal = ({
+    job,
+    isOpen,
+    onClose,
+    onUpdate,
+    onDelete,
+    onAddNote,
+    onAddReminder,
+    onAddInterview
+}) => {
     const [activeTab, setActiveTab] = useState('overview');
     const [isEditing, setIsEditing] = useState(false);
     const [editedData, setEditedData] = useState(job || {});
+    const [newNote, setNewNote] = useState('');
+    const [isAddingNote, setIsAddingNote] = useState(false);
+
+    const [newInterview, setNewInterview] = useState({
+        round: '',
+        scheduledDate: '',
+        interviewers: '',
+        feedback: '',
+        result: 'pending'
+    });
+    const [isAddingInterview, setIsAddingInterview] = useState(false);
+
+    const [newReminder, setNewReminder] = useState({
+        date: '',
+        message: ''
+    });
+    const [isAddingReminder, setIsAddingReminder] = useState(false);
 
     // Update editedData when job changes
     React.useEffect(() => {
@@ -41,6 +67,7 @@ export const JobDetailModal = ({ job, isOpen, onClose, onUpdate, onDelete }) => 
         { id: 'overview', label: 'Overview', icon: FileText },
         { id: 'notes', label: 'Notes', icon: MessageSquare },
         { id: 'interviews', label: 'Interviews', icon: Video },
+        { id: 'reminders', label: 'Reminders', icon: Clock },
         { id: 'documents', label: 'Documents', icon: Paperclip }
     ];
 
@@ -63,6 +90,33 @@ export const JobDetailModal = ({ job, isOpen, onClose, onUpdate, onDelete }) => 
     const handleSave = () => {
         onUpdate(job._id, editedData);
         setIsEditing(false);
+    };
+
+    const handleSaveNote = async () => {
+        if (!newNote.trim()) return;
+        await onAddNote(job._id, newNote);
+        setNewNote('');
+        setIsAddingNote(false);
+    };
+
+    const handleSaveInterview = async () => {
+        if (!newInterview.round) return;
+        await onAddInterview(job._id, newInterview);
+        setNewInterview({
+            round: '',
+            scheduledDate: '',
+            interviewers: '',
+            feedback: '',
+            result: 'pending'
+        });
+        setIsAddingInterview(false);
+    };
+
+    const handleSaveReminder = async () => {
+        if (!newReminder.date || !newReminder.message) return;
+        await onAddReminder(job._id, newReminder);
+        setNewReminder({ date: '', message: '' });
+        setIsAddingReminder(false);
     };
 
     const formatDate = (date) => {
@@ -126,12 +180,12 @@ export const JobDetailModal = ({ job, isOpen, onClose, onUpdate, onDelete }) => 
                         </div>
 
                         {/* Tabs */}
-                        <div className="flex items-center gap-1 px-6 py-3 border-b border-border-primary bg-bg-dark/30">
+                        <div className="flex items-center gap-1 px-6 py-3 border-b border-border-primary bg-bg-dark/30 overflow-x-auto no-scrollbar">
                             {tabs.map(tab => (
                                 <button
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id)}
-                                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === tab.id
+                                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${activeTab === tab.id
                                         ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
                                         : 'text-text-secondary hover:text-text-primary hover:bg-text-primary/5'
                                         }`}
@@ -286,26 +340,57 @@ export const JobDetailModal = ({ job, isOpen, onClose, onUpdate, onDelete }) => 
                                 <div className="space-y-4">
                                     <div className="flex items-center justify-between mb-4">
                                         <h3 className="text-lg font-bold text-text-primary">Notes</h3>
-                                        <button className="px-3 py-1.5 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 rounded-lg text-sm font-medium transition-colors">
-                                            + Add Note
+                                        <button
+                                            onClick={() => setIsAddingNote(!isAddingNote)}
+                                            className="px-3 py-1.5 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 rounded-lg text-sm font-medium transition-colors"
+                                        >
+                                            {isAddingNote ? 'Cancel' : '+ Add Note'}
                                         </button>
                                     </div>
 
+                                    {isAddingNote && (
+                                        <div className="p-4 bg-bg-dark border border-border-primary rounded-lg mb-4">
+                                            <textarea
+                                                value={newNote}
+                                                onChange={(e) => setNewNote(e.target.value)}
+                                                placeholder="Write your note here..."
+                                                className="w-full h-24 bg-bg-card border border-border-primary rounded-lg p-3 text-sm text-text-primary focus:outline-none focus:border-blue-500/50 mb-3"
+                                            />
+                                            <div className="flex justify-end gap-2">
+                                                <button
+                                                    onClick={() => setIsAddingNote(false)}
+                                                    className="px-3 py-1.5 text-text-secondary text-sm hover:text-text-primary"
+                                                >
+                                                    Cancel
+                                                </button>
+                                                <button
+                                                    onClick={handleSaveNote}
+                                                    disabled={!newNote.trim()}
+                                                    className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium disabled:opacity-50"
+                                                >
+                                                    Save Note
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+
                                     {job.notes && job.notes.length > 0 ? (
                                         <div className="space-y-3">
-                                            {job.notes.map((note, index) => (
+                                            {job.notes.slice().reverse().map((note, index) => (
                                                 <div key={index} className="p-4 bg-bg-dark/50 border border-border-primary rounded-lg">
-                                                    <p className="text-sm text-text-primary mb-2">{note.content}</p>
+                                                    <p className="text-sm text-text-primary mb-2 whitespace-pre-wrap">{note.content}</p>
                                                     <p className="text-xs text-text-secondary">{formatDate(note.createdAt)}</p>
                                                 </div>
                                             ))}
                                         </div>
                                     ) : (
-                                        <div className="text-center py-12">
-                                            <MessageSquare size={48} className="mx-auto mb-3 text-text-secondary/30" />
-                                            <p className="text-text-secondary">No notes yet</p>
-                                            <p className="text-xs text-text-secondary/70 mt-1">Add notes to track your thoughts</p>
-                                        </div>
+                                        !isAddingNote && (
+                                            <div className="text-center py-12">
+                                                <MessageSquare size={48} className="mx-auto mb-3 text-text-secondary/30" />
+                                                <p className="text-text-secondary">No notes yet</p>
+                                                <p className="text-xs text-text-secondary/70 mt-1">Add notes to track your thoughts</p>
+                                            </div>
+                                        )
                                     )}
                                 </div>
                             )}
@@ -315,10 +400,86 @@ export const JobDetailModal = ({ job, isOpen, onClose, onUpdate, onDelete }) => 
                                 <div className="space-y-4">
                                     <div className="flex items-center justify-between mb-4">
                                         <h3 className="text-lg font-bold text-text-primary">Interview Rounds</h3>
-                                        <button className="px-3 py-1.5 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 rounded-lg text-sm font-medium transition-colors">
-                                            + Add Interview
+                                        <button
+                                            onClick={() => setIsAddingInterview(!isAddingInterview)}
+                                            className="px-3 py-1.5 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 rounded-lg text-sm font-medium transition-colors"
+                                        >
+                                            {isAddingInterview ? 'Cancel' : '+ Add Interview'}
                                         </button>
                                     </div>
+
+                                    {isAddingInterview && (
+                                        <div className="p-4 bg-bg-dark border border-border-primary rounded-lg mb-4 space-y-3">
+                                            <div>
+                                                <label className="block text-xs font-medium text-text-secondary mb-1">Round Name</label>
+                                                <input
+                                                    type="text"
+                                                    value={newInterview.round}
+                                                    onChange={(e) => setNewInterview({ ...newInterview, round: e.target.value })}
+                                                    placeholder="e.g. Technical Screen"
+                                                    className="w-full px-3 py-2 bg-bg-card border border-border-primary rounded-lg text-sm text-text-primary focus:outline-none focus:border-blue-500/50"
+                                                />
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-3">
+                                                <div>
+                                                    <label className="block text-xs font-medium text-text-secondary mb-1">Date</label>
+                                                    <input
+                                                        type="datetime-local"
+                                                        value={newInterview.scheduledDate}
+                                                        onChange={(e) => setNewInterview({ ...newInterview, scheduledDate: e.target.value })}
+                                                        className="w-full px-3 py-2 bg-bg-card border border-border-primary rounded-lg text-sm text-text-primary focus:outline-none focus:border-blue-500/50"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-xs font-medium text-text-secondary mb-1">Result</label>
+                                                    <select
+                                                        value={newInterview.result}
+                                                        onChange={(e) => setNewInterview({ ...newInterview, result: e.target.value })}
+                                                        className="w-full px-3 py-2 bg-bg-card border border-border-primary rounded-lg text-sm text-text-primary focus:outline-none focus:border-blue-500/50"
+                                                    >
+                                                        <option value="pending">Pending</option>
+                                                        <option value="passed">Passed</option>
+                                                        <option value="failed">Failed</option>
+                                                        <option value="cancelled">Cancelled</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label className="block text-xs font-medium text-text-secondary mb-1">Interviewers</label>
+                                                <input
+                                                    type="text"
+                                                    value={newInterview.interviewers}
+                                                    onChange={(e) => setNewInterview({ ...newInterview, interviewers: e.target.value })}
+                                                    placeholder="Names/Roles"
+                                                    className="w-full px-3 py-2 bg-bg-card border border-border-primary rounded-lg text-sm text-text-primary focus:outline-none focus:border-blue-500/50"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-xs font-medium text-text-secondary mb-1">Feedback/Notes</label>
+                                                <textarea
+                                                    value={newInterview.feedback}
+                                                    onChange={(e) => setNewInterview({ ...newInterview, feedback: e.target.value })}
+                                                    placeholder="Feedback or notes..."
+                                                    className="w-full px-3 py-2 bg-bg-card border border-border-primary rounded-lg text-sm text-text-primary focus:outline-none focus:border-blue-500/50 h-20"
+                                                />
+                                            </div>
+                                            <div className="flex justify-end gap-2 pt-2">
+                                                <button
+                                                    onClick={() => setIsAddingInterview(false)}
+                                                    className="px-3 py-1.5 text-text-secondary text-sm hover:text-text-primary"
+                                                >
+                                                    Cancel
+                                                </button>
+                                                <button
+                                                    onClick={handleSaveInterview}
+                                                    disabled={!newInterview.round}
+                                                    className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium disabled:opacity-50"
+                                                >
+                                                    Save Interview
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
 
                                     {job.interviews && job.interviews.length > 0 ? (
                                         <div className="space-y-3">
@@ -336,21 +497,107 @@ export const JobDetailModal = ({ job, isOpen, onClose, onUpdate, onDelete }) => 
                                                         )}
                                                     </div>
                                                     {interview.scheduledDate && (
-                                                        <p className="text-sm text-text-secondary mb-2">
+                                                        <p className="text-sm text-text-secondary mb-2 flex items-center gap-2">
+                                                            <Calendar size={12} />
                                                             {formatDate(interview.scheduledDate)}
                                                         </p>
                                                     )}
+                                                    {interview.interviewers && (
+                                                        <p className="text-sm text-text-secondary mb-2">
+                                                            <span className="text-xs uppercase tracking-wider opacity-70">Interviewers:</span> {interview.interviewers}
+                                                        </p>
+                                                    )}
                                                     {interview.feedback && (
-                                                        <p className="text-sm text-text-secondary">{interview.feedback}</p>
+                                                        <div className="mt-2 pt-2 border-t border-border-primary/50">
+                                                            <p className="text-sm text-text-secondary italic">"{interview.feedback}"</p>
+                                                        </div>
                                                     )}
                                                 </div>
                                             ))}
                                         </div>
                                     ) : (
-                                        <div className="text-center py-12">
-                                            <Video size={48} className="mx-auto mb-3 text-text-secondary/30" />
-                                            <p className="text-text-secondary">No interviews scheduled</p>
+                                        !isAddingInterview && (
+                                            <div className="text-center py-12">
+                                                <Video size={48} className="mx-auto mb-3 text-text-secondary/30" />
+                                                <p className="text-text-secondary">No interviews scheduled</p>
+                                            </div>
+                                        )
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Reminders Tab */}
+                            {activeTab === 'reminders' && (
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <h3 className="text-lg font-bold text-text-primary">Reminders</h3>
+                                        <button
+                                            onClick={() => setIsAddingReminder(!isAddingReminder)}
+                                            className="px-3 py-1.5 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 rounded-lg text-sm font-medium transition-colors"
+                                        >
+                                            {isAddingReminder ? 'Cancel' : '+ Add Reminder'}
+                                        </button>
+                                    </div>
+
+                                    {isAddingReminder && (
+                                        <div className="p-4 bg-bg-dark border border-border-primary rounded-lg mb-4 space-y-3">
+                                            <div>
+                                                <label className="block text-xs font-medium text-text-secondary mb-1">Message</label>
+                                                <input
+                                                    type="text"
+                                                    value={newReminder.message}
+                                                    onChange={(e) => setNewReminder({ ...newReminder, message: e.target.value })}
+                                                    placeholder="e.g. Follow up on application"
+                                                    className="w-full px-3 py-2 bg-bg-card border border-border-primary rounded-lg text-sm text-text-primary focus:outline-none focus:border-blue-500/50"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-xs font-medium text-text-secondary mb-1">Date</label>
+                                                <input
+                                                    type="date"
+                                                    value={newReminder.date}
+                                                    onChange={(e) => setNewReminder({ ...newReminder, date: e.target.value })}
+                                                    className="w-full px-3 py-2 bg-bg-card border border-border-primary rounded-lg text-sm text-text-primary focus:outline-none focus:border-blue-500/50"
+                                                />
+                                            </div>
+                                            <div className="flex justify-end gap-2 pt-2">
+                                                <button
+                                                    onClick={() => setIsAddingReminder(false)}
+                                                    className="px-3 py-1.5 text-text-secondary text-sm hover:text-text-primary"
+                                                >
+                                                    Cancel
+                                                </button>
+                                                <button
+                                                    onClick={handleSaveReminder}
+                                                    disabled={!newReminder.message || !newReminder.date}
+                                                    className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium disabled:opacity-50"
+                                                >
+                                                    Set Reminder
+                                                </button>
+                                            </div>
                                         </div>
+                                    )}
+
+                                    {job.reminders && job.reminders.length > 0 ? (
+                                        <div className="space-y-2">
+                                            {job.reminders.map((reminder, index) => (
+                                                <div key={index} className="flex items-center gap-3 p-3 bg-bg-dark/50 border border-border-primary rounded-lg">
+                                                    <Clock size={16} className="text-blue-400 flex-shrink-0" />
+                                                    <div className="flex-1">
+                                                        <p className="text-sm font-medium text-text-primary">{reminder.message}</p>
+                                                        <p className="text-xs text-text-secondary">{formatDate(reminder.date)}</p>
+                                                    </div>
+                                                    {reminder.completed && <span className="text-xs text-green-400 font-bold">Done</span>}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        !isAddingReminder && (
+                                            <div className="text-center py-12">
+                                                <Clock size={48} className="mx-auto mb-3 text-text-secondary/30" />
+                                                <p className="text-text-secondary">No reminders set</p>
+                                            </div>
+                                        )
                                     )}
                                 </div>
                             )}
@@ -361,7 +608,7 @@ export const JobDetailModal = ({ job, isOpen, onClose, onUpdate, onDelete }) => 
                                     <div className="flex items-center justify-between mb-4">
                                         <h3 className="text-lg font-bold text-text-primary">Documents</h3>
                                         <button className="px-3 py-1.5 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 rounded-lg text-sm font-medium transition-colors">
-                                            + Upload
+                                            + Upload (Coming Soon)
                                         </button>
                                     </div>
 

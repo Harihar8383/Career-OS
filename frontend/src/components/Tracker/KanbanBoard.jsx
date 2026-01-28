@@ -40,6 +40,7 @@ const SortableJobCard = React.memo(({ job, onViewDetails, onDelete }) => {
         opacity: isDragging ? 0.5 : 1,
         position: 'relative',
         zIndex: isDragging ? 999 : 10,
+        cursor: isDragging ? 'grabbing' : undefined, // Let the child component control the cursor when not dragging
     };
 
     return (
@@ -47,15 +48,14 @@ const SortableJobCard = React.memo(({ job, onViewDetails, onDelete }) => {
             <TrackedJobCard
                 job={job}
                 onViewDetails={onViewDetails}
-                onDelete={onDelete}
             />
         </div>
     );
 });
 
 // Column component
-const KanbanColumn = React.memo(({ stage, jobs, onViewDetails, onDelete }) => {
-    const { setNodeRef } = useDroppable({ id: stage });
+const KanbanColumn = React.memo(({ stage, jobs, onViewDetails }) => {
+    const { setNodeRef, isOver } = useDroppable({ id: stage });
     const stageConfig = {
         saved: { label: 'Saved', color: 'blue', icon: Briefcase },
         applied: { label: 'Applied', color: 'purple', icon: Briefcase },
@@ -74,7 +74,13 @@ const KanbanColumn = React.memo(({ stage, jobs, onViewDetails, onDelete }) => {
             items={jobs.map(j => j._id)}
             strategy={verticalListSortingStrategy}
         >
-            <div ref={setNodeRef} className="flex flex-col min-w-[280px] max-w-[320px] bg-bg-card/30 backdrop-blur-sm rounded-2xl border border-border-primary p-4 h-[calc(100vh-320px)]">
+            <div
+                ref={setNodeRef}
+                className={`flex flex-col min-w-[280px] max-w-[320px] rounded-2xl border p-4 h-[calc(100vh-220px)] transition-colors duration-200 ${isOver
+                    ? 'bg-blue-500/10 border-blue-500/30'
+                    : 'bg-bg-card/30 backdrop-blur-sm border-border-primary'
+                    }`}
+            >
                 {/* Column Header */}
                 <div className="flex items-center justify-between mb-4 pb-3 border-b border-border-primary">
                     <div className="flex items-center gap-2">
@@ -110,7 +116,6 @@ const KanbanColumn = React.memo(({ stage, jobs, onViewDetails, onDelete }) => {
                                 key={job._id}
                                 job={job}
                                 onViewDetails={() => onViewDetails(job)}
-                                onDelete={onDelete}
                             />
                         ))
                     )}
@@ -120,9 +125,6 @@ const KanbanColumn = React.memo(({ stage, jobs, onViewDetails, onDelete }) => {
     );
 });
 
-/**
- * Kanban Board with drag-and-drop
- */
 /**
  * Kanban Board with drag-and-drop
  */
@@ -229,15 +231,21 @@ const KanbanBoardComponent = ({ jobs, onUpdateStage, onViewDetails, onDelete }) 
 
             <DragOverlay>
                 {activeJob ? (
-                    <div className="opacity-90">
+                    <motion.div
+                        initial={{ rotate: 0, scale: 1 }}
+                        animate={{ rotate: 3, scale: 1.05 }}
+                        className="opacity-90 shadow-2xl cursor-grabbing"
+                    >
                         <TrackedJobCard
                             job={activeJob}
                             onViewDetails={() => { }}
-                            onDelete={() => { }}
+                            isDragging={true}
                         />
-                    </div>
+                    </motion.div>
                 ) : null}
             </DragOverlay>
         </DndContext>
     );
 };
+
+export const KanbanBoard = React.memo(KanbanBoardComponent);

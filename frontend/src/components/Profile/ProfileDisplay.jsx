@@ -1,13 +1,13 @@
 // frontend/src/components/Profile/ProfileDisplay.jsx
 import React from 'react';
 import { DataCard, SkillTag, ExperienceItem, ProjectItem, EducationItem } from './ProfileCards';
-import { 
-  Briefcase, 
-  GraduationCap, 
-  BrainCircuit, 
-  GitBranch, 
-  User, 
-  Link2, 
+import {
+  Briefcase,
+  GraduationCap,
+  BrainCircuit,
+  GitBranch,
+  User,
+  Link2,
   Target,
   Code, // <-- 1. Import new icons
   Database,
@@ -44,17 +44,17 @@ export const ProfileDisplay = ({ profile }) => {
   const p = profile; // shortcut
 
   return (
-    <motion.div 
+    <motion.div
       className="grid grid-cols-1 lg:grid-cols-3 gap-6 auto-rows-auto"
       variants={bentoGridVariants}
       initial="hidden"
       animate="visible"
     >
-      
+
       {/* --- Personal Info Card --- */}
-      <DataCard 
-        title="Personal Details" 
-        icon={User} 
+      <DataCard
+        title="Personal Details"
+        icon={User}
         className="lg:col-span-1 lg:row-span-1"
         variants={bentoCardVariants}
       >
@@ -62,19 +62,19 @@ export const ProfileDisplay = ({ profile }) => {
         <div className="grid grid-cols-1 gap-4">
           <div>
             <h5 className="text-sm text-text-secondary">Full Name</h5>
-            <p className="text-white">{p.personal_info.full_name}</p>
+            <p className="text-text-primary">{p.personal_info.full_name}</p>
           </div>
           <div>
             <h5 className="text-sm text-text-secondary">Email</h5>
-            <p className="text-white">{p.personal_info.email}</p>
+            <p className="text-text-primary">{p.personal_info.email}</p>
           </div>
           <div>
             <h5 className="text-sm text-text-secondary">Phone</h5>
-            <p className="text-white">{p.personal_info.phone || 'Not provided'}</p>
+            <p className="text-text-primary">{p.personal_info.phone || 'Not provided'}</p>
           </div>
           <div>
             <h5 className="text-sm text-text-secondary">Location</h5>
-            <p className="text-white">{p.personal_info.location || 'Not provided'}</p>
+            <p className="text-text-primary">{p.personal_info.location || 'Not provided'}</p>
           </div>
         </div>
         <div className="flex flex-wrap gap-4 mt-4">
@@ -85,9 +85,9 @@ export const ProfileDisplay = ({ profile }) => {
       </DataCard>
 
       {/* --- Skills Card --- */}
-      <DataCard 
-        title="Technical Skills" 
-        icon={BrainCircuit} 
+      <DataCard
+        title="Technical Skills"
+        icon={BrainCircuit}
         className="lg:col-span-2 lg:row-span-2"
         variants={bentoCardVariants}
       >
@@ -135,36 +135,36 @@ export const ProfileDisplay = ({ profile }) => {
       </DataCard>
 
       {/* --- Career Preferences --- */}
-      <DataCard 
-        title="Career Preferences" 
-        icon={Target} 
+      <DataCard
+        title="Career Preferences"
+        icon={Target}
         className="lg:col-span-1 lg:row-span-1"
         variants={bentoCardVariants}
       >
         {/* ... (content unchanged) ... */}
-         <div>
-            <h5 className="text-sm text-text-secondary">Preferred Roles</h5>
-            <div className="flex flex-wrap gap-2 mt-2">
-              {p.career_preferences.preferred_roles?.length > 0 ? (
-                p.career_preferences.preferred_roles.map((skill, i) => <SkillTag key={i}>{skill}</SkillTag>)
-              ) : <p className="text-text-body text-sm">No roles listed.</p>}
-            </div>
+        <div>
+          <h5 className="text-sm text-text-secondary">Preferred Roles</h5>
+          <div className="flex flex-wrap gap-2 mt-2">
+            {p.career_preferences.preferred_roles?.length > 0 ? (
+              p.career_preferences.preferred_roles.map((skill, i) => <SkillTag key={i}>{skill}</SkillTag>)
+            ) : <p className="text-text-body text-sm">No roles listed.</p>}
           </div>
-           <div className="mt-4">
-            <h5 className="text-sm text-text-secondary">Target Locations</h5>
-            <div className="flex flex-wrap gap-2 mt-2">
-              {p.career_preferences.target_locations?.length > 0 ? (
-                p.career_preferences.target_locations.map((skill, i) => <SkillTag key={i}>{skill}</SkillTag>)
-              ) : <p className="text-text-body text-sm">No locations listed.</p>}
-            </div>
+        </div>
+        <div className="mt-4">
+          <h5 className="text-sm text-text-secondary">Target Locations</h5>
+          <div className="flex flex-wrap gap-2 mt-2">
+            {p.career_preferences.target_locations?.length > 0 ? (
+              p.career_preferences.target_locations.map((skill, i) => <SkillTag key={i}>{skill}</SkillTag>)
+            ) : <p className="text-text-body text-sm">No locations listed.</p>}
           </div>
+        </div>
       </DataCard>
-      
+
       {/* --- Education Card --- */}
       {p.education?.length > 0 && (
-        <DataCard 
-          title="Education" 
-          icon={GraduationCap} 
+        <DataCard
+          title="Education"
+          icon={GraduationCap}
           className="lg:col-span-1 lg:row-span-1"
           variants={bentoCardVariants}
         >
@@ -174,28 +174,28 @@ export const ProfileDisplay = ({ profile }) => {
 
       {/* --- Projects Card --- */}
       {p.projects?.length > 0 && (
-        <DataCard 
-          title="Projects" 
-          icon={GitBranch} 
+        <DataCard
+          title="Projects"
+          icon={GitBranch}
           className="lg:col-span-2 lg:row-span-1"
           variants={bentoCardVariants}
         >
           {p.projects.map((item, i) => <ProjectItem key={i} item={item} />)}
         </DataCard>
       )}
-      
+
       {/* --- Experience Card --- */}
       {p.experience?.length > 0 && (
-        <DataCard 
-          title="Experience" 
-          icon={Briefcase} 
+        <DataCard
+          title="Experience"
+          icon={Briefcase}
           className="lg:col-span-3"
           variants={bentoCardVariants}
         >
           {p.experience.map((item, i) => <ExperienceItem key={i} item={item} />)}
         </DataCard>
       )}
-      
+
     </motion.div>
   );
 };

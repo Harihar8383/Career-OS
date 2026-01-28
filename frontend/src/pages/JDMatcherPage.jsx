@@ -70,8 +70,8 @@ const MatcherInputView = () => {
         </span>
       </div>
 
-      <div className="relative group rounded-2xl p-[1px] bg-gradient-to-b from-white/10 to-transparent">
-        <div className="bg-[#18181B]/80 backdrop-blur-xl rounded-2xl p-6 sm:p-8 relative overflow-hidden">
+      <div className="relative group rounded-2xl p-[1px] bg-gradient-to-b from-border-primary to-transparent">
+        <div className="bg-bg-card/80 backdrop-blur-xl rounded-2xl p-6 sm:p-8 relative overflow-hidden shadow-2xl">
           {/* Background Glow */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/10 blur-[100px] pointer-events-none" />
 
@@ -84,7 +84,7 @@ const MatcherInputView = () => {
               value={jdText}
               onChange={(e) => setJdText(e.target.value)}
               placeholder="Paste job description..."
-              className="w-full h-80 bg-black/40 border border-white/10 rounded-xl p-5 text-gray-200 font-dm-sans placeholder:text-gray-600 focus:ring-2 focus:ring-[#A855F7]/50 focus:border-[#A855F7] outline-none transition-all resize-none shadow-inner"
+              className="w-full h-80 bg-bg-dark/40 border border-border-primary rounded-xl p-5 text-text-primary font-dm-sans placeholder:text-text-secondary focus:ring-2 focus:ring-[#A855F7]/50 focus:border-[#A855F7] outline-none transition-all resize-none shadow-inner"
             />
           </div>
 
@@ -196,12 +196,12 @@ export default function JDMatcherPage() {
       {/* Navigation Tabs (Only show on root or history pages, hide on results) */}
       {!location.pathname.includes('results') && (
         <div className="flex justify-center mb-8">
-          <div className="flex bg-slate-900/80 p-1 rounded-xl border border-white/10">
+          <div className="flex bg-bg-card/80 p-1 rounded-xl border border-border-primary backdrop-blur-md shadow-sm">
             <button
               onClick={() => navigate('/dashboard/matcher')}
               className={`flex items-center gap-2 px-6 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === 'new'
                 ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/25'
-                : 'text-text-secondary hover:text-white'
+                : 'text-text-secondary hover:text-text-primary'
                 }`}
             >
               <Plus size={16} /> New Analysis
@@ -210,7 +210,7 @@ export default function JDMatcherPage() {
               onClick={() => navigate('history')}
               className={`flex items-center gap-2 px-6 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === 'history'
                 ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/25'
-                : 'text-text-secondary hover:text-white'
+                : 'text-text-secondary hover:text-text-primary'
                 }`}
             >
               <History size={16} /> History

@@ -40,7 +40,7 @@ const ScoreGauge = ({ score = 0 }) => {
                     <path
                         d={`M ${width / 2 - radius} ${height - 10} A ${radius} ${radius} 0 0 1 ${width / 2 + radius} ${height - 10}`}
                         fill="none"
-                        stroke="rgba(255,255,255,0.05)"
+                        stroke="var(--color-border-secondary)"
                         strokeWidth={strokeWidth}
                         strokeLinecap="round"
                     />
@@ -60,8 +60,8 @@ const ScoreGauge = ({ score = 0 }) => {
 
                 {/* Score Text Overlay (Positioned absolutely to center in the bottom) */}
                 <div className="absolute bottom-0 text-center transform translate-y-2">
-                    <p className="text-gray-400 text-sm font-bold uppercase tracking-widest mb-1">Match Score</p>
-                    <p className="text-7xl font-clash-display font-bold text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.15)]">
+                    <p className="text-text-secondary text-sm font-bold uppercase tracking-widest mb-1">Match Score</p>
+                    <p className="text-7xl font-clash-display font-bold text-text-primary drop-shadow-[0_0_15px_rgba(255,255,255,0.15)]">
                         {Math.round(safeScore)}%
                     </p>
                 </div>

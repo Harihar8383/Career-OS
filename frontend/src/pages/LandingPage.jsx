@@ -11,7 +11,7 @@ import { Footer } from '../components/Landing/Footer';
 
 function LandingPage() {
   return (
-    <div className="antialiased bg-bg-dark text-text-primary">
+    <div className="dark antialiased bg-color-bg-dark text-color-text-primary" style={{ backgroundColor: 'var(--color-bg-dark)', color: 'var(--color-text-primary)' }}>
       <Header />
 
       <main className="w-full max-w-full overflow-x-hidden">

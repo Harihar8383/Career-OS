@@ -132,16 +132,16 @@ export default function JobHunterForm({ onSubmit }) {
             <form onSubmit={handleSubmit} className="space-y-6 font-dm-sans">
 
                 {/* Section 1: What You're Looking For */}
-                <section className="space-y-5 p-6 bg-[#18181B]/60 backdrop-blur-xl rounded-2xl border border-white/10 shadow-xl overflow-hidden relative">
+                <section className="space-y-5 p-6 bg-bg-card/60 backdrop-blur-xl rounded-2xl border border-border-primary shadow-xl overflow-hidden relative">
                     <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-blue-500 opacity-20" />
-                    <div className="flex items-center gap-2 pb-2 border-b border-white/5">
+                    <div className="flex items-center gap-2 pb-2 border-b border-border-secondary">
                         <Briefcase size={20} className="text-[#2934FF]" />
-                        <h3 className="text-lg font-bold text-white tracking-wide">What You're Looking For</h3>
+                        <h3 className="text-lg font-bold text-text-primary tracking-wide">What You're Looking For</h3>
                     </div>
 
                     {/* Job Titles */}
                     <div className="space-y-2">
-                        <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        <label className="block text-xs font-semibold text-text-secondary uppercase tracking-wider">
                             Target Job Titles <span className="text-red-400">*</span>
                         </label>
                         <EnhancedTagInput
@@ -177,10 +177,9 @@ export default function JobHunterForm({ onSubmit }) {
                                 <button
                                     key={type}
                                     type="button"
-                                    onClick={() => toggleSelection('employmentTypes', type.toLowerCase())}
                                     className={`px-4 py-2.5 rounded-xl border text-sm font-medium transition-all duration-300 ${config.employmentTypes.includes(type.toLowerCase())
                                         ? 'bg-[#2934FF] border-[#2934FF] text-white shadow-[0_0_15px_rgba(41,52,255,0.4)] scale-105'
-                                        : 'bg-white/5 border-white/5 text-gray-400 hover:bg-white/10 hover:text-white hover:border-white/10'
+                                        : 'bg-text-primary/5 border-border-secondary text-text-secondary hover:bg-text-primary/10 hover:text-text-primary hover:border-border-primary'
                                         }`}
                                 >
                                     {type}
@@ -197,11 +196,11 @@ export default function JobHunterForm({ onSubmit }) {
                 </section>
 
                 {/* Section 2: Location Preferences */}
-                <section className="space-y-5 p-6 bg-[#18181B]/60 backdrop-blur-xl rounded-2xl border border-white/10 shadow-xl relative overflow-hidden">
+                <section className="space-y-5 p-6 bg-bg-card/60 backdrop-blur-xl rounded-2xl border border-border-primary shadow-xl relative overflow-hidden">
                     <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 via-blue-500 to-purple-500 opacity-20" />
-                    <div className="flex items-center gap-2 pb-2 border-b border-white/5">
+                    <div className="flex items-center gap-2 pb-2 border-b border-border-secondary">
                         <MapPin size={20} className="text-[#A855F7]" />
-                        <h3 className="text-lg font-bold text-white tracking-wide">Location Preferences</h3>
+                        <h3 className="text-lg font-bold text-text-primary tracking-wide">Location Preferences</h3>
                     </div>
 
                     {/* Location Types */}
@@ -217,7 +216,7 @@ export default function JobHunterForm({ onSubmit }) {
                                     onClick={() => toggleSelection('locationTypes', type.toLowerCase())}
                                     className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium transition-all duration-300 ${config.locationTypes.includes(type.toLowerCase())
                                         ? 'bg-[#A855F7] border-[#A855F7] text-white shadow-[0_0_15px_rgba(168,85,247,0.4)] scale-105'
-                                        : 'bg-white/5 border-white/5 text-gray-400 hover:bg-white/10 hover:text-white hover:border-white/10'
+                                        : 'bg-text-primary/5 border-border-secondary text-text-secondary hover:bg-text-primary/10 hover:text-text-primary hover:border-border-primary'
                                         }`}
                                 >
                                     {locationIcons[type.toLowerCase()]}
@@ -259,11 +258,11 @@ export default function JobHunterForm({ onSubmit }) {
                 </section>
 
                 {/* Section 3: Compensation */}
-                <section className="space-y-5 p-6 bg-[#18181B]/60 backdrop-blur-xl rounded-2xl border border-white/10 shadow-xl relative overflow-hidden">
+                <section className="space-y-5 p-6 bg-bg-card/60 backdrop-blur-xl rounded-2xl border border-border-primary shadow-xl relative overflow-hidden">
                     <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-500 via-blue-500 to-green-500 opacity-20" />
-                    <div className="flex items-center gap-2 pb-2 border-b border-white/5">
+                    <div className="flex items-center gap-2 pb-2 border-b border-border-secondary">
                         <DollarSign size={20} className="text-[#22C55E]" />
-                        <h3 className="text-lg font-bold text-white tracking-wide">Expected Salary (Annual)</h3>
+                        <h3 className="text-lg font-bold text-text-primary tracking-wide">Expected Salary (Annual)</h3>
                     </div>
 
                     <RangeSlider
@@ -296,11 +295,11 @@ export default function JobHunterForm({ onSubmit }) {
                 </section>
 
                 {/* Advanced Options - Collapsible */}
-                <section className="bg-white/[0.02] rounded-2xl border border-white/5">
+                <section className="bg-bg-card/[0.02] rounded-2xl border border-border-secondary">
                     <button
                         type="button"
                         onClick={() => setShowAdvanced(!showAdvanced)}
-                        className="w-full flex items-center justify-between p-4 text-left hover:bg-white/[0.02] transition-colors rounded-2xl"
+                        className="w-full flex items-center justify-between p-4 text-left hover:bg-bg-dark/5 transition-colors rounded-2xl"
                     >
                         <span className="text-sm font-medium text-text-primary flex items-center gap-2">
                             <Calendar size={18} className="text-blue-400" />
@@ -310,7 +309,7 @@ export default function JobHunterForm({ onSubmit }) {
                     </button>
 
                     {showAdvanced && (
-                        <div className="px-6 pb-6 space-y-5 border-t border-white/5 pt-5">
+                        <div className="px-6 pb-6 space-y-5 border-t border-border-secondary pt-5">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                 {/* Notice Period */}
                                 <div className="space-y-2">
@@ -322,7 +321,7 @@ export default function JobHunterForm({ onSubmit }) {
                                         <select
                                             value={config.noticePeriod}
                                             onChange={(e) => setConfig({ ...config, noticePeriod: e.target.value })}
-                                            className="w-full appearance-none bg-black/20 border border-white/10 text-text-primary rounded-xl px-4 py-2.5 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                            className="w-full appearance-none bg-bg-card/20 border border-border-primary text-text-primary rounded-xl px-4 py-2.5 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                                         >
                                             <option value="immediate">Immediate (0-15 days)</option>
                                             <option value="30_days">30 Days</option>
@@ -343,7 +342,7 @@ export default function JobHunterForm({ onSubmit }) {
                                         <select
                                             value={config.startDate}
                                             onChange={(e) => setConfig({ ...config, startDate: e.target.value })}
-                                            className="w-full appearance-none bg-black/20 border border-white/10 text-text-primary rounded-xl px-4 py-2.5 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                            className="w-full appearance-none bg-bg-card/20 border border-border-primary text-text-primary rounded-xl px-4 py-2.5 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                                         >
                                             <option value="immediately">Looking Actively</option>
                                             <option value="actively_applying">Open to Opportunities</option>

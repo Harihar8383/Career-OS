@@ -6,10 +6,10 @@ import { cn } from "@/lib/utils"
 
 export const AnimatedThemeToggler = ({
   className,
-  duration = 400,
+  duration = 700,
   ...props
 }) => {
-  const [isDark, setIsDark] = useState(false)
+  const [isDark, setIsDark] = useState(true)
   const buttonRef = useRef(null)
 
   useEffect(() => {

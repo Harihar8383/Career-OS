@@ -24,7 +24,7 @@ export default function JobHunterResultPage() {
         <div className="max-w-7xl mx-auto space-y-4 pb-20">
             <button
                 onClick={() => navigate('/dashboard/hunter')}
-                className="flex items-center gap-2 text-text-secondary hover:text-white transition-colors group"
+                className="flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors group"
             >
                 <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
                 Back to Configuration

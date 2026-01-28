@@ -59,7 +59,7 @@ function DashboardPage() {
             <>
               <Sidenav />
               {/* --- Use bg-bg-card for the main content area --- */}
-              <main className="ml-64 p-10 bg-[#0A0A0A] min-h-screen">
+              <main className="ml-64 p-10 bg-bg-dark min-h-screen">
                 <Routes>
                   <Route path="/" element={<ProfilePage />} />
                   <Route path="/matcher/*" element={<JDMatcherPage />} />

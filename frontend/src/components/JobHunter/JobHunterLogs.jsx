@@ -102,7 +102,7 @@ export function JobHunterLogs({ logs = [], status = 'running' }) {
             {/* Header */}
             <div className="text-center space-y-1.5 pb-3">
                 <div className="flex items-center justify-center gap-3">
-                    <h2 className="text-2xl font-clash-display text-white">
+                    <h2 className="text-2xl font-clash-display text-text-primary">
                         {status === 'completed' ? 'Hunt Complete' : 'Agent Running'}
                     </h2>
                     {getStatusBadge()}

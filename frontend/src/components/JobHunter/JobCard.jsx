@@ -49,7 +49,7 @@ export function JobCard({ job }) {
             animate={{ opacity: 1, y: 0 }}
             whileHover={{ y: -5, scale: 1.01 }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
-            className="group relative bg-[#18181B]/60 backdrop-blur-xl border border-white/10 rounded-2xl p-5 overflow-hidden hover:border-blue-500/30 transition-colors duration-300"
+            className="group relative bg-bg-card/60 backdrop-blur-xl border border-border-primary rounded-2xl p-5 overflow-hidden hover:border-blue-500/30 transition-colors duration-300"
         >
             {/* Animated Gradient Overlay on Hover */}
             <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 via-purple-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
@@ -64,7 +64,7 @@ export function JobCard({ job }) {
                     <div className="flex-1 min-w-0">
                         {/* Tags Row */}
                         <div className="flex items-center gap-2 mb-2 flex-wrap">
-                            <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white/5 text-gray-400 border border-white/5 uppercase tracking-wider backdrop-blur-md">
+                            <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-text-primary/5 text-text-secondary border border-border-secondary uppercase tracking-wider backdrop-blur-md">
                                 {getSourceLabel(source)}
                             </span>
 
@@ -82,13 +82,13 @@ export function JobCard({ job }) {
                             )}
                         </div>
 
-                        <h3 className="text-lg font-bold text-white mb-1 truncate group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:to-purple-400 transition-all duration-300">
+                        <h3 className="text-lg font-bold text-text-primary mb-1 truncate group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:to-purple-400 transition-all duration-300">
                             {title}
                         </h3>
 
-                        <div className="flex items-center gap-2 text-gray-400 text-sm">
+                        <div className="flex items-center gap-2 text-text-secondary text-sm">
                             <Building2 size={14} className="text-blue-400" />
-                            <span className="truncate hover:text-white transition-colors cursor-default">{company}</span>
+                            <span className="truncate hover:text-text-primary transition-colors cursor-default">{company}</span>
                         </div>
                     </div>
 
@@ -113,13 +113,13 @@ export function JobCard({ job }) {
                         {badges.slice(0, 4).map((badge, index) => (
                             <span
                                 key={index}
-                                className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-medium bg-white/5 text-gray-300 border border-white/5 hover:border-blue-500/30 hover:bg-blue-500/5 transition-all"
+                                className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-medium bg-text-primary/5 text-text-secondary border border-border-secondary hover:border-blue-500/30 hover:bg-blue-500/5 transition-all"
                             >
                                 {badge}
                             </span>
                         ))}
                         {badges.length > 4 && (
-                            <span className="text-[10px] text-gray-500">+{badges.length - 4}</span>
+                            <span className="text-[10px] text-text-secondary">+{badges.length - 4}</span>
                         )}
                     </div>
                 )}
@@ -127,26 +127,26 @@ export function JobCard({ job }) {
                 {/* Details Grid */}
                 <div className="grid grid-cols-2 gap-y-2 gap-x-4 mb-4 text-sm">
                     {location && (
-                        <div className="flex items-center gap-2 text-gray-400">
-                            <MapPin size={14} className="text-gray-500" />
+                        <div className="flex items-center gap-2 text-text-secondary">
+                            <MapPin size={14} className="text-text-secondary" />
                             <span className="truncate">{location}</span>
                         </div>
                     )}
                     {salary && (
-                        <div className="flex items-center gap-2 text-gray-400">
-                            <DollarSign size={14} className="text-gray-500" />
+                        <div className="flex items-center gap-2 text-text-secondary">
+                            <DollarSign size={14} className="text-text-secondary" />
                             <span className="truncate">{salary}</span>
                         </div>
                     )}
                     {type && (
-                        <div className="flex items-center gap-2 text-gray-400">
-                            <Briefcase size={14} className="text-gray-500" />
+                        <div className="flex items-center gap-2 text-text-secondary">
+                            <Briefcase size={14} className="text-text-secondary" />
                             <span className="capitalize">{type}</span>
                         </div>
                     )}
                     {postedDate && (
-                        <div className="flex items-center gap-2 text-gray-400">
-                            <Clock size={14} className="text-gray-500" />
+                        <div className="flex items-center gap-2 text-text-secondary">
+                            <Clock size={14} className="text-text-secondary" />
                             <span>{postedDate}</span>
                         </div>
                     )}
@@ -171,8 +171,8 @@ export function JobCard({ job }) {
                     className="block w-full"
                 >
                     <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 
-                                     bg-white/5 hover:bg-blue-600 border border-white/10 hover:border-blue-500
-                                     text-white rounded-xl text-sm font-semibold transition-all duration-300
+                                     bg-text-primary/5 hover:bg-blue-600 border border-border-primary hover:border-blue-500
+                                     text-text-primary hover:text-white rounded-xl text-sm font-semibold transition-all duration-300
                                      group/btn shadow-lg hover:shadow-blue-600/25">
                         <span className="group-hover/btn:mr-1 transition-all">View Opportunity</span>
                         <ExternalLink size={16} className="opacity-70 group-hover/btn:opacity-100 group-hover/btn:translate-x-0.5 transition-all" />

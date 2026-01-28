@@ -22,7 +22,7 @@
 @font-face {
   font-family: 'Clash Display';
   src: url('/fonts/ClashDisplay-Bold.woff2') format('woff2');
-  font-weight: 700;
+  font-weight: 200;
   font-display: swap;
   font-style: normal;
 }
@@ -30,83 +30,90 @@
 :root {
   /* --- Primary Action Colors --- */
   /* Use for buttons, links, and main interactive elements */
-  --color-primary: #3b82f6;
-  --color-primary-light: #60a5fa;
+  --color-primary: #2934FF;
+  /* --blue-500 */
+  --color-primary-light: #1E28CC;
+  /* --blue-600 */
   /* For hover states */
 
   /* --- Secondary Accent Color --- */
   /* Use for tags, badges, highlights, or special icons */
-  --color-accent: #a855f7;
+  --color-accent: rgba(168, 85, 247, 0.05);
+  /* --bg-purple (using for accent bg? or keep purple?) - Original was #a855f7. Plan says --bg-purple is rgba... Let's stick to the color palette logic. User defined --bg-accent and --bg-purple. 
+     Wait, existing --color-accent is #a855f7. 
+     User provided --bg-accent: rgba(41, 52, 255, 0.05) and --bg-purple: rgba(168, 85, 247, 0.05).
+     Let's map --color-accent to something visible for text/icons if used there, or keep it close to the blue/purple theme.
+     Actually, let's look at the mapping in the plan.
+     --color-primary -> #2934FF
+     
+     Let's use the USER's palette directly where possible and map existing vars to it.
+  */
 
-  /* --- Text Colors --- */
-  --color-text-primary: #f4f4f5;
-  /* Main headings */
-  --color-text-body: #d4d4d8;
-  /* Paragraphs and main text */
-  --color-text-secondary: #71717a;
-  /* Subtext, metadata, captions */
+  /* === Mapped Variables (Light Mode Default) === */
 
-  /* --- Backgrounds (The "De-Blued" Neutrals) --- */
-  --color-bg-dark: #0a0a0a;
-  /* Main page background */
-  --color-bg-card: #171717;
-  /* Card backgrounds */
+  /* Text (Darkened for better readability on white) */
+  --color-text-primary: #09090B;
+  /* --text-primary */
+  --color-text-body: #3F3F46;
+  /* --text-secondary (Darker than before) */
+  --color-text-secondary: #52525B;
+  /* --text-tertiary */
 
-  /* --- Borders & Dividers --- */
-  --color-border-primary: #262626;
-  /* Main borders */
-  --color-border-secondary: #404040;
-  /* Lighter/subtle borders */
+  /* Backgrounds */
+  --color-bg-dark: #FFFFFF;
+  /* --bg-primary (Main background) - Note: In code it's called bg-dark, but now it's white */
+  --color-bg-card: #FAFAFA;
+  /* --bg-secondary (Card backgrounds) */
+  --color-syntask-bg: #F4F4F5;
+  /* --bg-tertiary (Elevated) */
 
-  /* --- Special Component Colors --- */
-  --color-syntask-bg: #171717;
-  /* Aligned with card background */
-  --color-syntask-border: #262626;
-  /* Aligned with primary border */
+  /* Borders (Increased opacity for visibility) */
+  --color-border-primary: rgba(0, 0, 0, 0.15);
+  /* --border-default (Stronger) */
+  --color-border-secondary: rgba(0, 0, 0, 0.08);
+  /* --border-subtle */
+  --color-syntask-border: rgba(0, 0, 0, 0.2);
+  /* --border-strong */
+
+  /* Fonts */
+  --font-clash-display: "Clash Display", system-ui, sans-serif;
+  --font-dm-sans: "DM Sans", system-ui, sans-serif;
+
+  /* Standard Shadcn/Tailwind Variables (Light) */
+  --background: 0 0% 100%;
+  --foreground: 240 10% 3.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 240 10% 3.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 240 10% 3.9%;
+  --primary: 240 5.9% 10%;
+  --primary-foreground: 0 0% 98%;
+  --secondary: 240 4.8% 95.9%;
+  --secondary-foreground: 240 5.9% 10%;
+  --muted: 240 4.8% 95.9%;
+  --muted-foreground: 240 3.8% 46.1%;
+  --accent: 240 4.8% 95.9%;
+  --accent-foreground: 240 5.9% 10%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 240 5.9% 90%;
+  --input: 240 5.9% 90%;
+  --ring: 240 5.9% 10%;
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.129 0.042 264.695);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.129 0.042 264.695);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.208 0.042 265.755);
-  --primary-foreground: oklch(0.984 0.003 247.858);
-  --secondary: oklch(0.968 0.007 247.896);
-  --secondary-foreground: oklch(0.208 0.042 265.755);
-  --muted: oklch(0.968 0.007 247.896);
-  --muted-foreground: oklch(0.554 0.046 257.417);
-  --accent: oklch(0.968 0.007 247.896);
-  --accent-foreground: oklch(0.208 0.042 265.755);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.929 0.013 255.508);
-  --input: oklch(0.929 0.013 255.508);
-  --ring: oklch(0.704 0.04 256.788);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.984 0.003 247.858);
-  --sidebar-foreground: oklch(0.129 0.042 264.695);
-  --sidebar-primary: oklch(0.208 0.042 265.755);
-  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-accent: oklch(0.968 0.007 247.896);
-  --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
-  --sidebar-border: oklch(0.929 0.013 255.508);
-  --sidebar-ring: oklch(0.704 0.04 256.788);
+
+  /* Sidebar (Light) */
+  --sidebar: oklch(0.985 0 0);
+  /* white */
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.87 0 0);
 }
 
-body {
-  color: var(--color-text-primary);
-  /* Default text color */
-  background-color: var(--color-bg-dark);
-  /* Default background */
-  font-family: var(--font-dm-sans);
-  overflow-x: hidden;
-}
-
-/* === Theme variables from your original config === */
+/* === Theme variables mapping === */
 @theme {
   --color-primary: var(--color-primary);
   --color-primary-light: var(--color-primary-light);
@@ -182,6 +189,15 @@ body {
   .border-syntask {
     border-color: var(--color-syntask-border);
   }
+
+  .bg-gradient-modern-light {
+    background-image: linear-gradient(to bottom right, rgba(239, 246, 255, 0.8), rgba(250, 245, 255, 0.5), #ffffff);
+  }
+
+  .dark .bg-gradient-modern-light {
+    background-image: none;
+    background-color: transparent;
+  }
 }
 
 @theme inline {
@@ -250,7 +266,31 @@ body {
   }
 }
 
+/* Dark mode overrides (Original values restored) */
 .dark {
+  /* --- Primary Action Colors --- */
+  --color-primary: #3b82f6;
+  --color-primary-light: #60a5fa;
+  --color-accent: #a855f7;
+
+  /* --- Text Colors --- */
+  --color-text-primary: #f4f4f5;
+  --color-text-body: #d4d4d8;
+  --color-text-secondary: #71717a;
+
+  /* --- Backgrounds --- */
+  --color-bg-dark: #0a0a0a;
+  --color-bg-card: #171717;
+
+  /* --- Borders --- */
+  --color-border-primary: #262626;
+  --color-border-secondary: #404040;
+
+  /* --- Special Component Colors --- */
+  --color-syntask-bg: #171717;
+  --color-syntask-border: #262626;
+
+  /* --- Shadcn/Tailwind Dark Variables --- */
   --background: oklch(0.129 0.042 264.695);
   --foreground: oklch(0.984 0.003 247.858);
   --card: oklch(0.208 0.042 265.755);

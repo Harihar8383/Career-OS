@@ -50,7 +50,7 @@ export default function JobHunterPage() {
             <div className="p-2.5 bg-blue-600/20 rounded-xl border border-blue-500/30">
               <Bot size={24} className="text-blue-400" />
             </div>
-            <h1 className="text-3xl font-clash-display text-white">Job Hunter Agent</h1>
+            <h1 className="text-3xl font-clash-display text-text-primary">Job Hunter Agent</h1>
             <span className="px-3 py-1 bg-blue-500/20 text-blue-300 text-xs font-bold rounded-full border border-blue-500/30 flex items-center gap-1.5">
               <Sparkles size={12} />
               AI POWERED
@@ -86,7 +86,7 @@ export default function JobHunterPage() {
         <div className="space-y-6">
           {/* Results Header */}
           <div className="text-center space-y-2">
-            <h2 className="text-2xl font-clash-display text-white">
+            <h2 className="text-2xl font-clash-display text-text-primary">
               Found {results.length} Job{results.length !== 1 ? 's' : ''}
             </h2>
             <p className="text-text-secondary text-sm">

@@ -16,7 +16,7 @@ export const MatcherResults = ({ results, onReset }) => {
       const end = Date.now() + 2 * 1000; // 2 seconds
       const colors = [
         "#2934FF", // Design System Blue
-        
+
         "#ffffff"
       ];
       const frame = () => {
@@ -49,7 +49,7 @@ export const MatcherResults = ({ results, onReset }) => {
   if (!results) return null;
 
   return (
-    <div ref={containerRef} className="max-w-7xl mx-auto px-4 pb-24 space-y-12">
+    <div ref={containerRef} className="max-w-7xl mx-auto px-6 py-8 pb-24 space-y-12 bg-gradient-modern-light rounded-3xl border border-border-secondary shadow-sm dark:shadow-none dark:border-none dark:bg-transparent transition-all duration-300">
 
       {/* 1. Header Section */}
       <motion.div
@@ -104,7 +104,7 @@ export const MatcherResults = ({ results, onReset }) => {
       <div className="flex justify-center pt-12">
         <button
           onClick={onReset}
-          className="px-8 py-3.5 bg-white/5 hover:bg-white/10 text-white rounded-xl transition-all duration-300 font-bold border border-white/10 hover:border-white/20 hover:scale-105 shadow-lg backdrop-blur-sm"
+          className="px-8 py-3.5 bg-bg-card hover:bg-bg-tertiary text-text-primary rounded-xl transition-all duration-300 font-bold border border-border-primary hover:border-border-strong hover:scale-105 shadow-lg backdrop-blur-sm"
         >
           Start New Analysis
         </button>

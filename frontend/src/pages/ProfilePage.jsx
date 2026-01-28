@@ -147,7 +147,7 @@ function ProfilePage() {
   if (isLoading) return <LoadingSpinner />;
   if (!profile) return (
     <div className="text-center p-12">
-      <h2 className="text-2xl font-clash-display text-white mb-2">Error</h2>
+      <h2 className="text-2xl font-clash-display text-text-primary mb-2">Error</h2>
       <p className="text-text-body">No profile data found. Please try refreshing.</p>
     </div>
   );
@@ -156,7 +156,7 @@ function ProfilePage() {
     <div className="max-w-6xl mx-auto relative min-h-[calc(100vh-100px)]">
 
       <div className="flex flex-wrap justify-between items-center gap-4 mb-8 pb-4 border-b border-border-primary">
-        <h1 className="text-3xl font-clash-display text-white">My Profile</h1>
+        <h1 className="text-3xl font-clash-display text-text-primary">My Profile</h1>
 
         <div className="flex items-center gap-4 flex-wrap">
           {isEditing ? (
@@ -175,7 +175,7 @@ function ProfilePage() {
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setShowUploadModal(true)}
-                className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
+                className="flex items-center gap-2 text-sm text-text-secondary hover:text-text-primary transition-colors"
               >
                 <Upload size={16} /> Update Resume
               </button>
@@ -191,7 +191,7 @@ function ProfilePage() {
 
               <button
                 onClick={handleEdit}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-800 border border-white/10 hover:bg-slate-700 transition text-sm text-white"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-bg-card border border-border-primary hover:bg-bg-dark transition text-sm text-text-primary"
               >
                 <Edit size={16} /> Edit
               </button>
@@ -207,7 +207,7 @@ function ProfilePage() {
               formData={editData}
               setFormData={setEditData}
             />
-            <div className="pt-6 flex justify-end border-t border-white/10">
+            <div className="pt-6 flex justify-end border-t border-border-primary">
               <SubmitButton isLoading={isSaving} className="py-2 h-auto">
                 <Save size={16} /> Save Changes
               </SubmitButton>
@@ -253,7 +253,7 @@ function ProfilePage() {
               // ... (unchanged)
               <div className="flex flex-col items-center justify-center h-64 text-center">
                 <AlertTriangle className="text-red-400 mb-6" size={48} />
-                <h2 className="text-2xl font-clash-display text-white mb-2">
+                <h2 className="text-2xl font-clash-display text-text-primary mb-2">
                   Upload Failed
                 </h2>
                 <p className="text-lg text-red-300 bg-red-500/10 p-4 rounded-lg font-dm-sans">
@@ -269,7 +269,7 @@ function ProfilePage() {
             ) : (
               // Upload State
               <>
-                <h2 className="text-2xl font-clash-display text-white mb-4">
+                <h2 className="text-2xl font-clash-display text-text-primary mb-4">
                   Update Your Resume
                 </h2>
                 <p className="text-text-body font-dm-sans mb-6">

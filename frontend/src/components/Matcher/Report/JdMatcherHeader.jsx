@@ -23,14 +23,14 @@ const JdMatcherHeader = ({ data }) => {
         if (v.includes("Likely Filtered") || v.includes("Weak")) return "bg-red-500/10 text-red-400 border-red-500/30 shadow-[0_0_15px_rgba(239,68,68,0.2)]";
         if (v.includes("Borderline")) return "bg-orange-500/10 text-orange-400 border-orange-500/30 shadow-[0_0_15px_rgba(249,115,22,0.2)]";
         if (v.includes("Competitive") || v.includes("Strong")) return "bg-[#2934FF]/10 text-[#8AA5FF] border-[#2934FF]/30 shadow-[0_0_15px_rgba(41,52,255,0.3)]";
-        return "bg-white/5 text-gray-400 border-white/10";
+        return "bg-bg-dark/5 text-text-secondary border-border-primary";
     };
 
     return (
-        <div className="w-full bg-[#18181B]/60 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl overflow-hidden flex flex-col md:flex-row min-h-[320px]">
+        <div className="w-full bg-bg-card/60 backdrop-blur-2xl rounded-2xl border border-border-primary shadow-xl dark:shadow-2xl overflow-hidden flex flex-col md:flex-row min-h-[320px] transition-all duration-300">
 
             {/* LEFT PANEL: Score & Metrics (Darker bg) */}
-            <div className="md:w-[40%] bg-[#0A0A0A]/80 relative p-8 flex flex-col items-center justify-center text-center border-b md:border-b-0 md:border-r border-white/10">
+            <div className="md:w-[40%] bg-bg-dark/80 relative p-8 flex flex-col items-center justify-center text-center border-b md:border-b-0 md:border-r border-border-primary">
                 {/* Gauge */}
                 <div className="scale-90 mb-4">
                     <ScoreGauge score={match_score} />
@@ -46,24 +46,24 @@ const JdMatcherHeader = ({ data }) => {
 
                 {/* Summary Text */}
                 <div>
-                    <h3 className="text-white font-bold text-xl mb-3 leading-tight font-clash-display">
+                    <h3 className="text-text-primary font-bold text-xl mb-3 leading-tight font-clash-display">
                         {header_summary}
                     </h3>
-                    <p className="text-gray-400 text-sm italic font-dm-sans px-4 leading-relaxed">
+                    <p className="text-text-secondary text-sm italic font-dm-sans px-4 leading-relaxed">
                         "{emotional_line}"
                     </p>
                 </div>
             </div>
 
             {/* RIGHT PANEL: Job Details & Info */}
-            <div className="md:w-[60%] p-10 flex flex-col justify-center relative bg-gradient-to-br from-[#18181B]/50 to-transparent">
+            <div className="md:w-[60%] p-10 flex flex-col justify-center relative bg-gradient-to-br from-bg-card/50 to-transparent">
 
                 {/* Background Glow */}
                 <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 blur-[80px] pointer-events-none" />
 
                 {/* Job Title & Company */}
                 <div className="mb-8 relative z-10">
-                    <h1 className="text-4xl md:text-5xl font-clash-display font-medium text-white mb-4 leading-tight">
+                    <h1 className="text-4xl md:text-5xl font-clash-display font-medium text-text-primary mb-4 leading-tight">
                         {job_title}
                     </h1>
                     <div className="flex items-center gap-3 text-sm font-bold uppercase tracking-widest">
@@ -77,7 +77,7 @@ const JdMatcherHeader = ({ data }) => {
 
                 {/* Tags Row */}
                 <div className="flex flex-wrap gap-3 mb-12 relative z-10">
-                    <span className="px-4 py-2 bg-white/5 text-gray-300 text-xs font-bold rounded-xl border border-white/10 flex items-center gap-2 backdrop-blur-md">
+                    <span className="px-4 py-2 bg-text-primary/5 text-text-secondary text-xs font-bold rounded-xl border border-border-primary flex items-center gap-2 backdrop-blur-md">
                         <BriefcaseIcon size={14} /> {experience_level}
                     </span>
                     {top_skills.map((skill, idx) => (
@@ -88,7 +88,7 @@ const JdMatcherHeader = ({ data }) => {
                 </div>
 
                 {/* File Info Footer */}
-                <div className="absolute bottom-6 right-8 flex items-center gap-3 text-xs text-gray-500 font-mono">
+                <div className="absolute bottom-6 right-8 flex items-center gap-3 text-xs text-text-secondary font-mono">
                     <FileText size={14} />
                     <span>{data.meta?.fileName || "resume.pdf"}</span>
                     <span>•</span>

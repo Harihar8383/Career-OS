@@ -33,9 +33,9 @@ export const MatcherHistory = ({ onLoadAnalysis }) => {
 
     if (history.length === 0) {
         return (
-            <div className="text-center py-12 bg-white/5 rounded-xl border border-white/10">
-                <Activity className="mx-auto text-gray-500 mb-4" size={48} />
-                <h3 className="text-xl font-clash-display text-white">No Analysis History</h3>
+            <div className="text-center py-12 bg-bg-card/5 rounded-xl border border-border-primary">
+                <Activity className="mx-auto text-text-secondary mb-4" size={48} />
+                <h3 className="text-xl font-clash-display text-text-primary">No Analysis History</h3>
                 <p className="text-text-secondary mt-2">Your past checks will appear here.</p>
             </div>
         );
@@ -69,7 +69,7 @@ export const MatcherHistory = ({ onLoadAnalysis }) => {
                 <div
                     key={item.runId}
                     onClick={() => onLoadAnalysis(item.runId)}
-                    className="group cursor-pointer bg-bg-dark/50 border border-white/10 hover:border-blue-500/50 rounded-xl p-5 transition-all hover:bg-bg-dark/80 relative overflow-hidden"
+                    className="group cursor-pointer bg-bg-card/50 border border-border-primary hover:border-blue-500/50 rounded-xl p-5 transition-all hover:bg-bg-card/80 relative overflow-hidden"
                 >
                     <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
                         <button
@@ -82,12 +82,12 @@ export const MatcherHistory = ({ onLoadAnalysis }) => {
                         <ChevronRight className="text-blue-400 p-1" />
                     </div>
 
-                    <h4 className="font-clash-display text-lg text-white pr-16 truncate">{item.jobTitle}</h4>
+                    <h4 className="font-clash-display text-lg text-text-primary pr-16 truncate">{item.jobTitle}</h4>
                     <p className="text-text-secondary text-sm flex items-center gap-2 mt-1">
                         <Briefcase size={14} /> {item.company}
                     </p>
 
-                    <div className="mt-4 flex items-end justify-between border-t border-white/5 pt-4">
+                    <div className="mt-4 flex items-end justify-between border-t border-border-primary pt-4">
                         <div className="text-xs text-text-secondary flex items-center gap-2">
                             <Calendar size={14} />
                             {new Date(item.date).toLocaleDateString()}

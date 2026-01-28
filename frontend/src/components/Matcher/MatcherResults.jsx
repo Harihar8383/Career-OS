@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import JdMatcherHeader from './Report/JdMatcherHeader';
 import SectionBreakdown from './Report/SectionBreakdown';
@@ -6,9 +6,61 @@ import KeywordGapReport from './Report/KeywordGapReport';
 import ActionableTodoList from './Report/ActionableTodoList';
 import BulletFeedback from './Report/BulletFeedback';
 import confetti from 'canvas-confetti';
+import { Bookmark, BookmarkCheck } from 'lucide-react';
+import { useAuth } from '@clerk/clerk-react';
+import { useToast } from '../ui/Toast';
 
 export const MatcherResults = ({ results, onReset }) => {
   const containerRef = useRef(null);
+  const { getToken } = useAuth();
+  const toast = useToast();
+  const [isSaved, setIsSaved] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSaveToTracker = async () => {
+    if (isSaved || isSaving) return;
+
+    setIsSaving(true);
+    try {
+      const token = await getToken();
+      const API_URL = import.meta.env.VITE_API_GATEWAY_URL || 'http://localhost:8080';
+
+      const jobData = {
+        title: results.jd_summary?.job_title || 'Job from JD Matcher',
+        company: results.jd_summary?.company || 'Unknown',
+        location: results.jd_summary?.location || '',
+        salary: results.jd_summary?.salary_range || '',
+        jobType: 'Full-time',
+        description: results.jd_summary?.description || '',
+        applyLink: '',
+        source: 'matcher',
+        matchScore: results.match_score || 0,
+        stage: 'saved',
+        priority: results.match_score >= 80 ? 'high' : results.match_score >= 60 ? 'medium' : 'low'
+      };
+
+      const response = await fetch(`${API_URL}/api/tracker/jobs`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(jobData)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save job');
+      }
+
+      setIsSaved(true);
+      toast.success('Job saved to tracker!');
+    } catch (error) {
+      console.error('Error saving job:', error);
+      toast.error('Failed to save job');
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   useEffect(() => {
     // Only fire confetti if score is high (e.g., >= 80)
@@ -100,8 +152,31 @@ export const MatcherResults = ({ results, onReset }) => {
         <BulletFeedback bullets={results.bullet_feedback} />
       </motion.div>
 
-      {/* Reset Button */}
-      <div className="flex justify-center pt-12">
+      {/* Action Buttons */}
+      <div className="flex justify-center items-center gap-4 pt-12">
+        {/* Save to Tracker Button */}
+        <button
+          onClick={handleSaveToTracker}
+          disabled={isSaved || isSaving}
+          className={`flex items-center gap-2 px-6 py-3.5 rounded-xl transition-all duration-300 font-bold border shadow-lg backdrop-blur-sm ${isSaved
+            ? 'bg-blue-500/20 text-blue-400 border-blue-500/30 cursor-default'
+            : 'bg-bg-card hover:bg-blue-500/10 text-text-primary border-border-primary hover:border-blue-500/30 hover:scale-105'
+            } ${isSaving ? 'opacity-50 cursor-wait' : ''}`}
+        >
+          {isSaved ? (
+            <>
+              <BookmarkCheck size={20} className="animate-pulse" />
+              Saved to Tracker
+            </>
+          ) : (
+            <>
+              <Bookmark size={20} />
+              Save to Tracker
+            </>
+          )}
+        </button>
+
+        {/* Start New Analysis Button */}
         <button
           onClick={onReset}
           className="px-8 py-3.5 bg-bg-card hover:bg-bg-tertiary text-text-primary rounded-xl transition-all duration-300 font-bold border border-border-primary hover:border-border-strong hover:scale-105 shadow-lg backdrop-blur-sm"

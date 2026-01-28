@@ -4,6 +4,7 @@ import onboardingRoutes from './onboarding.routes.js';
 import profileRoutes from './profile.routes.js';
 import matcherRoutes from './matcher.routes.js';
 import hunterRoutes from './hunter.routes.js'; // <-- Import hunter routes
+import trackerRoutes from './tracker.routes.js'; // <-- Import tracker routes
 
 const router = express.Router();
 
@@ -17,5 +18,6 @@ router.use('/onboarding', onboardingRoutes);
 router.use('/profile', profileRoutes);
 router.use('/matcher', matcherRoutes);
 router.use('/hunter', hunterRoutes); // <-- Mount hunter routes
+router.use('/tracker', trackerRoutes); // <-- Mount tracker routes
 
 export default router;

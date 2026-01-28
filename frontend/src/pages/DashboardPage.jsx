@@ -10,6 +10,7 @@ import ProfilePage from "./ProfilePage";
 import JDMatcherPage from "./JDMatcherPage";
 import JobHunterPage from "./JobHunterPage";
 import JobHunterResultPage from "./JobHunterResultPage";
+import JobTrackerPage from "./JobTrackerPage";
 
 // A placeholder for now
 const PlaceholderComponent = ({ title }) => (
@@ -65,6 +66,7 @@ function DashboardPage() {
                   <Route path="/matcher/*" element={<JDMatcherPage />} />
                   <Route path="/hunter" element={<JobHunterPage />} />
                   <Route path="/hunter/result/:runId" element={<JobHunterResultPage />} />
+                  <Route path="/tracker" element={<JobTrackerPage />} />
                   {/* Add more dashboard-nested routes here */}
                 </Routes>
               </main>

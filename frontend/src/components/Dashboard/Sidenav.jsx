@@ -1,8 +1,7 @@
-// src/components/Dashboard/Sidenav.jsx
 import React from 'react';
 import { UserButton } from '@clerk/clerk-react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { User, Target, BrainCircuit, Bot } from 'lucide-react';
+import { User, Target, BrainCircuit, Bot, ClipboardList } from 'lucide-react';
 import { AnimatedThemeToggler } from '../ui/animated-theme-toggler';
 
 // Re-usable NavItem component
@@ -73,6 +72,7 @@ export const Sidenav = () => {
         <NavItem icon={User} label="My Profile" path="/dashboard" />
         <NavItem icon={Target} label="JD Matcher" path="/dashboard/matcher" />
         <NavItem icon={BrainCircuit} label="Job Hunter Agent" path="/dashboard/hunter" />
+        <NavItem icon={ClipboardList} label="Job Tracker" path="/dashboard/tracker" />
         <NavItem icon={Bot} label="AI Mentor" path="/dashboard/mentor" />
       </div>
 

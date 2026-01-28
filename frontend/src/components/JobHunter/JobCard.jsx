@@ -1,6 +1,8 @@
-import React from 'react';
-import { MapPin, Briefcase, DollarSign, Clock, ExternalLink, Building2, Award, TrendingUp } from 'lucide-react';
+import React, { useState } from 'react';
+import { MapPin, Briefcase, DollarSign, Clock, ExternalLink, Building2, Award, TrendingUp, Bookmark, BookmarkCheck } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useAuth } from '@clerk/clerk-react';
+import { useToast } from '../ui/Toast';
 
 /**
  * JobCard - Displays a single job result with Phase 4 enhancements (Shiny Glass Design)
@@ -23,6 +25,63 @@ export function JobCard({ job }) {
         gapAnalysis,
         rank
     } = job;
+
+    const { getToken } = useAuth();
+    const toast = useToast();
+    const [isSaved, setIsSaved] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+
+    const handleSaveToTracker = async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (isSaved || isSaving) return;
+
+        setIsSaving(true);
+        try {
+            const token = await getToken();
+            const API_URL = import.meta.env.VITE_API_GATEWAY_URL || 'http://localhost:8080';
+
+            const jobData = {
+                title,
+                company,
+                location: location || '',
+                salary: salary || '',
+                jobType: type || 'Full-time',
+                description: description || '',
+                applyLink,
+                source: 'hunter',
+                matchScore,
+                tierLabel,
+                tier,
+                badges,
+                gapAnalysis,
+                stage: 'saved',
+                priority: 'medium'
+            };
+
+            const response = await fetch(`${API_URL}/api/tracker/jobs`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(jobData)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to save job');
+            }
+
+            setIsSaved(true);
+            toast.success('Job saved to tracker!');
+        } catch (error) {
+            console.error('Error saving job:', error);
+            toast.error('Failed to save job');
+        } finally {
+            setIsSaving(false);
+        }
+    };
 
     const getSourceLabel = (src) => {
         if (!src) return 'Unknown Source';
@@ -59,8 +118,25 @@ export function JobCard({ job }) {
 
             {/* Content Container (z-10 to stay above effects) */}
             <div className="relative z-10">
+                {/* Bookmark Button - Top Right */}
+                <button
+                    onClick={handleSaveToTracker}
+                    disabled={isSaved || isSaving}
+                    className={`absolute top-0 right-0 p-2 rounded-lg transition-all duration-300 z-20 ${isSaved
+                        ? 'bg-blue-500/20 text-blue-400 cursor-default'
+                        : 'bg-bg-dark/50 hover:bg-blue-500/20 text-text-secondary hover:text-blue-400'
+                        } ${isSaving ? 'opacity-50 cursor-wait' : ''}`}
+                    title={isSaved ? 'Saved to tracker' : 'Save to tracker'}
+                >
+                    {isSaved ? (
+                        <BookmarkCheck size={18} className="animate-pulse" />
+                    ) : (
+                        <Bookmark size={18} />
+                    )}
+                </button>
+
                 {/* Header */}
-                <div className="flex items-start justify-between gap-3 mb-3">
+                <div className="flex items-start justify-between gap-3 mb-3 pr-10">
                     <div className="flex-1 min-w-0">
                         {/* Tags Row */}
                         <div className="flex items-center gap-2 mb-2 flex-wrap">

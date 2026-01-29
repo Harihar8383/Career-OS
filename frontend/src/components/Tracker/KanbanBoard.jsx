@@ -24,7 +24,7 @@ import { DotPattern } from '../ui/dot-pattern';
 import { cn } from '../../lib/utils';
 
 // Sortable wrapper for job cards
-const SortableJobCard = React.memo(({ job, onViewDetails, onDelete }) => {
+const SortableJobCard = React.memo(({ job, onViewDetails }) => {
     const {
         attributes,
         listeners,
@@ -48,6 +48,7 @@ const SortableJobCard = React.memo(({ job, onViewDetails, onDelete }) => {
             <TrackedJobCard
                 job={job}
                 onViewDetails={onViewDetails}
+                isDragging={isDragging}
             />
         </div>
     );
@@ -68,6 +69,9 @@ const KanbanColumn = React.memo(({ stage, jobs, onViewDetails }) => {
 
     const config = stageConfig[stage] || stageConfig.saved;
     const Icon = config.icon;
+
+    // Memoize the list of items to prevent DotPattern re-renders affecting items if parent re-renders? 
+    // Actually DotPattern is light. The issue is SortableJobCard re-renders.
 
     return (
         <SortableContext
@@ -115,7 +119,7 @@ const KanbanColumn = React.memo(({ stage, jobs, onViewDetails }) => {
                             <SortableJobCard
                                 key={job._id}
                                 job={job}
-                                onViewDetails={() => onViewDetails(job)}
+                                onViewDetails={onViewDetails}
                             />
                         ))
                     )}
@@ -231,17 +235,13 @@ const KanbanBoardComponent = ({ jobs, onUpdateStage, onViewDetails, onDelete }) 
 
             <DragOverlay>
                 {activeJob ? (
-                    <motion.div
-                        initial={{ rotate: 0, scale: 1 }}
-                        animate={{ rotate: 3, scale: 1.05 }}
-                        className="opacity-90 shadow-2xl cursor-grabbing"
-                    >
+                    <div className="opacity-90 shadow-2xl cursor-grabbing rotate-3 scale-105">
                         <TrackedJobCard
                             job={activeJob}
                             onViewDetails={() => { }}
                             isDragging={true}
                         />
-                    </motion.div>
+                    </div>
                 ) : null}
             </DragOverlay>
         </DndContext>

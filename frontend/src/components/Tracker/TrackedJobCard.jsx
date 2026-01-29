@@ -1,13 +1,13 @@
 // frontend/src/components/Tracker/TrackedJobCard.jsx
-import React from 'react';
-import { Building2, Clock, Eye, FileText, Trash2 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import React, { memo } from 'react';
+import { Building2, Clock } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 /**
  * Minimal job card for Kanban view
+ * Memoized to prevent unnecessary re-renders during drag operations
  */
-export const TrackedJobCard = ({ job, onViewDetails, onDelete, className, isDragging }) => {
+export const TrackedJobCard = memo(({ job, onViewDetails, className, isDragging }) => {
     const { title, company, createdAt, priority } = job;
 
     // Priority color for left border
@@ -32,13 +32,18 @@ export const TrackedJobCard = ({ job, onViewDetails, onDelete, className, isDrag
         }
     };
 
+    const handleClick = (e) => {
+        e.stopPropagation(); // Prevent drag start if clicking (though dnd-kit usually handles this via activationConstraint)
+        onViewDetails(job);
+    };
+
     return (
         <div
-            className={`group relative bg-bg-card/60 backdrop-blur-xl border ${getPriorityColor()} border-l-4 border-y-border-primary border-r-border-primary rounded-xl p-4 ${isDragging ? 'cursor-grabbing' : 'cursor-pointer'} hover:border-blue-500/50 hover:bg-bg-card/80 transition-all duration-200 shadow-sm hover:shadow-md ${className || ''}`}
-            onClick={onViewDetails}
+            className={`group relative bg-bg-card/90 backdrop-blur-sm border ${getPriorityColor()} border-l-4 border-y-border-primary border-r-border-primary rounded-xl p-4 ${isDragging ? 'cursor-grabbing ring-2 ring-blue-500/40' : 'cursor-pointer'} hover:border-blue-500/50 hover:bg-bg-card transition-colors duration-200 shadow-sm ${className || ''}`}
+            onClick={handleClick}
         >
             {/* Content */}
-            <div className="relative z-10">
+            <div className="relative z-10 pointer-events-none"> {/* content doesn't need pointer events, wrapper handles click */}
                 {/* Company Icon */}
                 <div className="flex items-start gap-3 mb-3">
                     <div className="flex-shrink-0 w-10 h-10 bg-bg-dark/50 rounded-lg flex items-center justify-center border border-border-primary">
@@ -63,4 +68,6 @@ export const TrackedJobCard = ({ job, onViewDetails, onDelete, className, isDrag
             </div>
         </div>
     );
-};
+});
+
+TrackedJobCard.displayName = 'TrackedJobCard';

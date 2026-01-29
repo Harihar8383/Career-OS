@@ -50,17 +50,54 @@ export function DotPattern({
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
 
   useEffect(() => {
+    if (!glow) return;
+
+    let timeoutId;
     const updateDimensions = () => {
-      if (containerRef.current) {
-        const { width, height } = containerRef.current.getBoundingClientRect()
-        setDimensions({ width, height })
-      }
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        if (containerRef.current) {
+          const { width, height } = containerRef.current.getBoundingClientRect()
+          setDimensions({ width, height })
+        }
+      }, 200);
     }
 
     updateDimensions()
     window.addEventListener("resize", updateDimensions)
-    return () => window.removeEventListener("resize", updateDimensions);
-  }, [])
+    return () => {
+      window.removeEventListener("resize", updateDimensions)
+      clearTimeout(timeoutId);
+    };
+  }, [glow])
+
+  if (!glow) {
+    return (
+      <svg
+        aria-hidden="true"
+        className={cn(
+          "pointer-events-none absolute inset-0 h-full w-full fill-neutral-400/80",
+          className
+        )}
+        {...props}
+      >
+        <defs>
+          <pattern
+            id={id}
+            width={width}
+            height={height}
+            patternUnits="userSpaceOnUse"
+            patternContentUnits="userSpaceOnUse"
+            x={x}
+            y={y}
+          >
+            <circle id="pattern-circle" cx={cx} cy={cy} r={cr} />
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" strokeWidth={0} fill={`url(#${id})`} />
+      </svg>
+    )
+  }
 
   const dots = Array.from({
     length:
@@ -103,20 +140,20 @@ export function DotPattern({
           animate={
             glow
               ? {
-                  opacity: [0.4, 1, 0.4],
-                  scale: [1, 1.5, 1],
-                }
+                opacity: [0.4, 1, 0.4],
+                scale: [1, 1.5, 1],
+              }
               : {}
           }
           transition={
             glow
               ? {
-                  duration: dot.duration,
-                  repeat: Infinity,
-                  repeatType: "reverse",
-                  delay: dot.delay,
-                  ease: "easeInOut",
-                }
+                duration: dot.duration,
+                repeat: Infinity,
+                repeatType: "reverse",
+                delay: dot.delay,
+                ease: "easeInOut",
+              }
               : {}
           } />
       ))}

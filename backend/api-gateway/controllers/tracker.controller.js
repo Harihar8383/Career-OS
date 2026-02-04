@@ -7,7 +7,7 @@ import TrackedJob from '../models/TrackedJob.js';
  */
 export const createTrackedJob = async (req, res) => {
   try {
-    const { userId } = req.auth(); // Clerk auth as function
+    const { userId } = req.auth; // Clerk auth as object
     const jobData = {
       ...req.body,
       userId
@@ -45,7 +45,7 @@ export const createTrackedJob = async (req, res) => {
  */
 export const getAllTrackedJobs = async (req, res) => {
   try {
-    const { userId } = req.auth();
+    const { userId } = req.auth;
     const { stage, priority, company, search } = req.query;
 
     // Build filter
@@ -84,7 +84,7 @@ export const getAllTrackedJobs = async (req, res) => {
  */
 export const getTrackedJobById = async (req, res) => {
   try {
-    const { userId } = req.auth();
+    const { userId } = req.auth;
     const { id } = req.params;
 
     const job = await TrackedJob.findOne({ _id: id, userId });
@@ -116,7 +116,7 @@ export const getTrackedJobById = async (req, res) => {
  */
 export const updateTrackedJob = async (req, res) => {
   try {
-    const { userId } = req.auth();
+    const { userId } = req.auth;
     const { id } = req.params;
     const updates = req.body;
 
@@ -165,7 +165,7 @@ export const updateTrackedJob = async (req, res) => {
  */
 export const deleteTrackedJob = async (req, res) => {
   try {
-    const { userId } = req.auth();
+    const { userId } = req.auth;
     const { id } = req.params;
 
     const job = await TrackedJob.findOneAndDelete({ _id: id, userId });
@@ -197,7 +197,7 @@ export const deleteTrackedJob = async (req, res) => {
  */
 export const addNote = async (req, res) => {
   try {
-    const { userId } = req.auth();
+    const { userId } = req.auth;
     const { id } = req.params;
     const { content } = req.body;
 
@@ -243,7 +243,7 @@ export const addNote = async (req, res) => {
  */
 export const addReminder = async (req, res) => {
   try {
-    const { userId } = req.auth();
+    const { userId } = req.auth;
     const { id } = req.params;
     const { date, message } = req.body;
 
@@ -290,7 +290,7 @@ export const addReminder = async (req, res) => {
  */
 export const addInterview = async (req, res) => {
   try {
-    const { userId } = req.auth();
+    const { userId } = req.auth;
     const { id } = req.params;
     const { round, scheduledDate, interviewers, feedback, result } = req.body;
 
@@ -339,7 +339,7 @@ export const addInterview = async (req, res) => {
  */
 export const bulkUpdateStage = async (req, res) => {
   try {
-    const { userId } = req.auth();
+    const { userId } = req.auth;
     const { jobIds, stage } = req.body;
 
     if (!jobIds || !Array.isArray(jobIds) || jobIds.length === 0) {

@@ -125,7 +125,7 @@ export const Hero = () => {
 
               <motion.h1
                 variants={fadeIn}
-                className="text-[35px] sm:text-[35px] md:text-[42px] lg:text-[56px] xl:text-[76px] leading-[32px] sm:leading-[36px] md:leading-[46px] lg:leading-[60px] xl:leading-[77px] tracking-[-0.56px] sm:tracking-[-0.64px] md:tracking-[-0.84px] lg:tracking-[-1.12px] xl:tracking-[-1.42px] bg-gradient-to-b from-white from-20% to-gray-200 sm:from-white sm:from-30% sm:to-gray-300 to-100% bg-clip-text m-0 font-clash-display font-extrabold"
+                className="text-[35px] sm:text-[35px] md:text-[42px] lg:text-[56px] xl:text-[71px] leading-[32px] sm:leading-[36px] md:leading-[46px] lg:leading-[60px] xl:leading-[77px] tracking-[-0.56px] sm:tracking-[-0.64px] md:tracking-[-0.84px] lg:tracking-[-1.12px] xl:tracking-[-1.42px] bg-gradient-to-b from-white from-20% to-gray-200 sm:from-white sm:from-30% sm:to-gray-300 to-100% bg-clip-text m-0 font-clash-display font-extrabold"
                 style={{ WebkitTextFillColor: 'transparent' }}
               >
                 Go from Resume to Hired.<br />Smarter.

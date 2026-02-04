@@ -7,7 +7,7 @@ import { useToast } from '../ui/Toast';
 /**
  * JobCard - Displays a single job result with Phase 4 enhancements (Shiny Glass Design)
  */
-export function JobCard({ job }) {
+export function JobCard({ job, onJobClick }) {
     const {
         title,
         company,
@@ -30,54 +30,110 @@ export function JobCard({ job }) {
     const toast = useToast();
     const [isSaved, setIsSaved] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+    const [savedJobId, setSavedJobId] = useState(null);
 
-    const handleSaveToTracker = async (e) => {
+    // Check if job is already saved on mount
+    React.useEffect(() => {
+        const checkIfSaved = async () => {
+            try {
+                const token = await getToken();
+                const API_URL = import.meta.env.VITE_API_GATEWAY_URL || 'http://localhost:8080';
+
+                const response = await fetch(`${API_URL}/api/tracker/jobs`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    const jobs = result.data || [];
+                    const savedJob = jobs.find(j =>
+                        j.applyLink === applyLink ||
+                        (j.title === title && j.company === company)
+                    );
+
+                    if (savedJob) {
+                        setIsSaved(true);
+                        setSavedJobId(savedJob._id);
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking if job is saved:', error);
+            }
+        };
+
+        checkIfSaved();
+    }, [applyLink, title, company, getToken]);
+
+    const handleToggleSave = async (e) => {
         e.preventDefault();
         e.stopPropagation();
 
-        if (isSaved || isSaving) return;
+        if (isSaving) return;
 
         setIsSaving(true);
         try {
             const token = await getToken();
             const API_URL = import.meta.env.VITE_API_GATEWAY_URL || 'http://localhost:8080';
 
-            const jobData = {
-                title,
-                company,
-                location: location || '',
-                salary: salary || '',
-                jobType: type || 'Full-time',
-                description: description || '',
-                applyLink,
-                source: 'hunter',
-                matchScore,
-                tierLabel,
-                tier,
-                badges,
-                gapAnalysis,
-                stage: 'saved',
-                priority: 'medium'
-            };
+            if (isSaved && savedJobId) {
+                // Remove from tracker
+                const response = await fetch(`${API_URL}/api/tracker/jobs/${savedJobId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
 
-            const response = await fetch(`${API_URL}/api/tracker/jobs`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(jobData)
-            });
+                if (!response.ok) {
+                    throw new Error('Failed to remove job');
+                }
 
-            if (!response.ok) {
-                throw new Error('Failed to save job');
+                setIsSaved(false);
+                setSavedJobId(null);
+                toast.success('Job removed from tracker');
+            } else {
+                // Save to tracker
+                const jobData = {
+                    title,
+                    company,
+                    location: location || '',
+                    salary: salary || '',
+                    jobType: type || 'Full-time',
+                    description: description || '',
+                    applyLink,
+                    source: 'hunter',
+                    matchScore,
+                    tierLabel,
+                    tier,
+                    badges,
+                    gapAnalysis,
+                    stage: 'saved',
+                    priority: 'medium'
+                };
+
+                const response = await fetch(`${API_URL}/api/tracker/jobs`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(jobData)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to save job');
+                }
+
+                const result = await response.json();
+                setIsSaved(true);
+                setSavedJobId(result.data._id);
+                toast.success('Job saved to tracker!');
             }
-
-            setIsSaved(true);
-            toast.success('Job saved to tracker!');
         } catch (error) {
-            console.error('Error saving job:', error);
-            toast.error('Failed to save job');
+            console.error('Error toggling save:', error);
+            toast.error(isSaved ? 'Failed to remove job' : 'Failed to save job');
         } finally {
             setIsSaving(false);
         }
@@ -108,6 +164,7 @@ export function JobCard({ job }) {
             animate={{ opacity: 1, y: 0 }}
             whileHover={{ y: -5, scale: 1.01 }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            onDoubleClick={() => onJobClick && onJobClick(job)}
             className="group relative bg-bg-card/60 backdrop-blur-xl border border-border-primary rounded-2xl p-5 overflow-hidden hover:border-blue-500/30 transition-colors duration-300"
         >
             {/* Animated Gradient Overlay on Hover */}
@@ -120,16 +177,16 @@ export function JobCard({ job }) {
             <div className="relative z-10">
                 {/* Bookmark Button - Top Right */}
                 <button
-                    onClick={handleSaveToTracker}
-                    disabled={isSaved || isSaving}
+                    onClick={handleToggleSave}
+                    disabled={isSaving}
                     className={`absolute top-0 right-0 p-2 rounded-lg transition-all duration-300 z-20 ${isSaved
-                        ? 'bg-blue-500/20 text-blue-400 cursor-default'
+                        ? 'bg-blue-500/20 text-blue-400 hover:bg-red-500/20 hover:text-red-400'
                         : 'bg-bg-dark/50 hover:bg-blue-500/20 text-text-secondary hover:text-blue-400'
                         } ${isSaving ? 'opacity-50 cursor-wait' : ''}`}
-                    title={isSaved ? 'Saved to tracker' : 'Save to tracker'}
+                    title={isSaved ? 'Remove from tracker' : 'Save to tracker'}
                 >
                     {isSaved ? (
-                        <BookmarkCheck size={18} className="animate-pulse" />
+                        <BookmarkCheck size={18} className="fill-current" />
                     ) : (
                         <Bookmark size={18} />
                     )}

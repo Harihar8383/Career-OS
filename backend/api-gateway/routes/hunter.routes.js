@@ -4,7 +4,9 @@ import {
   startHunt,
   getSession,
   getResults,
-  streamLogs
+  streamLogs,
+  getAllSessions,
+  getJobById
 } from '../controllers/hunter.controller.js';
 import { requireAuth } from '@clerk/express';
 
@@ -14,8 +16,10 @@ const router = express.Router();
 router.use(requireAuth());
 
 router.post('/start', startHunt);  // Changed from /hunt to /start to match frontend
+router.get('/sessions', getAllSessions);  // Get all sessions for user (history)
 router.get('/session/:sessionId', getSession);
 router.get('/results/:sessionId', getResults);
+router.get('/job/:jobId', getJobById);  // Get single job details
 router.get('/logs/:sessionId', streamLogs);  // SSE endpoint
 
 export default router;

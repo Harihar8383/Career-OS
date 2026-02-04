@@ -1,14 +1,18 @@
 // src/pages/JobHunterPage.jsx
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AppLayout } from '../components/Layout/AppLayout';
 import JobHunterForm from '../components/JobHunter/JobHunterForm';
 import { JobHunterLogs } from '../components/JobHunter/JobHunterLogs';
 import { JobCard } from '../components/JobHunter/JobCard';
+import { JobDetailsModal } from '../components/JobHunter/JobDetailsModal';
 import { useJobHunt } from '../hooks/useJobHunt';
-import { Bot, Sparkles, ArrowLeft, RefreshCw } from 'lucide-react';
+import { Bot, Sparkles, ArrowLeft, RefreshCw, History } from 'lucide-react';
 
 export default function JobHunterPage() {
+  const navigate = useNavigate();
   const [view, setView] = useState('form'); // 'form', 'terminal', 'results'
+  const [selectedJob, setSelectedJob] = useState(null);
   const { sessionId, logs, status, error, results, startHunt, reset } = useJobHunt();
 
   /**
@@ -33,6 +37,13 @@ export default function JobHunterPage() {
   };
 
   /**
+   * Handle navigation to history page
+   */
+  const handleViewHistory = () => {
+    navigate('/dashboard/hunter/history');
+  };
+
+  /**
    * When status becomes completed, switch to results view
    */
   useEffect(() => {
@@ -46,15 +57,25 @@ export default function JobHunterPage() {
       {/* Header - Changes based on view */}
       {view === 'form' && (
         <div className="space-y-2 max-w-4xl mx-auto w-full">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-blue-600/20 rounded-xl border border-blue-500/30">
-              <Bot size={24} className="text-blue-400" />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 bg-blue-600/20 rounded-xl border border-blue-500/30">
+                <Bot size={24} className="text-blue-400" />
+              </div>
+              <h1 className="text-3xl font-clash-display text-text-primary">Job Hunter Agent</h1>
+              <span className="px-3 py-1 bg-blue-500/20 text-blue-300 text-xs font-bold rounded-full border border-blue-500/30 flex items-center gap-1.5">
+                <Sparkles size={12} />
+                AI POWERED
+              </span>
             </div>
-            <h1 className="text-3xl font-clash-display text-text-primary">Job Hunter Agent</h1>
-            <span className="px-3 py-1 bg-blue-500/20 text-blue-300 text-xs font-bold rounded-full border border-blue-500/30 flex items-center gap-1.5">
-              <Sparkles size={12} />
-              AI POWERED
-            </span>
+
+            <button
+              onClick={handleViewHistory}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600/20 hover:bg-purple-600 border border-purple-500/30 hover:border-purple-500 text-purple-300 hover:text-white rounded-lg text-sm font-semibold transition-all duration-300"
+            >
+              <History size={16} />
+              View History
+            </button>
           </div>
           <p className="text-text-body text-base font-dm-sans max-w-2xl">
             Configure your intelligent job hunting assistant. We'll automatically search and match opportunities based on your preferences.
@@ -105,7 +126,7 @@ export default function JobHunterPage() {
           {results.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {results.map((job, index) => (
-                <JobCard key={job.id || index} job={job} />
+                <JobCard key={job.id || index} job={job} onJobClick={setSelectedJob} />
               ))}
             </div>
           ) : (
@@ -124,6 +145,13 @@ export default function JobHunterPage() {
           )}
         </div>
       )}
+
+      {/* Job Details Modal */}
+      <JobDetailsModal
+        job={selectedJob}
+        isOpen={!!selectedJob}
+        onClose={() => setSelectedJob(null)}
+      />
     </div>
   );
 }

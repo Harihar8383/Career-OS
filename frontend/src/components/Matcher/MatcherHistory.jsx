@@ -10,46 +10,102 @@ const HistoryCard = ({ item, onLoadAnalysis, onDelete }) => {
     const toast = useToast();
     const [isSaved, setIsSaved] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+    const [savedJobId, setSavedJobId] = useState(null);
 
-    const handleSaveToTracker = async (e) => {
+    // Check if this matcher result is already saved on mount
+    React.useEffect(() => {
+        const checkIfSaved = async () => {
+            try {
+                const token = await getToken();
+                const response = await fetch(`${API_URL}/api/tracker/jobs`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    const jobs = result.data || [];
+                    // Check if a job with this runId exists
+                    const savedJob = jobs.find(j =>
+                        j.description?.includes(`Run ID: ${item.runId}`) ||
+                        (j.title === (item.jobTitle || 'Job from History') && j.company === (item.company || 'Unknown'))
+                    );
+
+                    if (savedJob) {
+                        setIsSaved(true);
+                        setSavedJobId(savedJob._id);
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking if job is saved:', error);
+            }
+        };
+
+        checkIfSaved();
+    }, [item.runId, item.jobTitle, item.company, getToken]);
+
+    const handleToggleSave = async (e) => {
         e.stopPropagation();
-        if (isSaved || isSaving) return;
+        if (isSaving) return;
 
         setIsSaving(true);
         try {
             const token = await getToken();
-            const jobData = {
-                title: item.jobTitle || 'Job from History',
-                company: item.company || 'Unknown',
-                location: '',
-                salary: '',
-                jobType: 'Full-time',
-                description: `Imported from Matcher History (Run ID: ${item.runId})`,
-                applyLink: '',
-                source: 'matcher_history',
-                matchScore: item.score || 0,
-                stage: 'saved',
-                priority: item.score >= 80 ? 'high' : item.score >= 60 ? 'medium' : 'low'
-            };
 
-            const response = await fetch(`${API_URL}/api/tracker/jobs`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(jobData)
-            });
+            if (isSaved && savedJobId) {
+                // Remove from tracker
+                const response = await fetch(`${API_URL}/api/tracker/jobs/${savedJobId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
 
-            if (!response.ok) {
-                throw new Error('Failed to save job');
+                if (!response.ok) {
+                    throw new Error('Failed to remove job');
+                }
+
+                setIsSaved(false);
+                setSavedJobId(null);
+                toast.success('Job removed from tracker');
+            } else {
+                // Save to tracker
+                const jobData = {
+                    title: item.jobTitle || 'Job from History',
+                    company: item.company || 'Unknown',
+                    location: '',
+                    salary: '',
+                    jobType: 'Full-time',
+                    description: `Imported from Matcher History (Run ID: ${item.runId})`,
+                    applyLink: '',
+                    source: 'matcher',
+                    matchScore: item.score || 0,
+                    stage: 'saved',
+                    priority: item.score >= 80 ? 'high' : item.score >= 60 ? 'medium' : 'low'
+                };
+
+                const response = await fetch(`${API_URL}/api/tracker/jobs`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(jobData)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to save job');
+                }
+
+                const result = await response.json();
+                setIsSaved(true);
+                setSavedJobId(result.data._id);
+                toast.success('Job saved to tracker!');
             }
-
-            setIsSaved(true);
-            toast.success('Job saved to tracker!');
         } catch (error) {
-            console.error('Error saving job:', error);
-            toast.error('Failed to save job');
+            console.error('Error toggling save:', error);
+            toast.error(isSaved ? 'Failed to remove job' : 'Failed to save job');
         } finally {
             setIsSaving(false);
         }
@@ -62,15 +118,15 @@ const HistoryCard = ({ item, onLoadAnalysis, onDelete }) => {
         >
             <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
                 <button
-                    onClick={handleSaveToTracker}
-                    disabled={isSaved || isSaving}
+                    onClick={handleToggleSave}
+                    disabled={isSaving}
                     className={`p-1.5 rounded-lg transition-colors ${isSaved
-                        ? 'bg-blue-500/10 text-blue-400'
+                        ? 'bg-blue-500/10 text-blue-400 hover:bg-red-500/10 hover:text-red-400'
                         : 'bg-bg-dark hover:bg-blue-500/10 text-text-secondary hover:text-blue-400'
-                        }`}
-                    title={isSaved ? 'Saved to Tracker' : 'Save to Tracker'}
+                        } ${isSaving ? 'opacity-50 cursor-wait' : ''}`}
+                    title={isSaved ? 'Remove from Tracker' : 'Save to Tracker'}
                 >
-                    {isSaved ? <BookmarkCheck size={16} /> : <Bookmark size={16} />}
+                    {isSaved ? <BookmarkCheck size={16} className="fill-current" /> : <Bookmark size={16} />}
                 </button>
                 <button
                     onClick={(e) => onDelete(e, item.runId)}

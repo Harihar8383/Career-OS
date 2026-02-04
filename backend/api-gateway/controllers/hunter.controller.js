@@ -225,3 +225,85 @@ export const streamLogs = async (req, res) => {
     }
   }
 };
+
+/**
+ * @desc Get all job hunt sessions for a user (history)
+ * @route GET /api/hunter/sessions
+ * @access Private
+ */
+export const getAllSessions = async (req, res) => {
+  const { userId } = req.auth;
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 20;
+  const skip = (page - 1) * limit;
+
+  try {
+    // Fetch sessions sorted by most recent first
+    const sessions = await HunterSession.find({ userId })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
+    // Get job counts for each session
+    const sessionsWithCounts = await Promise.all(
+      sessions.map(async (session) => {
+        const jobCount = await JobResult.countDocuments({
+          sessionId: session.sessionId,
+          userId
+        });
+        
+        return {
+          sessionId: session.sessionId,
+          status: session.status,
+          criteria: session.criteria,
+          createdAt: session.createdAt,
+          updatedAt: session.updatedAt,
+          jobCount
+        };
+      })
+    );
+
+    // Get total count for pagination
+    const totalSessions = await HunterSession.countDocuments({ userId });
+
+    res.status(200).json({
+      sessions: sessionsWithCounts,
+      pagination: {
+        page,
+        limit,
+        totalSessions,
+        totalPages: Math.ceil(totalSessions / limit),
+        hasMore: skip + sessions.length < totalSessions
+      }
+    });
+
+  } catch (error) {
+    console.error("[API] Error fetching sessions:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+/**
+ * @desc Get a single job by ID
+ * @route GET /api/hunter/job/:jobId
+ * @access Private
+ */
+export const getJobById = async (req, res) => {
+  const { userId } = req.auth;
+  const { jobId } = req.params;
+
+  try {
+    const job = await JobResult.findOne({ _id: jobId, userId }).lean();
+
+    if (!job) {
+      return res.status(404).json({ error: "Job not found." });
+    }
+
+    res.status(200).json(job);
+
+  } catch (error) {
+    console.error("[API] Error fetching job:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};

@@ -10,6 +10,7 @@ import ProfilePage from "./ProfilePage";
 import JDMatcherPage from "./JDMatcherPage";
 import JobHunterPage from "./JobHunterPage";
 import JobHunterResultPage from "./JobHunterResultPage";
+import JobHunterHistoryPage from "./JobHunterHistoryPage";
 import JobTrackerPage from "./JobTrackerPage";
 
 // A placeholder for now
@@ -65,6 +66,8 @@ function DashboardPage() {
                   <Route path="/" element={<ProfilePage />} />
                   <Route path="/matcher/*" element={<JDMatcherPage />} />
                   <Route path="/hunter" element={<JobHunterPage />} />
+                  <Route path="/hunter/history" element={<JobHunterHistoryPage />} />
+                  <Route path="/hunter/session/:sessionId" element={<JobHunterResultPage />} />
                   <Route path="/hunter/result/:runId" element={<JobHunterResultPage />} />
                   <Route path="/tracker" element={<JobTrackerPage />} />
                   {/* Add more dashboard-nested routes here */}

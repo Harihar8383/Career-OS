@@ -38,7 +38,7 @@ const KeywordGapReport = ({ data = {} }) => {
                     </h3>
                     <div className="flex flex-wrap gap-2">
                         {missing.length > 0 ? missing.map((tag, i) => (
-                            <span key={i} className="px-3 py-1.5 bg-red-500/10 text-red-300 text-xs font-bold rounded-lg border border-red-500/20 decoration-dotted underline shadow-[0_0_10px_rgba(239,68,68,0.1)]">
+                            <span key={i} className="px-3 py-1.5 bg-red-500/10 text-red-300 text-xs font-bold rounded-lg border border-red-500/20 shadow-[0_0_10px_rgba(239,68,68,0.1)]">
                                 {tag}
                             </span>
                         )) : <p className="text-gray-500 text-sm italic">No critical gaps.</p>}

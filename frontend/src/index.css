@@ -390,6 +390,31 @@
   scrollbar-color: rgba(100, 100, 100, 0.3) transparent;
 }
 
+/* Dark themed scrollbar for lists */
+.dark-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dark-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 9999px;
+}
+
+.dark-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(55, 65, 81, 0.8);
+  border-radius: 9999px;
+}
+
+.dark-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(75, 85, 99, 0.9);
+}
+
+/* For Firefox */
+.dark-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(55, 65, 81, 0.8) rgba(0, 0, 0, 0.3);
+}
+
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation: none;

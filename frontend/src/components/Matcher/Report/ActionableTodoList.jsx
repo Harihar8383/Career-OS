@@ -8,40 +8,42 @@ const PriorityBadge = ({ priority }) => {
 };
 
 const TopImprovements = ({ items = [] }) => (
-    <div className="col-span-1 lg:col-span-7 space-y-4">
+    <div className="col-span-1 lg:col-span-7 flex flex-col">
         <h3 className="flex items-center gap-2 text-lg font-bold text-text-primary mb-4">
             <span className="text-blue-400">⚡</span> Top Improvement Opportunities
         </h3>
 
-        {items.map((item, idx) => (
-            <div key={idx} className="bg-bg-card border border-border-primary hover:border-blue-500/30 p-5 rounded-2xl flex items-start gap-5 transition-all duration-300 group shadow-sm hover:shadow-md">
-                <div className="mt-1 font-mono text-text-secondary text-sm font-bold group-hover:text-blue-500 transition-colors w-6 text-center">0{idx + 1}</div>
-                <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                        <PriorityBadge priority={item.priority} />
-                        <h4 className="text-text-primary font-bold text-lg leading-tight">{item.action}</h4>
-                    </div>
-                    <p className="text-text-secondary text-sm mb-4 leading-relaxed font-dm-sans">
-                        {item.why_it_matters}
-                    </p>
-                    <div className="flex items-center gap-2">
-                        <span className="px-2.5 py-1 bg-bg-dark/50 border border-border-secondary rounded-lg text-[10px] text-text-secondary font-bold uppercase tracking-wider backdrop-blur-sm">
-                            {item.where_to_apply || "General"}
-                        </span>
+        <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 terminal-scrollbar">
+            {items.map((item, idx) => (
+                <div key={idx} className="bg-bg-card border border-border-primary hover:border-blue-500/30 p-5 rounded-2xl flex items-start gap-5 transition-all duration-300 group shadow-sm hover:shadow-md">
+                    <div className="mt-1 font-mono text-text-secondary text-sm font-bold group-hover:text-blue-500 transition-colors w-6 text-center">0{idx + 1}</div>
+                    <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                            <PriorityBadge priority={item.priority} />
+                            <h4 className="text-text-primary font-bold text-lg leading-tight">{item.action}</h4>
+                        </div>
+                        <p className="text-text-secondary text-sm mb-4 leading-relaxed font-dm-sans">
+                            {item.why_it_matters}
+                        </p>
+                        <div className="flex items-center gap-2">
+                            <span className="px-2.5 py-1 bg-bg-dark/50 border border-border-secondary rounded-lg text-[10px] text-text-secondary font-bold uppercase tracking-wider backdrop-blur-sm">
+                                {item.where_to_apply || "General"}
+                            </span>
+                        </div>
                     </div>
                 </div>
-            </div>
-        ))}
+            ))}
+        </div>
     </div>
 );
 
 const SkillValidator = ({ items = [] }) => (
-    <div className="col-span-1 lg:col-span-5 border border-border-primary bg-bg-card backdrop-blur-sm rounded-2xl p-6 h-fit shadow-lg">
+    <div className="col-span-1 lg:col-span-5 border border-border-primary bg-bg-card backdrop-blur-sm rounded-2xl p-6 shadow-lg flex flex-col">
         <h3 className="flex items-center gap-2 text-lg font-bold text-text-primary mb-6">
             <span className="text-purple-400">🛡️</span> Skill Evidence Validator
         </h3>
 
-        <div className="space-y-4">
+        <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 terminal-scrollbar">
             {items.map((item, idx) => (
                 <div key={idx} className="bg-bg-dark/50 rounded-xl p-4 border border-border-secondary hover:border-border-primary transition-colors">
                     <div className="flex justify-between items-center mb-2">

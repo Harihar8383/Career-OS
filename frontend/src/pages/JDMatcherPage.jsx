@@ -61,12 +61,12 @@ const MatcherInputView = () => {
   return (
     <div className="max-w-3xl mx-auto">
       <div className="flex items-center gap-3 mb-8">
-        <h1 className="text-4xl font-clash-display font-medium text-white tracking-wide">
+        <h1 className="text-3xl font-clash-display  text-white tracking-wide">
           JD Matcher
         </h1>
         <span className="px-3 py-1 bg-[#A855F7]/10 text-[#A855F7] text-xs font-bold rounded-full border border-[#A855F7]/30 flex items-center gap-1 shadow-[0_0_10px_rgba(168,85,247,0.2)]">
           <Sparkles size={12} />
-          AI AGENT
+          AI Powered
         </span>
       </div>
 
@@ -109,7 +109,7 @@ const MatcherHistoryView = () => {
         <button onClick={() => navigate('/dashboard/matcher')} className="p-2 hover:bg-slate-800 rounded-lg transition text-slate-400 hover:text-white">
           <ArrowLeft size={20} />
         </button>
-        <h1 className="text-2xl font-clash-display text-white">Analysis History</h1>
+        <h1 className="text-3xl font-clash-display text-white">Analysis History</h1>
       </div>
       <MatcherHistory onLoadAnalysis={(runId) => navigate(`../results/${runId}`)} />
     </div>

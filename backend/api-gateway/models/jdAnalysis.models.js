@@ -35,6 +35,11 @@ const JdAnalysisSchema = new Schema(
       type: Schema.Types.Mixed,
       default: null,
     },
+    embedding: {
+      // Vector embedding for semantic search (768 dimensions for Gemini)
+      type: [Number],
+      default: []
+    },
   },
   {
     // This adds `createdAt` and `updatedAt` fields

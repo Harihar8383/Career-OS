@@ -162,7 +162,11 @@ const UserSchema = new Schema(
         job_type: { type: [String], default: [] }, // e.g., 'Full-time', 'Internship'
         target_locations: { type: [String], default: [] },
         availability: { type: String } // e.g., 'Immediate', '2 weeks notice'
-      }
+      },
+
+      // Phase 3: AI Mentor Fields
+      resume_fingerprint: { type: String, default: '' },
+      raw_resume_text: { type: String, default: '' }
     }
   },
   {

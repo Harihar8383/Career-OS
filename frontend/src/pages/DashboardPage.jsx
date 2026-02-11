@@ -12,6 +12,7 @@ import JobHunterPage from "./JobHunterPage";
 import JobHunterResultPage from "./JobHunterResultPage";
 import JobHunterHistoryPage from "./JobHunterHistoryPage";
 import JobTrackerPage from "./JobTrackerPage";
+import AIMentorPage from "./AIMentorPage";
 
 // A placeholder for now
 const PlaceholderComponent = ({ title }) => (
@@ -70,6 +71,7 @@ function DashboardPage() {
                   <Route path="/hunter/session/:sessionId" element={<JobHunterResultPage />} />
                   <Route path="/hunter/result/:runId" element={<JobHunterResultPage />} />
                   <Route path="/tracker" element={<JobTrackerPage />} />
+                  <Route path="/mentor" element={<AIMentorPage />} />
                   {/* Add more dashboard-nested routes here */}
                 </Routes>
               </main>

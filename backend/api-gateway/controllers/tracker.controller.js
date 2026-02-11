@@ -25,6 +25,23 @@ export const createTrackedJob = async (req, res) => {
     const trackedJob = new TrackedJob(jobData);
     await trackedJob.save();
 
+    // Generate embedding for new job (async, non-blocking)
+    try {
+      const axios = (await import('axios')).default;
+      axios.post('http://localhost:8000/generate-job-embedding', {
+        jobId: trackedJob._id.toString(),
+        title: trackedJob.title || '',
+        company: trackedJob.company || '',
+        description: trackedJob.description || '',
+        location: trackedJob.location || ''
+      }).catch(err => {
+        console.error('Failed to generate job embedding (non-critical):', err.message);
+      });
+    } catch (error) {
+      console.error('Failed to trigger embedding generation:', error.message);
+      // Non-critical, don't block job creation
+    }
+
     res.status(201).json({
       success: true,
       data: trackedJob

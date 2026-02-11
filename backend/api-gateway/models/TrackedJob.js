@@ -197,6 +197,12 @@ const TrackedJobSchema = new Schema(
       default: ''
     },
 
+    // Vector embedding for semantic search (768 dimensions for Gemini text-embedding-004)
+    embedding: {
+      type: [Number],
+      default: []
+    },
+
     // Priority & Urgency
     priority: {
       type: String,

@@ -4,14 +4,21 @@ import sys
 import time
 import json
 import requests
-import pdfplumber
-import docx
+# import pdfplumber  # Not needed - PDF extraction handled by uploadthing
+# import docx  # Not needed - DOCX extraction handled by uploadthing
 import io
 import re
+import threading
+import asyncio
 from dotenv import load_dotenv
 from langchain_groq import ChatGroq
 from pymongo import MongoClient
 from pymongo.server_api import ServerApi
+from fastapi import FastAPI
+from fastapi.responses import StreamingResponse
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+import uvicorn
 
 # --- CONFIGURATION ---
 load_dotenv()
@@ -228,7 +235,43 @@ def resume_callback(ch, method, properties, body):
             upsert=True 
         )
 
-        print(f"   [db] ✅ Partial profile and Raw Text saved successfully.")
+        # --- Generate Resume Fingerprint ---
+        print(f"   [ai] Generating resume fingerprint for user: {user_id}")
+        
+        FINGERPRINT_PROMPT = """
+You are a resume summarizer. Create a concise 200-token summary capturing:
+- Seniority level and years of experience
+- Top 5 technical skills
+- 1-2 key projects or achievements
+- Target roles/industries
+
+Resume:
+\"\"\"
+{resume_text}
+\"\"\"
+
+Output format (plain text, no JSON):
+[Seniority] | [X YOE] | [Skill1, Skill2, ...] | [Key achievement] | [Target roles]
+"""
+        
+        try:
+            fingerprint_response = worker_llm.invoke(
+                FINGERPRINT_PROMPT.format(resume_text=raw_text[:8000])
+            )
+            fingerprint = fingerprint_response.content.strip()
+            
+            # Save to users collection
+            users_collection.update_one(
+                {"clerkId": user_id},
+                {"$set": {"profile.resume_fingerprint": fingerprint}}
+            )
+            print(f"   [ai] ✅ Fingerprint saved: {fingerprint[:100]}...")
+            
+        except Exception as e:
+            print(f"   [ai] ⚠️ Fingerprint generation failed: {e}")
+            # Non-critical, continue
+
+        print(f"   [db] ✅ Partial profile, Raw Text, and Fingerprint saved successfully.")
         
         ch.basic_ack(delivery_tag=method.delivery_tag)
         print("✅ [worker] RESUME job finished and acknowledged.")
@@ -314,6 +357,26 @@ def jd_analysis_callback(ch, method, properties, body):
 
         # 4. Save final results to DB
         update_analysis_status(run_id, "complete", results=final_result)
+        
+        # 5. Generate embedding for semantic search
+        try:
+            from utils.embeddings import generate_jd_embedding
+            
+            # Fetch the complete document to ensure we have all fields
+            analysis_doc = jd_analysis_collection.find_one({"runId": run_id})
+            if analysis_doc:
+                print(f"   [embedding] Generating embedding for analysis {run_id}...")
+                embedding = generate_jd_embedding(analysis_doc)
+                if embedding:
+                    jd_analysis_collection.update_one(
+                        {"runId": run_id},
+                        {"$set": {"embedding": embedding}}
+                    )
+                    print(f"   [embedding] ✅ Helper embedding saved for JD analysis")
+                else:
+                    print(f"   [embedding] ⚠️ Generated empty embedding")
+        except Exception as e:
+            print(f"   [embedding] ⚠️ Failed to generate embedding: {e}")
         
         ch.basic_ack(delivery_tag=method.delivery_tag)
         print("✅ [worker] JD ANALYSIS job finished and acknowledged.")
@@ -480,7 +543,124 @@ def main():
             print("   Retrying in 5 seconds...")
             time.sleep(5)
 
+
+# ============================================================
+# FASTAPI SERVER FOR AI MENTOR
+# ============================================================
+app = FastAPI()
+
+# CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+class ChatRequest(BaseModel):
+    user_id: str
+    thread_id: str
+    message: str
+
+@app.get("/health")
+def health():
+    return {"status": "ok", "service": "ai-worker"}
+
+@app.post("/mentor/stream")
+async def stream_mentor_chat(request: ChatRequest):
+    """Stream AI Mentor responses using SSE with token-by-token streaming."""
+    async def event_generator():
+        try:
+            from mentor_graph import invoke_mentor
+            
+            print(f"[mentor] Processing request for user: {request.user_id}")
+            
+            # Stream events from mentor (now async)
+            async for event in invoke_mentor(request.user_id, request.thread_id, request.message):
+                yield f"data: {json.dumps(event)}\n\n"
+                await asyncio.sleep(0.01)
+            print(f"[mentor] Stream complete")
+            
+        except Exception as e:
+            print(f"[mentor] Error: {e}")
+            import traceback
+            traceback.print_exc()
+            yield f"data: {json.dumps({'type': 'error', 'content': str(e)})}\n\n"
+    
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no"
+        }
+    )
+
+
+@app.post("/generate-job-embedding")
+async def generate_job_embedding_endpoint(request: dict):
+    """Generate and save embedding for a tracked job."""
+    print(f"   [api] Received embedding request for job: {request.get('jobId')}")
+    try:
+        from utils.embeddings import generate_job_embedding
+        from bson import ObjectId
+        
+        job_id = request.get('jobId')
+        job_doc = {
+            'title': request.get('title', ''),
+            'company': request.get('company', ''),
+            'description': request.get('description', ''),
+            'location': request.get('location', '')
+        }
+        
+        # Generate embedding
+        embedding = generate_job_embedding(job_doc)
+        
+        if embedding:
+            print(f"   [api] Generated {len(embedding)}-dim embedding for job {job_id}")
+            
+            # Update in MongoDB
+            result = mongo_db['trackedjobs'].update_one(
+                {"_id": ObjectId(job_id)},
+                {"$set": {"embedding": embedding}}
+            )
+            
+            if result.modified_count > 0:
+                print(f"   [api] ✅ Successfully saved embedding for job {job_id}")
+                return {"success": True, "dimensions": len(embedding)}
+            else:
+                print(f"   [api] ⚠️ Update matched but didn't modify (embedding might exist)")
+                return {"success": True, "message": "No changes made"}
+        else:
+            print(f"   [api] ❌ Failed to generate embedding")
+            return {"success": False, "error": "Failed to generate embedding"}
+            
+    except Exception as e:
+        print(f"   [api] ❌ Error in embedding endpoint: {e}")
+        return {"success": False, "error": str(e)}
+
+def run_fastapi():
+    """Run FastAPI server in a separate thread"""
+    # Use port 8000 for AI worker (API gateway uses 8080)
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+
+# ============================================================
+# MAIN ENTRY POINT
+# ============================================================
 if __name__ == "__main__":
+    print("=" * 60)
+    print("🚀 Starting Unified AI Worker Service")
+    print("=" * 60)
+    
+    # Start FastAPI server in background thread
+    fastapi_thread = threading.Thread(target=run_fastapi, daemon=True)
+    fastapi_thread.start()
+    print("✅ FastAPI server started on port 8000")
+    
+    # Start RabbitMQ consumers in main thread
+    print("🐇 Starting RabbitMQ consumers...")
     try:
         main()
     except KeyboardInterrupt:

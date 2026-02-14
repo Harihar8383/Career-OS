@@ -1,4 +1,10 @@
 import mongoose from 'mongoose';
+import dns from 'dns';
+
+// Fix for Node.js v22 DNS resolver issue on Windows
+// This forces Node.js to use Google Public DNS for SRV record lookups
+// See: https://stackoverflow.com/questions/68386270/nodejs-mongoose-srv-query-failed
+dns.setServers(['8.8.8.8', '8.8.4.4']);
 
 const connectDB = async () => {
   try {
@@ -12,7 +18,9 @@ const connectDB = async () => {
     console.log(`✅ API Gateway connected to MongoDB: ${conn.connection.host}`);
   } catch (error) {
     console.error(`❌ Error connecting to MongoDB: ${error.message}`);
-    process.exit(1); 
+    console.log(`⚠️  Server will continue running, but database operations will fail`);
+    console.log(`💡 Please check your MongoDB connection string and network connectivity`);
+    // Don't exit - allow server to start for debugging
   }
 };
 

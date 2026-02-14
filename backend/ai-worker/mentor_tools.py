@@ -3,6 +3,7 @@ import os
 import json
 from langchain.tools import tool
 from pymongo import MongoClient
+from tavily import TavilyClient
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -318,11 +319,39 @@ def internet_search(query: str) -> str:
     Returns:
         Search results summary
     """
-    # Placeholder - will be implemented with Tavily API
-    return json.dumps({
-        "message": f"Internet search for '{query}' would be performed here.",
-        "note": "This feature will be implemented with Tavily API integration."
-    })
+
+    api_key = os.getenv("TAVILY_API_KEY")
+    if not api_key:
+        return json.dumps({"error": "TAVILY_API_KEY not found in environment variables."})
+        
+    try:
+        print(f"   [tool:internet_search] Searching Tavily for: '{query}'")
+        client = TavilyClient(api_key=api_key)
+        
+        # optimized for general knowledge and market data
+        response = client.search(
+            query=query, 
+            search_depth="advanced",
+            max_results=5,
+            include_answer=True
+        )
+        
+        # Return answer + results for better context
+        return json.dumps({
+            "answer": response.get("answer", ""),
+            "results": [
+                {
+                    "title": r.get("title"),
+                    "url": r.get("url"),
+                    "content": r.get("content")
+                } 
+                for r in response.get("results", [])
+            ]
+        }, default=str)
+        
+    except Exception as e:
+        print(f"   [tool:internet_search] Error: {e}")
+        return json.dumps({"error": str(e)})
 
 @tool
 def calculate(numbers: list, operation: str) -> str:
@@ -362,9 +391,15 @@ def get_mentor_tools():
     """
     Return all available tools for the mentor agent.
     """
+    # Import Action Card tools
+    from action_card_tools import query_leetcode_questions, open_job_hunter, open_jd_matcher
+    
     return [
         vector_search_jobs,
         fetch_scan_history,
         get_profile_details,
-        internet_search
+        internet_search,
+        query_leetcode_questions,
+        open_job_hunter,
+        open_jd_matcher
     ]

@@ -27,6 +27,14 @@ const MatcherInputView = () => {
     runId
   } = useMatcher();
 
+  // Prefill JD Text from Action Card
+  const location = useLocation();
+  useEffect(() => {
+    if (location.state?.prefilled?.url && !jdText) {
+      setJdText(location.state.prefilled.url);
+    }
+  }, [location.state, setJdText, jdText]);
+
   // Auto-navigate to results when complete
   useEffect(() => {
     if (status === 'complete' && results) {

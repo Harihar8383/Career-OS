@@ -4,16 +4,35 @@ const PRESET_RANGES = [
     { label: '₹3-5L', min: 300000, max: 500000 },
     { label: '₹5-10L', min: 500000, max: 1000000 },
     { label: '₹10-20L', min: 1000000, max: 2000000 },
-    { label: '₹20L+', min: 2000000, max: 5000000 },
+    { label: '₹20-50L', min: 2000000, max: 5000000 },
+    { label: '₹50L-1Cr', min: 5000000, max: 10000000 },
 ];
+
+// Helper to format currency in lakhs/crores
+const formatCurrency = (value) => {
+    if (value >= 10000000) {
+        return `₹${(value / 10000000).toFixed(1)}Cr`;
+    } else if (value >= 100000) {
+        return `₹${(value / 100000).toFixed(1)}L`;
+    } else {
+        return `₹${(value / 1000).toFixed(0)}K`;
+    }
+};
+
+// Smart step size based on value
+const getStepSize = (value) => {
+    if (value < 1000000) return 50000;      // 50k steps below 10L
+    if (value < 5000000) return 100000;     // 1L steps for 10-50L
+    return 500000;                           // 5L steps above 50L
+};
 
 export function RangeSlider({
     min = 0,
-    max = 5000000,
+    max = 10000000,
     step = 50000,
-    value = [0, 5000000],
+    value = [0, 10000000],
     onChange,
-    formatValue = (val) => val,
+    formatValue = formatCurrency,
     className = ""
 }) {
     const [isDragging, setIsDragging] = useState(null);
@@ -32,12 +51,15 @@ export function RangeSlider({
         const rect = sliderRef.current.getBoundingClientRect();
         const percentage = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
         const newValue = min + (percentage / 100) * (max - min);
-        const steppedValue = Math.round(newValue / step) * step;
+
+        // Use smart step size
+        const currentStep = getStepSize(newValue);
+        const steppedValue = Math.round(newValue / currentStep) * currentStep;
 
         if (isDragging === 'min') {
-            onChange([Math.min(steppedValue, value[1] - step), value[1]]);
+            onChange([Math.min(steppedValue, value[1] - currentStep), value[1]]);
         } else {
-            onChange([value[0], Math.max(steppedValue, value[0] + step)]);
+            onChange([value[0], Math.max(steppedValue, value[0] + currentStep)]);
         }
     };
 
@@ -70,8 +92,8 @@ export function RangeSlider({
                         type="button"
                         onClick={() => selectPreset(preset)}
                         className={`px-3 py-1.5 text-xs rounded-lg border transition-all ${value[0] === preset.min && value[1] === preset.max
-                                ? 'bg-blue-600/20 border-blue-500/50 text-blue-300'
-                                : 'bg-white/5 border-white/10 text-text-secondary hover:bg-white/10 hover:text-text-primary'
+                            ? 'bg-blue-600/20 border-blue-500/50 text-blue-300'
+                            : 'bg-white/5 border-white/10 text-text-secondary hover:bg-white/10 hover:text-text-primary'
                             }`}
                     >
                         {preset.label}

@@ -1,7 +1,8 @@
 // src/components/AIChat/ChatInterface.jsx
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@clerk/clerk-react';
-import { Send, Sparkles, Loader2 } from 'lucide-react';
+import { Send, Sparkles, Loader2, ChevronDown, ChevronRight, BrainCircuit } from 'lucide-react';
+import ActionCard from './ActionCard';
 
 export default function ChatInterface() {
     const { getToken } = useAuth();
@@ -41,7 +42,7 @@ export default function ChatInterface() {
         setInput('');
         setIsStreaming(true);
 
-        let assistantMessage = { role: 'assistant', content: '' };
+        let assistantMessage = { role: 'assistant', content: '', thoughts: [], isThinkingExpanded: false };
         setMessages(prev => [...prev, assistantMessage]);
 
         try {
@@ -77,10 +78,15 @@ export default function ChatInterface() {
                         try {
                             const event = JSON.parse(data);
 
-                            if (event.type === 'thought') {
-                                setCurrentThought(event.content);
-                            } else if (event.type === 'tool_start') {
-                                // Show tool execution status
+                            if (event.type === 'thought' || event.type === 'tool_start') {
+                                setMessages(prev => {
+                                    const updated = [...prev];
+                                    const lastMsg = updated[updated.length - 1];
+                                    if (lastMsg) {
+                                        lastMsg.thoughts = [...(lastMsg.thoughts || []), event.content];
+                                    }
+                                    return updated;
+                                });
                                 setCurrentThought(event.content);
                             } else if (event.type === 'token') {
                                 // Accumulate tokens for typing effect
@@ -107,6 +113,17 @@ export default function ChatInterface() {
                                     updated[updated.length - 1].isStreaming = false;
                                     return updated;
                                 });
+                                setCurrentThought('');
+                            } else if (event.type === 'action_card') {
+                                // Action Card received - add as a special message
+                                setMessages(prev => [
+                                    ...prev,
+                                    {
+                                        role: 'action_card',
+                                        content: event.content,
+                                        isActionCard: true
+                                    }
+                                ]);
                                 setCurrentThought('');
                             } else if (event.type === 'error') {
                                 setMessages(prev => {
@@ -195,19 +212,95 @@ export default function ChatInterface() {
                         key={idx}
                         className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                     >
-                        <div
-                            className={`max-w-[80%] px-4 py-3 rounded-lg ${msg.role === 'user'
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-[#171717] text-[#d4d4d8] border border-[#262626]'
-                                }`}
-                        >
-                            <div className="whitespace-pre-wrap">
-                                {msg.content}
-                                {msg.isStreaming && (
-                                    <span className="inline-block w-[2px] h-4 ml-1 bg-blue-500 animate-pulse"></span>
-                                )}
+                        {msg.isActionCard ? (
+                            // Render Action Card
+                            <div className="w-full max-w-md">
+                                <ActionCard data={msg.content} />
                             </div>
-                        </div>
+                        ) : (
+                            // Render regular message
+                            <div
+                                className={`max-w-[80%] px-4 py-3 rounded-lg ${msg.role === 'user'
+                                    ? 'bg-blue-600 text-white'
+                                    : 'bg-[#171717] text-[#d4d4d8] border border-[#262626]'
+                                    }`}
+                            >
+                                {/* Thoughts Toggle */}
+                                {/* Thoughts Section - Active Status & Collapsible */}
+                                {(msg.thoughts && msg.thoughts.length > 0) || (msg.role === 'assistant' && msg.isStreaming && !msg.content) ? (
+                                    <div className="mb-4">
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setMessages(prev => {
+                                                    const updated = [...prev];
+                                                    updated[idx] = {
+                                                        ...updated[idx],
+                                                        isThinkingExpanded: !updated[idx].isThinkingExpanded
+                                                    };
+                                                    return updated;
+                                                });
+                                            }}
+                                            className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs transition-all duration-200 group cursor-pointer z-10 
+                                                ${msg.isStreaming && !msg.content
+                                                    ? 'bg-blue-900/20 border-blue-500/30 text-blue-400'
+                                                    : 'bg-[#262626] hover:bg-[#333] border-[#404040] text-[#a1a1aa]'}`}
+                                        >
+                                            {msg.isStreaming && !msg.content ? (
+                                                <div className="relative flex h-3 w-3">
+                                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                                                    <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
+                                                </div>
+                                            ) : (
+                                                <BrainCircuit className="w-3.5 h-3.5" />
+                                            )}
+
+                                            <span className="font-medium select-none">
+                                                {msg.isStreaming && !msg.content
+                                                    ? (currentThought || 'Thinking...')
+                                                    : (msg.isThinkingExpanded ? 'Hide process' : 'View process')}
+                                            </span>
+
+                                            {msg.isThinkingExpanded ?
+                                                <ChevronDown className="w-3.5 h-3.5 opacity-70" /> :
+                                                <ChevronRight className="w-3.5 h-3.5 opacity-70" />
+                                            }
+                                        </button>
+
+                                        {msg.isThinkingExpanded && (
+                                            <div className="mt-3 ml-2 pl-4 border-l-2 border-blue-500/30 space-y-3 relative animate-in fade-in slide-in-from-top-2 duration-300">
+                                                {/* Connecting line decoration */}
+                                                <div className="absolute -left-[9px] top-0 w-2 h-2 rounded-full bg-blue-500/30" />
+
+                                                {msg.thoughts && msg.thoughts.map((thought, tIdx) => (
+                                                    <div key={tIdx} className="text-xs text-[#a1a1aa] font-mono leading-relaxed bg-[#0a0a0a]/50 p-2 rounded border border-[#262626] flex items-start gap-2">
+                                                        <div className="mt-1 w-1.5 h-1.5 rounded-full bg-blue-500/50 flex-shrink-0" />
+                                                        <span>{thought}</span>
+                                                    </div>
+                                                ))}
+
+                                                {/* Active thinking indicator inside the block */}
+                                                {msg.isStreaming && !msg.content && (
+                                                    <div className="flex items-center gap-2 text-xs text-blue-400 font-mono p-2 bg-blue-900/10 rounded border border-blue-500/20 animate-pulse">
+                                                        <Loader2 className="w-3 h-3 animate-spin" />
+                                                        <span>{currentThought || 'Processing...'}</span>
+                                                    </div>
+                                                )}
+
+                                                <div className="absolute -left-[9px] bottom-0 w-2 h-2 rounded-full bg-blue-500/30" />
+                                            </div>
+                                        )}
+                                    </div>
+                                ) : null}
+
+                                <div className="whitespace-pre-wrap">
+                                    {msg.content}
+                                    {msg.isStreaming && (
+                                        <span className="inline-block w-[2px] h-4 ml-1 bg-blue-500 animate-pulse"></span>
+                                    )}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 ))}
 

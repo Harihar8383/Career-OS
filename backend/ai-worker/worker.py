@@ -572,12 +572,12 @@ async def stream_mentor_chat(request: ChatRequest):
     """Stream AI Mentor responses using SSE with token-by-token streaming."""
     async def event_generator():
         try:
-            from mentor_graph import invoke_mentor
+            from mentor_graph_v3 import invoke_mentor_v3
             
             print(f"[mentor] Processing request for user: {request.user_id}")
             
             # Stream events from mentor (now async)
-            async for event in invoke_mentor(request.user_id, request.thread_id, request.message):
+            async for event in invoke_mentor_v3(request.user_id, request.thread_id, request.message):
                 yield f"data: {json.dumps(event)}\n\n"
                 await asyncio.sleep(0.01)
             print(f"[mentor] Stream complete")

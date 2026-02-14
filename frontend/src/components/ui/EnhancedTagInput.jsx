@@ -32,10 +32,13 @@ export function EnhancedTagInput({
             ? LOCATION_SUGGESTIONS
             : [];
 
+    // Ensure tags is always an array
+    const tagsArray = Array.isArray(tags) ? tags : (tags ? [tags] : []);
+
     const filteredSuggestions = suggestions.filter(
         (suggestion) =>
             suggestion.toLowerCase().includes(inputValue.toLowerCase()) &&
-            !tags.includes(suggestion)
+            !tagsArray.includes(suggestion)
     ).slice(0, 5);
 
     useEffect(() => {
@@ -51,8 +54,8 @@ export function EnhancedTagInput({
 
     const addTag = (tag) => {
         const trimmed = tag.trim();
-        if (trimmed && !tags.includes(trimmed) && tags.length < maxTags) {
-            onTagsChange([...tags, trimmed]);
+        if (trimmed && !tagsArray.includes(trimmed) && tagsArray.length < maxTags) {
+            onTagsChange([...tagsArray, trimmed]);
             setInputValue("");
             setShowSuggestions(false);
             setHighlightedIndex(-1);
@@ -68,18 +71,21 @@ export function EnhancedTagInput({
                 // Handle comma-separated values
                 const values = inputValue.split(',').map(v => v.trim()).filter(v => v);
                 if (values.length > 1) {
+                    // Accumulate all new unique values
+                    const newTags = [...tagsArray];
                     values.forEach(val => {
-                        if (!tags.includes(val) && tags.length < maxTags) {
-                            onTagsChange(prev => [...prev, val]);
+                        if (!newTags.includes(val) && newTags.length < maxTags) {
+                            newTags.push(val);
                         }
                     });
+                    onTagsChange(newTags);
                     setInputValue("");
                 } else {
                     addTag(inputValue);
                 }
             }
-        } else if (e.key === 'Backspace' && !inputValue && tags.length > 0) {
-            onTagsChange(tags.slice(0, -1));
+        } else if (e.key === 'Backspace' && !inputValue && tagsArray.length > 0) {
+            onTagsChange(tagsArray.slice(0, -1));
         } else if (e.key === 'ArrowDown') {
             e.preventDefault();
             setHighlightedIndex(prev =>
@@ -102,13 +108,13 @@ export function EnhancedTagInput({
     };
 
     const removeTag = (tagToRemove) => {
-        onTagsChange(tags.filter(tag => tag !== tagToRemove));
+        onTagsChange(tagsArray.filter(tag => tag !== tagToRemove));
     };
 
     return (
         <div className="relative" ref={suggestionRef}>
             <div className={`flex flex-wrap items-center gap-2 p-3 rounded-xl border border-white/10 bg-black/20 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500/50 transition-all ${className}`}>
-                {tags.map((tag, index) => (
+                {tagsArray.map((tag, index) => (
                     <span
                         key={index}
                         className="flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg bg-blue-600/20 text-blue-300 border border-blue-500/30 hover:bg-blue-600/30 transition-colors"
@@ -137,11 +143,11 @@ export function EnhancedTagInput({
                             }
                         }}
                         className="flex-1 bg-transparent border-none outline-none text-text-primary placeholder:text-text-secondary"
-                        placeholder={tags.length === 0 ? placeholder : ""}
+                        placeholder={tagsArray.length === 0 ? placeholder : ""}
                         aria-label={placeholder}
-                        disabled={tags.length >= maxTags}
+                        disabled={tagsArray.length >= maxTags}
                     />
-                    {tags.length === 0 && !inputValue && (
+                    {tagsArray.length === 0 && !inputValue && (
                         <span className="text-xs text-text-secondary/60 flex items-center gap-1">
                             <kbd className="px-1.5 py-0.5 bg-white/5 rounded text-[10px]">Enter</kbd>
                             to add
@@ -160,8 +166,8 @@ export function EnhancedTagInput({
                             onClick={() => addTag(suggestion)}
                             onMouseEnter={() => setHighlightedIndex(index)}
                             className={`w-full text-left px-4 py-2.5 text-sm transition-colors flex items-center gap-2 ${index === highlightedIndex
-                                    ? 'bg-blue-600/20 text-blue-300'
-                                    : 'text-text-primary hover:bg-white/5'
+                                ? 'bg-blue-600/20 text-blue-300'
+                                : 'text-text-primary hover:bg-white/5'
                                 }`}
                         >
                             <Plus size={14} className="opacity-50" />
@@ -171,9 +177,9 @@ export function EnhancedTagInput({
                 </div>
             )}
 
-            {tags.length > 0 && (
+            {tagsArray.length > 0 && (
                 <p className="text-xs text-text-secondary mt-2">
-                    {tags.length}/{maxTags} tags {tags.length < maxTags && '• Separate multiple with commas'}
+                    {tagsArray.length}/{maxTags} tags {tagsArray.length < maxTags && '• Separate multiple with commas'}
                 </p>
             )}
         </div>

@@ -20,19 +20,40 @@ import {
     ArrowLeft
 } from 'lucide-react';
 
-export default function JobHunterForm({ onSubmit }) {
+export default function JobHunterForm({ onSubmit, initialValues }) {
     const toast = useToast();
     const navigate = useNavigate();
 
-    const [config, setConfig] = useState({
-        jobTitles: [],
-        locationTypes: ['remote'], // Smart default
-        locations: [],
-        noticePeriod: "immediate",
-        salaryRange: [500000, 1500000], // Default ₹5L - ₹15L
-        currency: "INR",
-        startDate: "immediately",
-        employmentTypes: ['full-time'], // Smart default
+    const [config, setConfig] = useState(() => {
+        const defaults = {
+            jobTitles: [],
+            locationTypes: ['remote'], // Smart default
+            locations: [],
+            noticePeriod: "immediate",
+            salaryRange: [500000, 1500000], // Default ₹5L - ₹15L
+            currency: "INR",
+            startDate: "immediately",
+            employmentTypes: ['full-time'], // Smart default
+        };
+
+        if (initialValues) {
+            // Handle new Action Card payload structure
+            const locations = initialValues.locations || (initialValues.location ? [initialValues.location] : []);
+            const isRemote = locations.some(loc => loc.toLowerCase().includes('remote'));
+            const hasLocations = locations.length > 0 && !isRemote;
+
+            return {
+                ...defaults,
+                jobTitles: initialValues.role ? [initialValues.role] : [],
+                locationTypes: isRemote ? ['remote'] : (hasLocations ? ['hybrid', 'onsite'] : ['remote']),
+                locations: hasLocations ? locations : [],
+                salaryRange: initialValues.salaryRange || (initialValues.minSalary
+                    ? [initialValues.minSalary, Math.max(initialValues.minSalary * 5, 5000000)]  // 5x multiplier for better range
+                    : defaults.salaryRange)
+            };
+        }
+
+        return defaults;
     });
 
     const [isSubmitting, setIsSubmitting] = useState(false);

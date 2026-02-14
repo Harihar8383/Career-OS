@@ -1,6 +1,6 @@
 // src/pages/JobHunterPage.jsx
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { AppLayout } from '../components/Layout/AppLayout';
 import JobHunterForm from '../components/JobHunter/JobHunterForm';
 import { JobHunterLogs } from '../components/JobHunter/JobHunterLogs';
@@ -11,6 +11,7 @@ import { Bot, Sparkles, ArrowLeft, RefreshCw, History } from 'lucide-react';
 
 export default function JobHunterPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [view, setView] = useState('form'); // 'form', 'terminal', 'results'
   const [selectedJob, setSelectedJob] = useState(null);
   const { sessionId, logs, status, error, results, startHunt, reset } = useJobHunt();
@@ -96,7 +97,10 @@ export default function JobHunterPage() {
 
       {/* Content - Changes based on view */}
       {view === 'form' && (
-        <JobHunterForm onSubmit={handleStartHunt} />
+        <JobHunterForm
+          onSubmit={handleStartHunt}
+          initialValues={location.state?.prefilled}
+        />
       )}
 
       {view === 'terminal' && (

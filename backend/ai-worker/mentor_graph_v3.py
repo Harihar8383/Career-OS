@@ -302,6 +302,23 @@ def build_mentor_graph_v3():
     
     def agent_node(state: AgentState) -> Dict:
         """Main agent node that generates thoughts/actions."""
+        # --- TOKEN OPTIMIZATION: TRIM HISTORY ---
+        # Keep only the last 10 messages to prevent 11k+ token usage
+        # This solves the "infinite memory" issue with MongoDB persistence
+        current_messages = state["messages"]
+        if len(current_messages) > 10:
+            # Always keep the most recent 10 messages
+            # The System Prompt is injected separately in step 5, so we don't need to worry about losing it here
+            from langchain_core.messages import trim_messages
+            
+            # Helper to calculate token length (approximate)
+            def count_tokens(msg):
+                return len(msg.content) // 4
+                
+            # Trim to last 10 messages
+            state["messages"] = current_messages[-10:]
+            print(f"   [agent] Trimmed conversation history from {len(current_messages)} to {len(state['messages'])} messages")
+            
         # 1. Check if last tool was an Action Card (fast-path)
         messages = state["messages"]
         if len(messages) >= 2:

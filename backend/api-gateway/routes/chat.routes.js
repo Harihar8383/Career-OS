@@ -11,4 +11,8 @@ router.post('/stream', requireAuth(), streamChat);
 // GET /api/chat/history/:threadId - Get chat history for a thread
 router.get('/history/:threadId', requireAuth(), getChatHistory);
 
+// GET /api/chat/threads - Get all threads for the user
+import { getUserThreads } from '../controllers/chat.controller.js';
+router.get('/threads', requireAuth(), getUserThreads);
+
 export default router;

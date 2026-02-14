@@ -47,7 +47,7 @@ export const streamChat = async (req, res) => {
     let assistantMessage = '';
 
     // Pipe SSE events from Python to client
-    response.data.on('data', (chunk) => {
+    response.data.on('data', async (chunk) => {
       const chunkStr = chunk.toString();
       res.write(chunk);
 
@@ -59,6 +59,15 @@ export const streamChat = async (req, res) => {
             const data = JSON.parse(line.slice(6));
             if (data.type === 'response') {
               assistantMessage = data.content;
+            } else if (data.type === 'action_card') {
+               // SAVE ACTION CARD IMMEDIATELY
+               await ChatHistory.create({
+                 userId,
+                 threadId: actualThreadId,
+                 role: 'action_card',
+                 content: JSON.stringify(data.content), // Stringify JSON for storage
+                 metadata: { timestamp: new Date() }
+               });
             }
           } catch (e) {
             // Ignore parse errors
@@ -113,5 +122,31 @@ export const getChatHistory = async (req, res) => {
   } catch (error) {
     console.error('Error fetching chat history:', error);
     res.status(500).json({ error: 'Failed to fetch chat history' });
+  }
+};
+
+export const getUserThreads = async (req, res) => {
+  const { userId } = req.auth;
+
+  try {
+    const threads = await ChatHistory.aggregate([
+      { $match: { userId } },
+      { $sort: { createdAt: -1 } },
+      {
+        $group: {
+          _id: "$threadId",
+          lastMessage: { $first: "$content" },
+          updatedAt: { $first: "$createdAt" },
+          docCount: { $sum: 1 }
+        }
+      },
+      { $sort: { updatedAt: -1 } },
+      { $limit: 20 }
+    ]);
+
+    res.json({ threads });
+  } catch (error) {
+    console.error('Error fetching user threads:', error);
+    res.status(500).json({ error: 'Failed to fetch user threads' });
   }
 };

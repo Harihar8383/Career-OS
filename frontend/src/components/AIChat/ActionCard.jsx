@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Search, FileText, ArrowRight } from 'lucide-react';
+import { Search, FileText, ArrowRight, MapPin, DollarSign, Briefcase } from 'lucide-react';
 
 export default function ActionCard({ data }) {
     const navigate = useNavigate();
@@ -16,89 +16,71 @@ export default function ActionCard({ data }) {
     const isJobHunter = data.action === 'OPEN_JOB_HUNTER';
     const Icon = isJobHunter ? Search : FileText;
 
-    // Color scheme based on action type
-    const colors = isJobHunter
-        ? {
-            border: 'from-blue-500/50 to-blue-600/50',
-            glow: 'shadow-[0_0_20px_rgba(59,130,246,0.15)] hover:shadow-[0_0_30px_rgba(59,130,246,0.25)]',
-            icon: 'text-blue-400',
-            button: 'bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border-blue-500/30'
-        }
-        : {
-            border: 'from-purple-500/50 to-purple-600/50',
-            glow: 'shadow-[0_0_20px_rgba(168,85,247,0.15)] hover:shadow-[0_0_30px_rgba(168,85,247,0.25)]',
-            icon: 'text-purple-400',
-            button: 'bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 border-purple-500/30'
-        };
-
     return (
         <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-            className={`relative group cursor-pointer ${colors.glow
-                } transition-all duration-300`}
-            onClick={handleClick}
+            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            className="w-full max-w-md my-4"
         >
-            {/* Glassmorphism Card */}
-            <div className="relative bg-bg-card/60 backdrop-blur-xl rounded-xl p-5 border border-border/50 overflow-hidden">
-                {/* Gradient Border Effect */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${colors.border} opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl`} />
-                <div className="absolute inset-[1px] bg-bg-card/80 backdrop-blur-xl rounded-xl" />
+            <div
+                onClick={handleClick}
+                className="group/card relative overflow-hidden rounded-2xl bg-bg-card border border-border-primary/50 hover:border-[#A855F7]/50 transition-all duration-300 cursor-pointer hover:shadow-[0_0_25px_-5px_rgba(168,85,247,0.15)] active:scale-[0.98]"
+            >
+                {/* Background Gradient Effect */}
+                <div className="absolute inset-0 bg-gradient-to-br from-[#A855F7]/5 via-transparent to-blue-600/5 opacity-0 group-hover/card:opacity-100 transition-opacity duration-500" />
 
-                {/* Content */}
-                <div className="relative z-10 flex items-start gap-4">
-                    {/* Icon */}
-                    <motion.div
-                        whileHover={{ scale: 1.1, rotate: 5 }}
-                        className={`p-3 rounded-lg bg-bg-secondary/50 ${colors.icon}`}
-                    >
+                <div className="relative p-5 flex items-start gap-4">
+                    {/* Icon Box */}
+                    <div className={`p-3 rounded-xl flex-shrink-0 transition-colors duration-300 ${isJobHunter ? 'bg-blue-500/10 text-blue-400 group-hover/card:bg-blue-500/20' : 'bg-[#A855F7]/10 text-[#A855F7] group-hover/card:bg-[#A855F7]/20'}`}>
                         <Icon className="w-6 h-6" />
-                    </motion.div>
+                    </div>
 
-                    {/* Text Content */}
-                    <div className="flex-1">
-                        <p className="text-xs text-text-secondary mb-1">AI Suggestion</p>
-                        <h3 className="text-base font-medium text-text-primary mb-3">
+                    <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between mb-1">
+                            <span className="text-[10px] font-bold tracking-widest uppercase text-text-secondary/60">
+                                {isJobHunter ? 'Job Search Agent' : 'Resume Analysis'}
+                            </span>
+                            <div className="p-1 rounded-full bg-white/5 opacity-0 group-hover/card:opacity-100 transition-all -translate-x-2 group-hover/card:translate-x-0">
+                                <ArrowRight className="w-3 h-3 text-text-primary" />
+                            </div>
+                        </div>
+
+                        <h3 className="font-clash-display font-medium text-lg text-text-primary mb-3 leading-snug group-hover/card:text-white transition-colors">
                             {data.label}
                         </h3>
 
                         {/* Payload Badges */}
                         {data.payload && (
-                            <div className="flex flex-wrap gap-2 mb-3">
+                            <div className="flex flex-wrap gap-2 mt-3">
                                 {data.payload.role && (
-                                    <span className="px-2 py-1 text-xs rounded-md bg-bg-secondary/50 text-text-secondary border border-border/30">
-                                        {data.payload.role}
+                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-lg bg-white/5 text-text-secondary border border-white/5 group-hover/card:border-white/10 transition-colors">
+                                        <Briefcase className="w-3 h-3" />
+                                        <span className="truncate max-w-[120px]">{data.payload.role}</span>
                                     </span>
                                 )}
                                 {data.payload.location && (
-                                    <span className="px-2 py-1 text-xs rounded-md bg-bg-secondary/50 text-text-secondary border border-border/30">
-                                        📍 {data.payload.location}
+                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-lg bg-white/5 text-text-secondary border border-white/5 group-hover/card:border-white/10 transition-colors">
+                                        <MapPin className="w-3 h-3" />
+                                        <span className="truncate max-w-[100px]">{data.payload.location}</span>
                                     </span>
                                 )}
                                 {data.payload.minSalary && (
-                                    <span className="px-2 py-1 text-xs rounded-md bg-bg-secondary/50 text-text-secondary border border-border/30">
-                                        💰 ${data.payload.minSalary.toLocaleString()}+
-                                    </span>
-                                )}
-                                {data.payload.url && (
-                                    <span className="px-2 py-1 text-xs rounded-md bg-bg-secondary/50 text-text-secondary border border-border/30 truncate max-w-[200px]">
-                                        🔗 {new URL(data.payload.url).hostname}
+                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-lg bg-white/5 text-text-secondary border border-white/5 group-hover/card:border-white/10 transition-colors">
+                                        <DollarSign className="w-3 h-3" />
+                                        <span>{parseInt(data.payload.minSalary).toLocaleString()}</span>
                                     </span>
                                 )}
                             </div>
                         )}
 
-                        {/* Action Button */}
-                        <button
-                            className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-200 ${colors.button
-                                } group-hover:gap-3`}
-                        >
-                            <span className="text-sm font-medium">
-                                {isJobHunter ? 'Search Jobs' : 'Analyze Job'}
+                        {/* Call to Action - Appears on Hover */}
+                        <div className="h-0 overflow-hidden group-hover/card:h-8 transition-all duration-300 ease-in-out opacity-0 group-hover/card:opacity-100 mt-0 group-hover/card:mt-3">
+                            <span className="text-xs font-medium text-[#A855F7] flex items-center gap-1">
+                                {isJobHunter ? 'Launch Job Hunter' : 'Run JD Matcher'}
+                                <ArrowRight className="w-3 h-3" />
                             </span>
-                            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                        </button>
+                        </div>
                     </div>
                 </div>
             </div>

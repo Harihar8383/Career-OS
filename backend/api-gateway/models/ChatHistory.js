@@ -15,7 +15,7 @@ const ChatHistorySchema = new Schema({
   },
   role: {
     type: String,
-    enum: ['user', 'assistant', 'system'],
+    enum: ['user', 'assistant', 'system', 'action_card'],
     required: true
   },
   content: {

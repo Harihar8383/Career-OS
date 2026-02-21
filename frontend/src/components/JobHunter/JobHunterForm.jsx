@@ -48,7 +48,7 @@ export default function JobHunterForm({ onSubmit, initialValues }) {
                 locationTypes: isRemote ? ['remote'] : (hasLocations ? ['hybrid', 'onsite'] : ['remote']),
                 locations: hasLocations ? locations : [],
                 salaryRange: initialValues.salaryRange || (initialValues.minSalary
-                    ? [initialValues.minSalary, Math.max(initialValues.minSalary * 5, 5000000)]  // 5x multiplier for better range
+                    ? [initialValues.minSalary, Math.min(10000000, Math.max(initialValues.minSalary * 5, 5000000))]  // 5x multiplier for better range, cap at 1Cr
                     : defaults.salaryRange)
             };
         }
@@ -198,6 +198,7 @@ export default function JobHunterForm({ onSubmit, initialValues }) {
                                 <button
                                     key={type}
                                     type="button"
+                                    onClick={() => toggleSelection('employmentTypes', type.toLowerCase())}
                                     className={`px-4 py-2.5 rounded-xl border text-sm font-medium transition-all duration-300 ${config.employmentTypes.includes(type.toLowerCase())
                                         ? 'bg-[#2934FF] border-[#2934FF] text-white shadow-[0_0_15px_rgba(41,52,255,0.4)] scale-105'
                                         : 'bg-text-primary/5 border-border-secondary text-text-secondary hover:bg-text-primary/10 hover:text-text-primary hover:border-border-primary'
@@ -288,7 +289,7 @@ export default function JobHunterForm({ onSubmit, initialValues }) {
 
                     <RangeSlider
                         min={0}
-                        max={5000000}
+                        max={10000000}
                         step={50000}
                         value={config.salaryRange}
                         onChange={(newRange) => {

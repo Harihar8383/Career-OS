@@ -45,6 +45,7 @@ export const streamChat = async (req, res) => {
     );
 
     let assistantMessage = '';
+    let assistantThoughts = [];
 
     // Pipe SSE events from Python to client
     response.data.on('data', async (chunk) => {
@@ -57,17 +58,32 @@ export const streamChat = async (req, res) => {
         if (line.startsWith('data: ')) {
           try {
             const data = JSON.parse(line.slice(6));
-            if (data.type === 'response') {
-              assistantMessage = data.content;
+            if (data.type === 'token') {
+              assistantMessage += data.content;
+            } else if (data.type === 'thought' || data.type === 'tool_start') {
+              // Collect thoughts so we can persist them
+              assistantThoughts.push(data.content);
+            } else if (data.type === 'done') {
+              // Save the complete assistant message + thoughts
+              if (assistantMessage) {
+                await ChatHistory.create({
+                  userId,
+                  threadId: actualThreadId,
+                  role: 'assistant',
+                  content: assistantMessage,
+                  metadata: { timestamp: new Date(), thoughts: assistantThoughts }
+                });
+                assistantMessage = '';
+                assistantThoughts = [];
+              }
             } else if (data.type === 'action_card') {
-               // SAVE ACTION CARD IMMEDIATELY
-               await ChatHistory.create({
-                 userId,
-                 threadId: actualThreadId,
-                 role: 'action_card',
-                 content: JSON.stringify(data.content), // Stringify JSON for storage
-                 metadata: { timestamp: new Date() }
-               });
+              await ChatHistory.create({
+                userId,
+                threadId: actualThreadId,
+                role: 'action_card',
+                content: JSON.stringify(data.content),
+                metadata: { timestamp: new Date() }
+              });
             }
           } catch (e) {
             // Ignore parse errors
@@ -77,17 +93,6 @@ export const streamChat = async (req, res) => {
     });
 
     response.data.on('end', async () => {
-      // Save assistant message to history
-      if (assistantMessage) {
-        await ChatHistory.create({
-          userId,
-          threadId: actualThreadId,
-          role: 'assistant',
-          content: assistantMessage,
-          metadata: { timestamp: new Date() }
-        });
-      }
-
       res.write('data: [DONE]\n\n');
       res.end();
     });

@@ -88,7 +88,7 @@ def open_job_hunter(role: str, location: str = None, minSalary: int = None) -> s
     if minSalary:
         # Assume minSalary is already in INR (e.g., 1000000 for 10 LPA)
         # Set max to 50 LPA (5000000) for "X+ lpa" queries
-        salary_range = [minSalary, max(minSalary * 2, 5000000)]
+        salary_range = [minSalary, max(minSalary * 2, 10000000)]
     
     print(f"   [tool:open_job_hunter] Creating Action Card for role='{role}', locations={locations}, minSalary={minSalary}")
     

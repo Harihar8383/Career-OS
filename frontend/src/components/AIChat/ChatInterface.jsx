@@ -25,13 +25,28 @@ export default function ChatInterface() {
     const textareaRef = useRef(null);
     const API_URL = import.meta.env.VITE_API_GATEWAY_URL || 'http://localhost:8080';
 
-    const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const scrollToBottom = (force = false) => {
+        if (!messagesEndRef.current) return;
+
+        // If forcing (e.g. new message sent), scroll immediately
+        if (force) {
+            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+            return;
+        }
+
+        // Otherwise only auto-scroll if already near the bottom (within 150px)
+        const container = messagesEndRef.current.parentElement;
+        if (container) {
+            const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 150;
+            if (isNearBottom) {
+                messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
     };
 
     useEffect(() => {
-        scrollToBottom();
-    }, [messages, currentThought]);
+        scrollToBottom(isStreaming);
+    }, [messages, currentThought, isStreaming]);
 
     // Auto-resize textarea
     useEffect(() => {
@@ -83,13 +98,18 @@ export default function ChatInterface() {
                             parsedContent = typeof msg.content === 'string' ? JSON.parse(msg.content) : msg.content;
                         } catch (e) {
                             console.error("Failed to parse action card content:", e);
-                            parsedContent = {}; // Fallback
+                            parsedContent = {};
                         }
                     }
                     return {
                         role: msg.role,
                         content: parsedContent,
                         isActionCard: msg.role === 'action_card',
+                        // Restore saved thoughts from metadata so "View Reasoning" persists on reload
+                        thoughts: (msg.role === 'assistant' && msg.metadata?.thoughts?.length)
+                            ? msg.metadata.thoughts
+                            : [],
+                        isThinkingExpanded: false,
                         id: msg._id || Date.now() + Math.random()
                     };
                 });
@@ -153,19 +173,22 @@ export default function ChatInterface() {
             });
 
             const reader = response.body.getReader();
-            const decoder = new TextDecoder();
-            let streamingContent = "";
+            const decoder = new TextDecoder('utf-8');
+            let sseBuffer = "";
 
             while (true) {
                 const { done, value } = await reader.read();
                 if (done) break;
 
-                const chunk = decoder.decode(value);
-                const lines = chunk.split('\n');
+                // Use stream:true so multi-byte chars split across chunks decode correctly
+                sseBuffer += decoder.decode(value, { stream: true });
+                const lines = sseBuffer.split('\n');
+                // Keep the last (potentially incomplete) line in the buffer
+                sseBuffer = lines.pop();
 
                 for (const line of lines) {
                     if (line.startsWith('data: ')) {
-                        const data = line.slice(6);
+                        const data = line.slice(6).trim();
                         if (data === '[DONE]') continue;
 
                         try {
@@ -182,8 +205,9 @@ export default function ChatInterface() {
                                     lastMsg.thoughts = [...(lastMsg.thoughts || []), event.content];
                                     setCurrentThought(event.content);
                                 } else if (event.type === 'token') {
-                                    streamingContent += event.content;
-                                    lastMsg.content = streamingContent;
+                                    // Accumulate from prev state, not an outer variable,
+                                    // so React Strict Mode double-invocation won't duplicate tokens
+                                    lastMsg.content = (lastMsg.content || '') + event.content;
                                 } else if (event.type === 'done') {
                                     lastMsg.isStreaming = false;
                                     lastMsg.isThinkingExpanded = false; // Auto-collapse
@@ -325,7 +349,7 @@ export default function ChatInterface() {
                             </button>
                         )}
                         <div className="flex items-center gap-2 text-text-primary font-clash-display font-medium text-lg tracking-tight">
-                            
+
                             <span className="text-white">AI Career Mentor</span>
                         </div>
                     </div>

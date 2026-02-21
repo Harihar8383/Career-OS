@@ -38,7 +38,7 @@ export function RangeSlider({
     const [isDragging, setIsDragging] = useState(null);
     const sliderRef = useRef(null);
 
-    const getPercentage = (value) => ((value - min) / (max - min)) * 100;
+    const getPercentage = (value) => Math.max(0, Math.min(100, ((value - min) / (max - min)) * 100));
 
     const handleMouseDown = (thumb) => (e) => {
         e.preventDefault();

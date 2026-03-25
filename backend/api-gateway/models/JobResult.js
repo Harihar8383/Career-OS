@@ -26,6 +26,22 @@ const JobResultSchema = new Schema(
       type: String,
       default: ''
     },
+    description: {
+      type: String,
+      default: ''
+    },
+    salary: {
+      type: String,
+      default: ''
+    },
+    salary_min: {
+      type: Number,
+      default: 0
+    },
+    salary_max: {
+      type: Number,
+      default: 0
+    },
     applyLink: {
       type: String,
       required: true,
@@ -45,6 +61,26 @@ const JobResultSchema = new Schema(
       type: Number,
       min: 0,
       max: 100,
+      default: 0
+    },
+    tierLabel: {
+      type: String,
+      default: ''
+    },
+    tier: {
+      type: String,
+      default: ''
+    },
+    badges: {
+      type: [String],
+      default: []
+    },
+    gapAnalysis: {
+      type: String,
+      default: ''
+    },
+    rank: {
+      type: Number,
       default: 0
     }
   },

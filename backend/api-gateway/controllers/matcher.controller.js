@@ -119,6 +119,7 @@ export const getAnalysisResults = async (req, res) => {
 
     const responseData = {
         ...analysis.analysisResults,
+        jdText: analysis.jdText || '',
         meta: {
             fileName: profile?.file_name || "resume.pdf",
             // Use snake_case created_at if it comes from Python, or camelCase if from Mongoose
@@ -146,7 +147,7 @@ export const getAnalysisHistory = async (req, res) => {
         const history = await JdAnalysis.find({ clerkId: userId, status: 'complete' })
             .sort({ createdAt: -1 })
             .limit(20) // Limit to last 20
-            .select('runId createdAt analysisResults.jd_summary analysisResults.match_score');
+            .select('runId createdAt jdText analysisResults.jd_summary analysisResults.match_score');
             
         // Transform for frontend
         const safeHistory = history.map(h => ({
@@ -154,7 +155,8 @@ export const getAnalysisHistory = async (req, res) => {
             date: h.createdAt,
             jobTitle: h.analysisResults?.jd_summary?.job_title || 'Unknown Job',
             company: h.analysisResults?.jd_summary?.company || 'Unknown Company',
-            score: h.analysisResults?.match_score || 0
+            score: h.analysisResults?.match_score || 0,
+            jdText: h.jdText || ''
         }));
 
         res.status(200).json(safeHistory);

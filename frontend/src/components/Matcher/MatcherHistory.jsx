@@ -26,9 +26,8 @@ const HistoryCard = ({ item, onLoadAnalysis, onDelete }) => {
                 if (response.ok) {
                     const result = await response.json();
                     const jobs = result.data || [];
-                    // Check if a job with this runId exists
+                    // Check by title + company (no longer rely on Run ID placeholder)
                     const savedJob = jobs.find(j =>
-                        j.description?.includes(`Run ID: ${item.runId}`) ||
                         (j.title === (item.jobTitle || 'Job from History') && j.company === (item.company || 'Unknown'))
                     );
 
@@ -77,7 +76,7 @@ const HistoryCard = ({ item, onLoadAnalysis, onDelete }) => {
                     location: '',
                     salary: '',
                     jobType: 'Full-time',
-                    description: `Imported from Matcher History (Run ID: ${item.runId})`,
+                    description: item.jdText || '',
                     applyLink: '',
                     source: 'matcher',
                     matchScore: item.score || 0,

@@ -31,7 +31,7 @@ export const MatcherResults = ({ results, onReset }) => {
         location: results.jd_summary?.location || '',
         salary: results.jd_summary?.salary_range || '',
         jobType: 'Full-time',
-        description: results.jd_summary?.description || '',
+        description: results.jdText || results.jd_summary?.description || '',
         applyLink: '',
         source: 'matcher',
         matchScore: results.match_score || 0,

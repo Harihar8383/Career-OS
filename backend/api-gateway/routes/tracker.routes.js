@@ -9,7 +9,8 @@ import {
   addNote,
   addReminder,
   addInterview,
-  bulkUpdateStage
+  bulkUpdateStage,
+  getAnalytics
 } from '../controllers/tracker.controller.js';
 import { requireAuth } from '@clerk/express';
 
@@ -19,6 +20,7 @@ const router = express.Router();
 router.use(requireAuth());
 
 // Main CRUD routes
+router.get('/analytics', getAnalytics);
 router.post('/jobs', createTrackedJob);
 router.get('/jobs', getAllTrackedJobs);
 router.get('/jobs/:id', getTrackedJobById);

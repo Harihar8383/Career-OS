@@ -403,3 +403,107 @@ export const bulkUpdateStage = async (req, res) => {
     });
   }
 };
+
+/**
+ * Get job search analytics for the dashboard
+ * GET /api/tracker/analytics
+ */
+export const getAnalytics = async (req, res) => {
+  try {
+    const { userId } = req.auth;
+
+    // Fetch all jobs with basic required fields
+    const jobs = await TrackedJob.find(
+      { userId }, 
+      'title company stage interviews reminders'
+    );
+    
+    let totalJobs = jobs.length;
+    let countsByStage = {
+      saved: 0, applied: 0, screening: 0, interview: 0, offer: 0, rejected: 0, accepted: 0
+    };
+
+    let interviewCount = 0;
+    let appliedCount = 0;
+    
+    const now = new Date();
+    const upcomingInterviews = [];
+    const upcomingReminders = [];
+
+    jobs.forEach(job => {
+      // Aggregate stage counts
+      if (countsByStage[job.stage] !== undefined) {
+        countsByStage[job.stage]++;
+      }
+      
+      // Determine if job reached applied stage or further
+      const hasApplied = ['applied', 'screening', 'interview', 'offer', 'rejected', 'accepted'].includes(job.stage);
+      if (hasApplied) {
+        appliedCount++;
+      }
+      
+      // Check if they ever had an interview
+      const hasInterviewed = job.interviews && job.interviews.length > 0;
+      if (hasInterviewed || ['interview', 'offer', 'accepted'].includes(job.stage)) {
+        interviewCount++;
+      }
+
+      // Collect upcoming interviews
+      if (job.interviews && job.interviews.length > 0) {
+        job.interviews.forEach(int => {
+          if (int.scheduledDate && new Date(int.scheduledDate) >= now) {
+            upcomingInterviews.push({
+              jobId: job._id,
+              company: job.company,
+              title: job.title,
+              round: int.round,
+              scheduledDate: int.scheduledDate
+            });
+          }
+        });
+      }
+
+      // Collect upcoming reminders
+      if (job.reminders && job.reminders.length > 0) {
+        job.reminders.forEach(rem => {
+          if (!rem.completed && rem.date && new Date(rem.date) >= now) {
+            upcomingReminders.push({
+              jobId: job._id,
+              company: job.company,
+              title: job.title,
+              message: rem.message,
+              date: rem.date
+            });
+          }
+        });
+      }
+    });
+
+    // Calculate applied -> interview conversion rate
+    const conversionRate = appliedCount > 0 ? ((interviewCount / appliedCount) * 100).toFixed(1) : 0;
+
+    // Sort by date ascending (closest first)
+    upcomingInterviews.sort((a, b) => new Date(a.scheduledDate) - new Date(b.scheduledDate));
+    upcomingReminders.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    res.status(200).json({
+      success: true,
+      data: {
+        totalJobs,
+        countsByStage,
+        conversionRate,
+        upcomingInterviews: upcomingInterviews.slice(0, 5),
+        upcomingReminders: upcomingReminders.slice(0, 5)
+      }
+    });
+
+  } catch (error) {
+    console.error('Error fetching analytics:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch analytics',
+      error: error.message
+    });
+  }
+};
+

@@ -6,6 +6,7 @@ import { Sidenav } from "../components/Dashboard/Sidenav";
 import { Routes, Route } from "react-router-dom";
 
 // *** IMPORT THE REAL PAGES ***
+import DashboardHome from "./DashboardHome";
 import ProfilePage from "./ProfilePage";
 import JDMatcherPage from "./JDMatcherPage";
 import JobHunterPage from "./JobHunterPage";
@@ -13,14 +14,6 @@ import JobHunterResultPage from "./JobHunterResultPage";
 import JobHunterHistoryPage from "./JobHunterHistoryPage";
 import JobTrackerPage from "./JobTrackerPage";
 import AIMentorPage from "./AIMentorPage";
-
-// A placeholder for now
-const PlaceholderComponent = ({ title }) => (
-  <div className="text-center">
-    <h1 className="text-3xl font-clash-display text-white">{title}</h1>
-    <p className="mt-4 text-text-body text-lg font-dm-sans">This feature is coming soon.</p>
-  </div>
-);
 
 function DashboardPage() {
   const { getToken } = useAuth();
@@ -64,7 +57,8 @@ function DashboardPage() {
               {/* --- Use bg-bg-card for the main content area --- */}
               <main className="ml-64 p-10 bg-bg-dark min-h-screen">
                 <Routes>
-                  <Route path="/" element={<ProfilePage />} />
+                  <Route path="/" element={<DashboardHome />} />
+                  <Route path="/profile" element={<ProfilePage />} />
                   <Route path="/matcher/*" element={<JDMatcherPage />} />
                   <Route path="/hunter" element={<JobHunterPage />} />
                   <Route path="/hunter/history" element={<JobHunterHistoryPage />} />

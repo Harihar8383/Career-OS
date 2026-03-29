@@ -75,7 +75,8 @@ export const Sidenav = () => {
 
       {/* Navigation */}
       <div className="flex flex-col space-y-2">
-        <NavItem iconSrc="/icons/profile.png" label="My Profile" path="/dashboard" />
+        <NavItem iconSrc="/icons/dashboard.png" label="Dashboard" path="/dashboard" />
+        <NavItem iconSrc="/icons/profile.png" label="My Profile" path="/dashboard/profile" />
         <NavItem iconSrc="/icons/jd_matcher.png" label="JD Matcher" path="/dashboard/matcher" />
         <NavItem iconSrc="/icons/job_hunter.png" label="Job Hunter Agent" path="/dashboard/hunter" />
         <NavItem iconSrc="/icons/tracker.png" label="Job Tracker" path="/dashboard/tracker" />

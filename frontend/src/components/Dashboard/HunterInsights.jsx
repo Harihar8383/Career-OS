@@ -28,11 +28,10 @@ export default function HunterInsights({ hunterSummary = {}, topCompanies = [] }
             <button
               key={t.key}
               onClick={() => setTab(t.key)}
-              className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${
-                tab === t.key
+              className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${tab === t.key
                   ? 'bg-blue-500/20 text-blue-400'
                   : 'text-text-secondary hover:text-text-primary'
-              }`}
+                }`}
             >
               {t.label}
             </button>

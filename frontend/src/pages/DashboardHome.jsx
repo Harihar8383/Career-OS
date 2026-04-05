@@ -115,10 +115,9 @@ export default function DashboardHome() {
       </div>
 
       {/* ── Row 3: Skill Gap + Match Score Trend ──────────────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <MatchScoreTrend data={d.matchScoreTrend} />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6 lg:h-[480px]">
         <SkillGapRadar skillGaps={d.skillGaps} />
-        
+        <MatchScoreTrend data={d.matchScoreTrend} />
       </div>
 
       {/* ── Row 4: Recent Analyses + Hunter Insights ──────────────────── */}

@@ -1,17 +1,17 @@
 // frontend/src/components/Dashboard/ActionItemsFeed.jsx
 import React from 'react';
 import { motion } from 'framer-motion';
-import { 
-  Calendar, Bell, AlertTriangle, Clock, 
-  ArrowUpRight, CheckCircle2, MoreHorizontal 
+import {
+  Calendar, Bell, AlertTriangle, Clock,
+  ArrowUpRight, CheckCircle2, MoreHorizontal
 } from 'lucide-react';
 
 const URGENCY_CONFIG = {
-  today:    { label: 'Today',     color: 'text-rose-500',   bg: 'bg-rose-500/10',   glow: 'bg-rose-500/20',   border: 'border-rose-500/20', icon: AlertTriangle },
-  tomorrow: { label: 'Tomorrow',  color: 'text-amber-500',  bg: 'bg-amber-500/10',  glow: 'bg-amber-500/20',  border: 'border-amber-500/20', icon: Clock },
-  thisWeek: { label: 'This Week', color: 'text-blue-500',   bg: 'bg-blue-500/10',   glow: 'bg-blue-500/20',   border: 'border-blue-500/20', icon: Calendar },
-  stale:    { label: 'Stale',     color: 'text-orange-500', bg: 'bg-orange-500/10', glow: 'bg-orange-500/20', border: 'border-orange-500/20', icon: AlertTriangle },
-  later:    { label: 'Later',     color: 'text-gray-400',   bg: 'bg-gray-500/10',   glow: 'bg-gray-500/20',   border: 'border-border-primary', icon: Bell },
+  today: { label: 'Today', color: 'text-rose-500', bg: 'bg-rose-500/10', glow: 'bg-rose-500/20', border: 'border-rose-500/20', icon: AlertTriangle },
+  tomorrow: { label: 'Tomorrow', color: 'text-amber-500', bg: 'bg-amber-500/10', glow: 'bg-amber-500/20', border: 'border-amber-500/20', icon: Clock },
+  thisWeek: { label: 'This Week', color: 'text-blue-500', bg: 'bg-blue-500/10', glow: 'bg-blue-500/20', border: 'border-blue-500/20', icon: Calendar },
+  stale: { label: 'Stale', color: 'text-orange-500', bg: 'bg-orange-500/10', glow: 'bg-orange-500/20', border: 'border-orange-500/20', icon: AlertTriangle },
+  later: { label: 'Later', color: 'text-gray-400', bg: 'bg-gray-500/10', glow: 'bg-gray-500/20', border: 'border-border-primary', icon: Bell },
 };
 
 const TYPE_ICON = {
@@ -36,7 +36,7 @@ const getDerivedUrgency = (dateString, fallbackUrgency) => {
   if (isNaN(itemDate.getTime())) return fallbackUrgency || 'later'; // Safe fallback for invalid strings
 
   const now = new Date();
-  now.setHours(0, 0, 0, 0); 
+  now.setHours(0, 0, 0, 0);
   itemDate.setHours(0, 0, 0, 0);
 
   const diffTime = itemDate.getTime() - now.getTime();
@@ -78,7 +78,7 @@ export default function ActionItemsFeed({ items = [] }) {
     dynamicUrgency: getDerivedUrgency(item.date, item.urgency)
   })).sort((a, b) => {
     const weight = { stale: 0, today: 1, tomorrow: 2, thisWeek: 3, later: 4 };
-    
+
     const weightA = weight[a.dynamicUrgency] ?? 5;
     const weightB = weight[b.dynamicUrgency] ?? 5;
 
@@ -86,7 +86,7 @@ export default function ActionItemsFeed({ items = [] }) {
     if (weightA !== weightB) {
       return weightA - weightB;
     }
-    
+
     // 2. Secondary Sort: Chronological Date (Safe against NaN)
     const timeA = a.date ? new Date(a.date).getTime() : Infinity;
     const timeB = b.date ? new Date(b.date).getTime() : Infinity;
@@ -96,7 +96,7 @@ export default function ActionItemsFeed({ items = [] }) {
 
     // If both are Infinity (no dates), they are equal. Do NOT subtract them or you get NaN.
     if (safeTimeA === safeTimeB) return 0;
-    
+
     return safeTimeA - safeTimeB;
   });
 
@@ -130,7 +130,7 @@ export default function ActionItemsFeed({ items = [] }) {
                 className={`group relative overflow-hidden rounded-2xl border ${featuredConfig.border} bg-bg-dark/40 p-4 transition-all duration-300 hover:bg-bg-dark/60 cursor-pointer`}
               >
                 <div className={`absolute -right-8 -top-8 w-32 h-32 blur-3xl rounded-full ${featuredConfig.glow} opacity-40 transition-opacity group-hover:opacity-60`} />
-                
+
                 <div className="relative z-10">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
@@ -143,11 +143,11 @@ export default function ActionItemsFeed({ items = [] }) {
                     </div>
                     <MoreHorizontal className="w-4 h-4 text-text-secondary opacity-50 hover:opacity-100 transition-opacity" />
                   </div>
-                  
+
                   <h4 className="text-base font-semibold text-text-primary mb-1 pr-4">
                     {featuredItem.title}
                   </h4>
-                  
+
                   <div className="flex items-center gap-2 mb-4">
                     <p className="text-xs text-text-secondary line-clamp-1">
                       {featuredItem.subtitle}
@@ -207,7 +207,7 @@ export default function ActionItemsFeed({ items = [] }) {
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center gap-3 pl-3">
                       <span className={`text-[9px] font-bold uppercase tracking-wider whitespace-nowrap ${config.color} opacity-80`}>
                         {config.label}

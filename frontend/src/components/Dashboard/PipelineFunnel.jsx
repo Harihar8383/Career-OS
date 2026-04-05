@@ -1,9 +1,9 @@
 // frontend/src/components/Dashboard/PipelineFunnel.jsx
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  Briefcase, Send, Phone, Users, Award, 
-  CheckCircle, XCircle, TrendingUp, ArrowDown 
+import {
+  Briefcase, Send, Phone, Users, Award,
+  CheckCircle, XCircle, TrendingUp, ArrowDown
 } from 'lucide-react';
 
 const STAGES = [
@@ -17,7 +17,7 @@ const STAGES = [
 
 export default function PipelineFunnel({ pipeline = {} }) {
   const [hoveredStage, setHoveredStage] = useState(null);
-  
+
   const counts = STAGES.map(s => pipeline[s.key] || 0);
   const maxCount = Math.max(1, ...counts);
   const rejectedCount = pipeline.rejected || 0;
@@ -59,17 +59,17 @@ export default function PipelineFunnel({ pipeline = {} }) {
             const isOtherHovered = hoveredStage !== null && !isHovered;
 
             return (
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: i * 0.05 }}
-                key={stage.key} 
+                key={stage.key}
                 className={`relative transition-all duration-300 ${isOtherHovered ? 'opacity-40 grayscale-[30%]' : 'opacity-100'}`}
                 onMouseEnter={() => setHoveredStage(stage.key)}
                 onMouseLeave={() => setHoveredStage(null)}
               >
                 {/* Timeline Node - w-6 (24px) pushed left by 30px aligns its center perfectly at 18px */}
-                <div 
+                <div
                   className="absolute -left-[30px] top-2 w-6 h-6 rounded-full border-[2px] border-bg-card flex items-center justify-center z-10 shadow-sm transition-transform duration-300 hover:scale-110"
                   style={{ backgroundColor: stage.color }}
                 >
@@ -80,7 +80,7 @@ export default function PipelineFunnel({ pipeline = {} }) {
                 {i < STAGES.length - 1 && (
                   <div className="absolute -left-[36px] -bottom-[18px] z-20 bg-bg-card border border-border-primary text-text-secondary text-[8px] font-bold px-1.5 py-0.5 rounded-full flex items-center justify-center gap-0.5 shadow-sm min-w-[36px]">
                     <ArrowDown className="w-2 h-2" />
-                    {getConversion(stage.key, STAGES[i+1].key)}%
+                    {getConversion(stage.key, STAGES[i + 1].key)}%
                   </div>
                 )}
 
@@ -109,9 +109,9 @@ export default function PipelineFunnel({ pipeline = {} }) {
                       animate={{ width: `${widthPercent}%` }}
                       transition={{ duration: 1, delay: i * 0.1 + 0.2, ease: "easeOut" }}
                       className="absolute top-0 left-0 bottom-0 rounded-r-full"
-                      style={{ 
+                      style={{
                         backgroundColor: stage.color,
-                        boxShadow: `0 0 8px ${stage.color}30` 
+                        boxShadow: `0 0 8px ${stage.color}30`
                       }}
                     />
                   </div>
@@ -123,7 +123,7 @@ export default function PipelineFunnel({ pipeline = {} }) {
 
         {/* Drop-off / Rejected State Branch */}
         {rejectedCount > 0 && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6 }}
@@ -131,7 +131,7 @@ export default function PipelineFunnel({ pipeline = {} }) {
           >
             {/* Branching timeline line - Exactly aligned to track center (18px) */}
             <div className="absolute -left-[18px] top-[-18px] w-[20px] h-[28px] border-l-[2px] border-b-[2px] border-red-500/30 rounded-bl-xl z-0" />
-            
+
             <div className="ml-0 flex items-center justify-between p-2.5 bg-red-500/5 dark:bg-red-500/10 border border-red-500/10 dark:border-red-500/20 rounded-xl relative z-10">
               <div className="flex items-center gap-2.5 text-red-600 dark:text-red-400">
                 <div className="p-1.5 bg-red-500/10 dark:bg-red-500/20 rounded-lg">

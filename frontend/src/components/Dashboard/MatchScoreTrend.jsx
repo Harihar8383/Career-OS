@@ -1,8 +1,8 @@
 // frontend/src/components/Dashboard/MatchScoreTrend.jsx
 import React from 'react';
-import { 
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, 
-  Tooltip, ResponsiveContainer, ReferenceLine 
+import {
+  AreaChart, Area, XAxis, YAxis, CartesianGrid,
+  Tooltip, ResponsiveContainer, ReferenceLine
 } from 'recharts';
 import { motion } from 'framer-motion';
 import { Target, Sparkles, Briefcase } from 'lucide-react';
@@ -11,7 +11,7 @@ import { Target, Sparkles, Briefcase } from 'lucide-react';
 const CustomTooltip = ({ active, payload }) => {
   if (!active || !payload?.length) return null;
   const d = payload[0].payload;
-  
+
   // Determine dot color based on score threshold
   const dotColor = d.score >= 75 ? 'bg-emerald-400' : d.score >= 50 ? 'bg-amber-400' : 'bg-rose-400';
   const glowColor = d.score >= 75 ? 'shadow-[0_0_8px_rgba(52,211,153,0.5)]' : d.score >= 50 ? 'shadow-[0_0_8px_rgba(251,191,36,0.5)]' : 'shadow-[0_0_8px_rgba(244,63,94,0.5)]';
@@ -27,7 +27,7 @@ const CustomTooltip = ({ active, payload }) => {
           <div className={`w-2 h-2 rounded-full ${dotColor} ${glowColor}`} />
         </div>
       </div>
-      
+
       <p className="font-semibold text-sm text-white leading-tight mb-1 truncate">
         {d.jobTitle}
       </p>
@@ -68,7 +68,7 @@ export default function MatchScoreTrend({ data = [] }) {
   const chartData = sortedData.map((d, index) => {
     const currentDate = new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     const prevDate = index > 0 ? new Date(sortedData[index - 1].date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : null;
-    
+
     return {
       ...d,
       displayLabel: currentDate === prevDate ? '' : currentDate,
@@ -95,7 +95,7 @@ export default function MatchScoreTrend({ data = [] }) {
             <span>AI Evaluation History</span>
           </div>
         </div>
-        
+
         {/* Stark, minimalist typography for metrics */}
         <div className="flex gap-6 text-right">
           <div>
@@ -115,7 +115,7 @@ export default function MatchScoreTrend({ data = [] }) {
       </div>
 
       {/* Chart Container */}
-      <div className="flex-1 min-h-[220px] w-full relative z-10">
+      <div className="flex-1 min-h-[200px] w-full relative z-10">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={chartData} margin={{ top: 10, right: 0, left: -25, bottom: 0 }}>
             <defs>
@@ -125,71 +125,71 @@ export default function MatchScoreTrend({ data = [] }) {
                 <stop offset="50%" stopColor="#6366f1" stopOpacity={0.1} />
                 <stop offset="100%" stopColor="#6366f1" stopOpacity={0} />
               </linearGradient>
-              
+
               {/* Real SVG Glow Filter for the line */}
               <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
                 <feGaussianBlur stdDeviation="4" result="blur" />
                 <feComposite in="SourceGraphic" in2="blur" operator="over" />
               </filter>
             </defs>
-            
+
             {/* Highly subtle dotted grid */}
             <CartesianGrid vertical={false} stroke="currentColor" strokeOpacity={0.06} strokeDasharray="1 6" />
-            
+
             {/* Benchmark Line - Tells the user what "Good" looks like */}
-            <ReferenceLine 
-              y={75} 
-              stroke="currentColor" 
-              strokeOpacity={0.15} 
-              strokeDasharray="4 4" 
-              label={{ 
-                position: 'insideBottomLeft', 
-                value: 'TARGET MATCH (75%)', 
-                fill: 'currentColor', 
-                opacity: 0.4, 
+            <ReferenceLine
+              y={75}
+              stroke="currentColor"
+              strokeOpacity={0.15}
+              strokeDasharray="4 4"
+              label={{
+                position: 'insideBottomLeft',
+                value: 'TARGET MATCH (75%)',
+                fill: 'currentColor',
+                opacity: 0.4,
                 fontSize: 9,
                 fontWeight: 700,
                 letterSpacing: '0.05em'
-              }} 
+              }}
             />
-            
-            <XAxis 
-              dataKey="index" 
+
+            <XAxis
+              dataKey="index"
               tickFormatter={(val) => chartData[val]?.displayLabel || ''}
-              tick={{ fill: 'currentColor', opacity: 0.4, fontSize: 10, fontWeight: 600 }} 
-              axisLine={false} 
-              tickLine={false} 
+              tick={{ fill: 'currentColor', opacity: 0.4, fontSize: 10, fontWeight: 600 }}
+              axisLine={false}
+              tickLine={false}
               tickMargin={12}
               minTickGap={10}
             />
-            <YAxis 
-              domain={[0, 100]} 
-              tick={{ fill: 'currentColor', opacity: 0.4, fontSize: 10, fontWeight: 600 }} 
-              axisLine={false} 
-              tickLine={false} 
+            <YAxis
+              domain={[0, 100]}
+              tick={{ fill: 'currentColor', opacity: 0.4, fontSize: 10, fontWeight: 600 }}
+              axisLine={false}
+              tickLine={false}
               tickCount={5}
             />
-            
-            <Tooltip 
-              content={<CustomTooltip />} 
+
+            <Tooltip
+              content={<CustomTooltip />}
               cursor={{ stroke: 'currentColor', strokeOpacity: 0.1, strokeWidth: 1, strokeDasharray: '4 4' }}
               isAnimationActive={false}
             />
-            
-            <Area 
-              type="monotoneX" 
-              dataKey="score" 
-              stroke="#3b82f6" 
-              strokeWidth={3} 
-              fill="url(#colorScore)" 
+
+            <Area
+              type="monotoneX"
+              dataKey="score"
+              stroke="#3b82f6"
+              strokeWidth={3}
+              fill="url(#colorScore)"
               animationDuration={1000}
               animationEasing="ease-out"
-              activeDot={{ 
-                r: 6, 
+              activeDot={{
+                r: 6,
                 fill: '#ffffff',
-                stroke: '#3b82f6', 
+                stroke: '#3b82f6',
                 strokeWidth: 3
-              }} 
+              }}
             />
           </AreaChart>
         </ResponsiveContainer>

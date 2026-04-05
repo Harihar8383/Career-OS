@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { AnimatedThemeToggler } from '../ui/animated-theme-toggler';
 
 // Re-usable NavItem component with Image Icon support
-const NavItem = ({ iconSrc, label, path, isBlueHover = true }) => {
+const NavItem = ({ iconSrc, label, path, isBlueHover = true, iconScale = 1 }) => {
   const navigate = useNavigate();
   const location = useLocation();
   // Enhanced active logic
@@ -36,7 +36,7 @@ const NavItem = ({ iconSrc, label, path, isBlueHover = true }) => {
           : `grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 ${isBlueHover ? 'group-hover:drop-shadow-[0_0_5px_rgba(59,130,246,0.5)]' : ''}`
         }`}
       >
-        <img src={iconSrc} alt={label} className="w-full h-full object-contain" />
+        <img src={iconSrc} alt={label} className="w-full h-full object-contain" style={{ transform: `scale(${iconScale})` }} />
       </div>
 
       <span className={`font-medium text-sm z-10 transition-colors duration-300 ${isActive ? 'text-blue-400' : 'group-hover:text-text-primary'}`}>{label}</span>
@@ -75,7 +75,7 @@ export const Sidenav = () => {
 
       {/* Navigation */}
       <div className="flex flex-col space-y-2">
-        <NavItem iconSrc="/icons/dashboard.png" label="Dashboard" path="/dashboard" />
+        <NavItem iconSrc="/icons/dashboard.png" label="Dashboard" path="/dashboard" iconScale={1.55} />
         <NavItem iconSrc="/icons/profile.png" label="My Profile" path="/dashboard/profile" />
         <NavItem iconSrc="/icons/jd_matcher.png" label="JD Matcher" path="/dashboard/matcher" />
         <NavItem iconSrc="/icons/job_hunter.png" label="Job Hunter Agent" path="/dashboard/hunter" />

@@ -3,9 +3,10 @@ import express from 'express';
 import onboardingRoutes from './onboarding.routes.js';
 import profileRoutes from './profile.routes.js';
 import matcherRoutes from './matcher.routes.js';
-import hunterRoutes from './hunter.routes.js'; // <-- Import hunter routes
-import trackerRoutes from './tracker.routes.js'; // <-- Import tracker routes
-import chatRoutes from './chat.routes.js'; // <-- Import chat routes
+import hunterRoutes from './hunter.routes.js';
+import trackerRoutes from './tracker.routes.js';
+import chatRoutes from './chat.routes.js';
+import dashboardRoutes from './dashboard.routes.js';
 
 const router = express.Router();
 
@@ -18,8 +19,9 @@ router.get("/health", (_, res) => {
 router.use('/onboarding', onboardingRoutes);
 router.use('/profile', profileRoutes);
 router.use('/matcher', matcherRoutes);
-router.use('/hunter', hunterRoutes); // <-- Mount hunter routes
-router.use('/tracker', trackerRoutes); // <-- Mount tracker routes
-router.use('/chat', chatRoutes); // <-- Mount chat routes
+router.use('/hunter', hunterRoutes);
+router.use('/tracker', trackerRoutes);
+router.use('/chat', chatRoutes);
+router.use('/dashboard', dashboardRoutes);
 
-export default router;
+export default router;

@@ -73,12 +73,15 @@ export const getDashboardAnalytics = async (req, res) => {
 
     // ── 13. Action Items Feed ────────────────────────────────────────────
     const actionItems = [];
+    
+    const startOfToday = new Date(now);
+    startOfToday.setHours(0, 0, 0, 0);
 
     trackedJobs.forEach(job => {
-      // Future interviews
+      // Future and today's interviews
       if (job.interviews) {
         job.interviews.forEach(int => {
-          if (int.scheduledDate && new Date(int.scheduledDate) >= now) {
+          if (int.scheduledDate && new Date(int.scheduledDate) >= startOfToday) {
             actionItems.push({
               type: 'interview',
               urgency: _getUrgency(int.scheduledDate, now),
@@ -90,10 +93,10 @@ export const getDashboardAnalytics = async (req, res) => {
           }
         });
       }
-      // Pending reminders
+      // Pending reminders (including overdue)
       if (job.reminders) {
         job.reminders.forEach(rem => {
-          if (!rem.completed && rem.date && new Date(rem.date) >= now) {
+          if (!rem.completed && rem.date) {
             actionItems.push({
               type: 'reminder',
               urgency: _getUrgency(rem.date, now),

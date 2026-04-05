@@ -12,8 +12,6 @@ import SkillGapRadar from '../components/Dashboard/SkillGapRadar';
 import MatchScoreTrend from '../components/Dashboard/MatchScoreTrend';
 import RecentAnalyses from '../components/Dashboard/RecentAnalyses';
 import HunterInsights from '../components/Dashboard/HunterInsights';
-import TimeInStage from '../components/Dashboard/TimeInStage';
-import SourceDistribution from '../components/Dashboard/SourceDistribution';
 import ActivityHeatmap from '../components/Dashboard/ActivityHeatmap';
 
 const API_URL = import.meta.env.VITE_API_GATEWAY_URL || 'http://localhost:8080';
@@ -109,15 +107,18 @@ export default function DashboardHome() {
         <div className="lg:col-span-3">
           <PipelineFunnel pipeline={d.pipeline} />
         </div>
-        <div className="lg:col-span-2">
-          <ActionItemsFeed items={d.actionItems} />
+        <div className="lg:col-span-2 h-[500px] lg:h-auto lg:relative">
+          <div className="lg:absolute lg:inset-0 w-full h-full">
+            <ActionItemsFeed items={d.actionItems} />
+          </div>
         </div>
       </div>
 
       {/* ── Row 3: Skill Gap + Match Score Trend ──────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <SkillGapRadar skillGaps={d.skillGaps} />
         <MatchScoreTrend data={d.matchScoreTrend} />
+        <SkillGapRadar skillGaps={d.skillGaps} />
+        
       </div>
 
       {/* ── Row 4: Recent Analyses + Hunter Insights ──────────────────── */}
@@ -126,11 +127,7 @@ export default function DashboardHome() {
         <HunterInsights hunterSummary={d.hunterSummary} topCompanies={d.topCompanies} />
       </div>
 
-      {/* ── Row 5: Time in Stage + Source Distribution ────────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <TimeInStage data={d.timeInStage} />
-        <SourceDistribution distribution={d.sourceDistribution} />
-      </div>
+      
 
       {/* ── Row 6: Activity Heatmap (full width) ─────────────────────── */}
       <ActivityHeatmap data={d.activityHeatmap} />

@@ -3,6 +3,9 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* =============================================
+   CLASH DISPLAY FONT FACES
+   ============================================= */
 @font-face {
   font-family: 'Clash Display';
   src: url('/fonts/ClashDisplay-Regular.woff2') format('woff2');
@@ -22,74 +25,148 @@
 @font-face {
   font-family: 'Clash Display';
   src: url('/fonts/ClashDisplay-Bold.woff2') format('woff2');
-  font-weight: 200;
+  font-weight: 700;
   font-display: swap;
   font-style: normal;
 }
 
-@keyframes shimmer {
-  0% {
-    transform: translateX(-150%) skewX(-12deg);
-  }
+/* =============================================
+   KEYFRAMES — Section 4.1 Animation Vocabulary
+   ============================================= */
 
-  100% {
-    transform: translateX(150%) skewX(-12deg);
-  }
+/* Shimmer sweep for loading states */
+@keyframes shimmer {
+  0%   { transform: translateX(-150%) skewX(-12deg); }
+  100% { transform: translateX(150%)  skewX(-12deg); }
 }
 
+/* Skeleton pulse — Section 8.3: Use skeletons everywhere, never spinners for content */
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+/* Glow ring pulse — Section 3.4: Status dot pulses once on appear (600ms, once) */
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 currentColor; }
+  50%       { box-shadow: 0 0 0 6px transparent; }
+}
+
+/* Atmospheric breathe — ambient glow for score panels */
+@keyframes breathe {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50%       { opacity: 1;   transform: scale(1.04); }
+}
+
+/* Terminal cursor blink — Section 3.2: AI Thinking Terminal */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+/* Shimmer slide (retained for MagicUI compat) */
+@keyframes shimmer-slide {
+  to { transform: translate(calc(100cqw - 100%), 0); }
+}
+
+/* Spin around (retained for MagicUI compat) */
+@keyframes spin-around {
+  0%           { transform: translateZ(0) rotate(0deg); }
+  15%, 35%     { transform: translateZ(0) rotate(90deg); }
+  65%, 85%     { transform: translateZ(0) rotate(270deg); }
+  100%         { transform: translateZ(0) rotate(360deg); }
+}
+
+/* Stagger fade-up — Section 4.2: Results sections reveal with staggered fade-up */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Tag wave — Section 3.5: Tags animate in with 15ms stagger per tag */
+@keyframes tag-in {
+  from { opacity: 0; transform: scale(0.85) translateY(4px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* =============================================
+   ROOT — LIGHT MODE (default)
+   Section 7.1: Color Tokens (Unified)
+   ============================================= */
 :root {
-  /* --- Primary Action Colors --- */
-  /* Use for buttons, links, and main interactive elements */
-  --color-primary: #2934FF;
-  /* --blue-500 */
-  --color-primary-light: #1E28CC;
-  /* --blue-600 */
-  /* For hover states */
+  /* ─── Brand ─── */
+  --brand-primary:       #2934FF;
+  --brand-primary-hover: #1E27CC;
+  --brand-purple:        #A855F7;
+  --brand-purple-dim:    rgba(168, 85, 247, 0.10);
 
-  /* --- Secondary Accent Color --- */
-  /* Use for tags, badges, highlights, or special icons */
-  --color-accent: rgba(168, 85, 247, 0.05);
-  /* --bg-purple (using for accent bg? or keep purple?) - Original was #a855f7. Plan says --bg-purple is rgba... Let's stick to the color palette logic. User defined --bg-accent and --bg-purple. 
-     Wait, existing --color-accent is #a855f7. 
-     User provided --bg-accent: rgba(41, 52, 255, 0.05) and --bg-purple: rgba(168, 85, 247, 0.05).
-     Let's map --color-accent to something visible for text/icons if used there, or keep it close to the blue/purple theme.
-     Actually, let's look at the mapping in the plan.
-     --color-primary -> #2934FF
-     
-     Let's use the USER's palette directly where possible and map existing vars to it.
-  */
+  /* ─── Semantic ─── */
+  --color-success:     #16A34A;
+  --color-success-dim: rgba(22, 163, 74, 0.10);
+  --color-warning:     #D97706;
+  --color-warning-dim: rgba(217, 119, 6, 0.10);
+  --color-danger:      #DC2626;
+  --color-danger-dim:  rgba(220, 38, 38, 0.10);
+  --color-info:        #2934FF;
+  --color-info-dim:    rgba(41, 52, 255, 0.08);
 
-  /* === Mapped Variables (Light Mode Default) === */
+  /* ─── Surface (Light mode) ─── */
+  --surface-base:          #F8F9FA;
+  --surface-card:          #FFFFFF;
+  --surface-overlay:       rgba(0, 0, 0, 0.03);
+  --surface-border:        rgba(0, 0, 0, 0.10);
+  --surface-border-strong: rgba(0, 0, 0, 0.18);
 
-  /* Text (Darkened for better readability on white) */
-  --color-text-primary: #09090B;
-  /* --text-primary */
-  --color-text-body: #3F3F46;
-  /* --text-secondary (Darker than before) */
-  --color-text-secondary: #52525B;
-  /* --text-tertiary */
+  /* ─── Text scale (Light) ─── */
+  --text-high: #09090B;
+  --text-mid:  #52525B;
+  --text-low:  #A1A1AA;
 
-  /* Backgrounds */
-  --color-bg-dark: #FFFFFF;
-  /* --bg-primary (Main background) - Note: In code it's called bg-dark, but now it's white */
-  --color-bg-card: #FAFAFA;
-  /* --bg-secondary (Card backgrounds) */
-  --color-syntask-bg: #F4F4F5;
-  /* --bg-tertiary (Elevated) */
+  /* ─── Legacy mapped vars (backward compat) ─── */
+  --color-primary:          #2934FF;
+  --color-primary-light:    #1E27CC;
+  --color-accent:           rgba(168, 85, 247, 0.05);
+  --color-text-primary:     #09090B;
+  --color-text-body:        #3F3F46;
+  --color-text-secondary:   #52525B;
+  --color-bg-dark:          #FFFFFF;
+  --color-bg-card:          #FAFAFA;
+  --color-syntask-bg:       #F4F4F5;
+  --color-border-primary:   rgba(0, 0, 0, 0.12);
+  --color-border-secondary: rgba(0, 0, 0, 0.07);
+  --color-syntask-border:   rgba(0, 0, 0, 0.18);
+  --color-border-strong:    rgba(0, 0, 0, 0.22);
+  --color-border-secondary-alias: rgba(0, 0, 0, 0.07);
 
-  /* Borders (Increased opacity for visibility) */
-  --color-border-primary: rgba(0, 0, 0, 0.15);
-  /* --border-default (Stronger) */
-  --color-border-secondary: rgba(0, 0, 0, 0.08);
-  /* --border-subtle */
-  --color-syntask-border: rgba(0, 0, 0, 0.2);
-  /* --border-strong */
-
-  /* Fonts */
+  /* ─── Typography ─── */
   --font-clash-display: "Clash Display", system-ui, sans-serif;
-  --font-dm-sans: "DM Sans", system-ui, sans-serif;
+  --font-dm-sans:       "DM Sans", system-ui, sans-serif;
 
-  /* Standard Shadcn/Tailwind Variables (Light) */
+  /* ─── Spacing — 8×4px base grid (Section 7.3) ─── */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-12: 48px;
+
+  /* ─── Animation timing (Section 7.5 + 4.1) ─── */
+  --duration-instant:  80ms;
+  --duration-fast:     150ms;
+  --duration-normal:   250ms;
+  --duration-slow:     500ms;
+  --duration-dramatic: 1200ms;
+  --ease-app:          cubic-bezier(0.32, 0, 0, 1);
+
+  /* ─── Radii ─── */
+  --radius:    0.625rem;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  /* ─── Shadcn/Tailwind Standard Variables (Light) ─── */
   --background: 0 0% 100%;
   --foreground: 240 10% 3.9%;
   --card: 0 0% 100%;
@@ -109,11 +186,9 @@
   --border: 240 5.9% 90%;
   --input: 240 5.9% 90%;
   --ring: 240 5.9% 10%;
-  --radius: 0.625rem;
 
-  /* Sidebar (Light) */
+  /* ─── Sidebar (Light) ─── */
   --sidebar: oklch(0.985 0 0);
-  /* white */
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
   --sidebar-primary-foreground: oklch(0.985 0 0);
@@ -121,250 +196,42 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.87 0 0);
+}
 
-  /* === JD Matcher New UX Tokens === */
-  /* === Brand === */
-  --brand-primary: #2934FF;
-  /* Main action color */
-  --brand-primary-hover: #1E27CC;
-  /* Hover/pressed state */
-  --brand-purple: #A855F7;
-  /* Secondary accent */
-  --brand-purple-dim: rgba(168, 85, 247, 0.1);
-
-  /* === Semantic === */
-  --color-success: #16A34A;
-  /* Matched, complete */
-  --color-success-dim: rgba(22, 163, 74, 0.1);
-  --color-warning: #D97706;
-  /* Borderline, weakly implied */
-  --color-warning-dim: rgba(217, 119, 6, 0.1);
-  --color-danger: #DC2626;
-  /* Missing, gaps, errors */
-  --color-danger-dim: rgba(220, 38, 38, 0.1);
-  --color-info: #2934FF;
-  /* = brand primary */
-  --color-info-dim: rgba(41, 52, 255, 0.08);
-
-  /* === Surface (Dark Mode — default) === */
-  --surface-base: #0A0B0D;
-  --surface-card: #111318;
-  --surface-overlay: rgba(255, 255, 255, 0.04);
-  --surface-border: rgba(255, 255, 255, 0.08);
+/* =============================================
+   DARK MODE OVERRIDES
+   Direction 1 "Intelligence Panel" — Section 2
+   Background #0A0B0D, Cards #111318
+   ============================================= */
+.dark {
+  /* ─── Surface ─── */
+  --surface-base:          #0A0B0D;
+  --surface-card:          #111318;
+  --surface-overlay:       rgba(255, 255, 255, 0.04);
+  --surface-border:        rgba(255, 255, 255, 0.08);
   --surface-border-strong: rgba(255, 255, 255, 0.15);
 
-  /* === Text === */
+  /* ─── Text (Dark) ─── */
   --text-high: #F4F4F5;
-  /* Primary readable text */
-  --text-mid: #A1A1AA;
-  /* Secondary, labels */
-  --text-low: #52525B;
-  /* Placeholders, disabled */
-}
+  --text-mid:  #A1A1AA;
+  --text-low:  #52525B;
 
-/* === Theme variables mapping === */
-@theme {
-  --color-primary: var(--color-primary);
-  --color-primary-light: var(--color-primary-light);
-  --color-accent: var(--color-accent);
-  --color-text-primary: var(--color-text-primary);
-  --color-text-secondary: var(--color-text-secondary);
-  --color-text-body: var(--color-text-body);
-  --color-bg-dark: var(--color-bg-dark);
-  --color-bg-card: var(--color-bg-card);
-  --color-border-primary: var(--color-border-primary);
-  --color-border-secondary: var(--color-border-secondary);
-  --color-syntask-bg: var(--color-syntask-bg);
-  --color-syntask-border: var(--color-syntask-border);
+  /* ─── Legacy (Dark overrides) ─── */
+  --color-primary:          #2934FF;
+  --color-primary-light:    #1E27CC;
+  --color-accent:           #A855F7;
+  --color-text-primary:     #F4F4F5;
+  --color-text-body:        #D4D4D8;
+  --color-text-secondary:   #71717A;
+  --color-bg-dark:          #0A0A0A;
+  --color-bg-card:          #171717;
+  --color-border-primary:   rgba(255, 255, 255, 0.08);
+  --color-border-secondary: rgba(255, 255, 255, 0.14);
+  --color-border-strong:    rgba(255, 255, 255, 0.20);
+  --color-syntask-bg:       #171717;
+  --color-syntask-border:   #262626;
 
-  --font-clash-display: "Clash Display", system-ui, sans-serif;
-  --font-dm-sans: "DM Sans", system-ui, sans-serif;
-
-  /* JD Matcher Tokens Exported to Tailwind */
-  --color-brand-primary: var(--brand-primary);
-  --color-brand-primary-hover: var(--brand-primary-hover);
-  --color-brand-purple: var(--brand-purple);
-  --color-brand-purple-dim: var(--brand-purple-dim);
-
-  --color-success: var(--color-success);
-  --color-success-dim: var(--color-success-dim);
-  --color-warning: var(--color-warning);
-  --color-warning-dim: var(--color-warning-dim);
-  --color-danger: var(--color-danger);
-  --color-danger-dim: var(--color-danger-dim);
-  --color-info: var(--color-info);
-  --color-info-dim: var(--color-info-dim);
-
-  --color-surface-base: var(--surface-base);
-  --color-surface-card: var(--surface-card);
-  --color-surface-overlay: var(--surface-overlay);
-  --color-surface-border: var(--surface-border);
-  --color-surface-border-strong: var(--surface-border-strong);
-
-  --color-text-high: var(--text-high);
-  --color-text-mid: var(--text-mid);
-  --color-text-low: var(--text-low);
-}
-
-/* Optional: dark mode variant */
-@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
-
-/* Base layer applying fonts and body defaults */
-@layer base {
-  body {
-    font-family: var(--font-dm-sans);
-    color: var(--color-text-body);
-    background-color: var(--color-bg-card);
-  }
-}
-
-/* Optional: reusable utility classes if you want them */
-@layer components {
-  .font-clash-display {
-    font-family: var(--font-clash-display);
-  }
-
-  .font-dm-sans {
-    font-family: var(--font-dm-sans);
-  }
-
-  .text-primary {
-    color: var(--color-text-primary);
-  }
-
-  .text-secondary {
-    color: var(--color-text-secondary);
-  }
-
-  .text-body {
-    color: var(--color-text-body);
-  }
-
-  .bg-dark {
-    background-color: var(--color-bg-dark);
-  }
-
-  .bg-card {
-    background-color: var(--color-bg-card);
-  }
-
-  .border-primary {
-    border-color: var(--color-border-primary);
-  }
-
-  .border-secondary {
-    border-color: var(--color-border-secondary);
-  }
-
-  .bg-syntask {
-    background-color: var(--color-syntask-bg);
-  }
-
-  .border-syntask {
-    border-color: var(--color-syntask-border);
-  }
-
-  .bg-gradient-modern-light {
-    background-image: linear-gradient(to bottom right, rgba(239, 246, 255, 0.8), rgba(250, 245, 255, 0.5), #ffffff);
-  }
-
-  .dark .bg-gradient-modern-light {
-    background-image: none;
-    background-color: transparent;
-  }
-}
-
-@theme inline {
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --animate-shimmer-slide: shimmer-slide var(--speed) ease-in-out infinite alternate;
-  --animate-spin-around: spin-around calc(var(--speed) * 2) infinite linear;
-
-  @keyframes shimmer-slide {
-    to {
-      transform: translate(calc(100cqw - 100%), 0);
-    }
-  }
-
-  @keyframes spin-around {
-    0% {
-      transform: translateZ(0) rotate(0);
-    }
-
-    15%,
-    35% {
-      transform: translateZ(0) rotate(90deg);
-    }
-
-    65%,
-    85% {
-      transform: translateZ(0) rotate(270deg);
-    }
-
-    100% {
-      transform: translateZ(0) rotate(360deg);
-    }
-  }
-}
-
-/* Dark mode overrides (Original values restored) */
-.dark {
-  /* --- Primary Action Colors --- */
-  --color-primary: #3b82f6;
-  --color-primary-light: #60a5fa;
-  --color-accent: #a855f7;
-
-  /* --- Text Colors --- */
-  --color-text-primary: #f4f4f5;
-  --color-text-body: #d4d4d8;
-  --color-text-secondary: #71717a;
-
-  /* --- Backgrounds --- */
-  --color-bg-dark: #0a0a0a;
-  --color-bg-card: #171717;
-
-  /* --- Borders --- */
-  --color-border-primary: #262626;
-  --color-border-secondary: #404040;
-
-  /* --- Special Component Colors --- */
-  --color-syntask-bg: #171717;
-  --color-syntask-border: #262626;
-
-  /* --- Shadcn/Tailwind Dark Variables --- */
+  /* ─── Shadcn/Tailwind Dark ─── */
   --background: oklch(0.129 0.042 264.695);
   --foreground: oklch(0.984 0.003 247.858);
   --card: oklch(0.208 0.042 265.755);
@@ -398,99 +265,354 @@
   --sidebar-ring: oklch(0.551 0.027 264.364);
 }
 
+/* =============================================
+   TAILWIND v4 @THEME EXPORT
+   Exposes CSS vars as Tailwind color/font utilities
+   ============================================= */
+@theme {
+  /* Fonts */
+  --font-clash-display: "Clash Display", system-ui, sans-serif;
+  --font-dm-sans:       "DM Sans", system-ui, sans-serif;
+
+  /* Brand */
+  --color-brand-primary:       var(--brand-primary);
+  --color-brand-primary-hover: var(--brand-primary-hover);
+  --color-brand-purple:        var(--brand-purple);
+  --color-brand-purple-dim:    var(--brand-purple-dim);
+
+  /* Semantic */
+  --color-success:     var(--color-success);
+  --color-success-dim: var(--color-success-dim);
+  --color-warning:     var(--color-warning);
+  --color-warning-dim: var(--color-warning-dim);
+  --color-danger:      var(--color-danger);
+  --color-danger-dim:  var(--color-danger-dim);
+  --color-info:        var(--color-info);
+  --color-info-dim:    var(--color-info-dim);
+
+  /* Surface */
+  --color-surface-base:          var(--surface-base);
+  --color-surface-card:          var(--surface-card);
+  --color-surface-overlay:       var(--surface-overlay);
+  --color-surface-border:        var(--surface-border);
+  --color-surface-border-strong: var(--surface-border-strong);
+
+  /* Text */
+  --color-text-high: var(--text-high);
+  --color-text-mid:  var(--text-mid);
+  --color-text-low:  var(--text-low);
+
+  /* Legacy compat */
+  --color-primary:          var(--color-primary);
+  --color-primary-light:    var(--color-primary-light);
+  --color-accent:           var(--color-accent);
+  --color-text-primary:     var(--color-text-primary);
+  --color-text-secondary:   var(--color-text-secondary);
+  --color-text-body:        var(--color-text-body);
+  --color-bg-dark:          var(--color-bg-dark);
+  --color-bg-card:          var(--color-bg-card);
+  --color-border-primary:   var(--color-border-primary);
+  --color-border-secondary: var(--color-border-secondary);
+  --color-border-strong:    var(--color-border-strong);
+  --color-syntask-bg:       var(--color-syntask-bg);
+  --color-syntask-border:   var(--color-syntask-border);
+
+  /* Radius */
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+
+  /* Shadcn standard */
+  --color-background:                var(--background);
+  --color-foreground:                var(--foreground);
+  --color-card:                      var(--card);
+  --color-card-foreground:           var(--card-foreground);
+  --color-popover:                   var(--popover);
+  --color-popover-foreground:        var(--popover-foreground);
+  --color-primary-foreground:        var(--primary-foreground);
+  --color-secondary:                 var(--secondary);
+  --color-secondary-foreground:      var(--secondary-foreground);
+  --color-muted:                     var(--muted);
+  --color-muted-foreground:          var(--muted-foreground);
+  --color-accent-foreground:         var(--accent-foreground);
+  --color-destructive:               var(--destructive);
+  --color-border:                    var(--border);
+  --color-input:                     var(--input);
+  --color-ring:                      var(--ring);
+  --color-sidebar:                   var(--sidebar);
+  --color-sidebar-foreground:        var(--sidebar-foreground);
+  --color-sidebar-primary:           var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent:            var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border:            var(--sidebar-border);
+  --color-sidebar-ring:              var(--sidebar-ring);
+
+  /* Animation export */
+  --animate-shimmer-slide:    shimmer-slide var(--speed) ease-in-out infinite alternate;
+  --animate-spin-around:      spin-around calc(var(--speed) * 2) infinite linear;
+  --animate-skeleton-pulse:   skeleton-pulse 1.5s ease-in-out infinite;
+  --animate-breathe:          breathe 3s ease-in-out infinite;
+  --animate-blink:            blink 1s step-end infinite;
+  --animate-fade-up:          fade-up 0.5s ease-out both;
+  --animate-tag-in:           tag-in 0.2s ease-out both;
+}
+
+/* =============================================
+   CUSTOM VARIANT
+   ============================================= */
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+/* =============================================
+   BASE LAYER — Typography defaults
+   Section 7.2: Typography Scale
+   ============================================= */
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
 
   body {
+    font-family: var(--font-dm-sans);
+    color: var(--text-high);
+    background-color: var(--surface-base);
     @apply bg-background text-foreground;
+  }
+
+  /* Section 7.5: Focus rings — ring-2 ring-brand-primary/50 */
+  :focus-visible {
+    outline: 2px solid rgba(41, 52, 255, 0.5);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* Section 7.5: cursor-pointer on all click targets */
+  button, [role="button"], [role="tab"] {
+    cursor: pointer;
   }
 }
 
+/* =============================================
+   COMPONENT LAYER — Design system utilities
+   Section 7.4: Component Consistency Rules
+   ============================================= */
+@layer components {
+
+  /* ─── Font utilities ─── */
+  .font-clash-display { font-family: var(--font-clash-display); }
+  .font-dm-sans       { font-family: var(--font-dm-sans); }
+
+  /* ─── Section Header (Rule 7.4.1) ───
+     Always: border-l-4 border-brand-primary pl-6 mb-8
+     with h2.text-3xl.font-clash-display + p.text-text-secondary.text-sm */
+  .section-header {
+    border-left: 4px solid var(--brand-primary);
+    padding-left: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  /* ─── Cards (Rule 7.4.2) ───
+     Always: bg-surface-card border border-surface-border rounded-2xl
+     Never mix rounded-xl and rounded-2xl on adjacent cards */
+  .card-base {
+    background-color: var(--surface-card);
+    border: 1px solid var(--surface-border);
+    border-radius: 1rem;
+  }
+
+  /* ─── Tags / Chips (Rule 7.4.3) ───
+     Always: px-3 py-1.5 text-xs font-bold rounded-lg border + semantic color */
+  .chip {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border-radius: 0.5rem;
+    border: 1px solid;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+
+  .chip-success {
+    background-color: var(--color-success-dim);
+    color: var(--color-success);
+    border-color: rgba(22, 163, 74, 0.25);
+  }
+
+  .chip-danger {
+    background-color: var(--color-danger-dim);
+    color: var(--color-danger);
+    border-color: rgba(220, 38, 38, 0.25);
+  }
+
+  .chip-warning {
+    background-color: var(--color-warning-dim);
+    color: var(--color-warning);
+    border-color: rgba(217, 119, 6, 0.25);
+  }
+
+  .chip-info {
+    background-color: var(--color-info-dim);
+    color: var(--brand-primary);
+    border-color: rgba(41, 52, 255, 0.25);
+  }
+
+  /* ─── Skeleton Loader (Section 8.3) ───
+     Rule: Always skeleton, never spinner for content loading.
+     Skeletons must match the exact dimensions of loaded content. */
+  .skeleton {
+    background-color: var(--surface-border);
+    border-radius: 6px;
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
+  }
+
+  /* ─── Hover lift — Section 3.8: card lifts translateY(-2px) on hover ─── */
+  .hover-lift {
+    transition: transform var(--duration-fast) ease,
+                box-shadow var(--duration-fast) ease;
+  }
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  }
+
+  /* ─── Background gradients ─── */
+  .bg-gradient-modern-light {
+    background-image: linear-gradient(
+      to bottom right,
+      rgba(239, 246, 255, 0.8),
+      rgba(250, 245, 255, 0.5),
+      #ffffff
+    );
+  }
+
+  .dark .bg-gradient-modern-light {
+    background-image: none;
+    background-color: transparent;
+  }
+
+  /* Atmospheric glow — used behind score gauges (Section 3.3 Approach B: color-coded background glow) */
+  .bg-glow-brand {
+    background: radial-gradient(ellipse at center, rgba(41, 52, 255, 0.15) 0%, transparent 70%);
+  }
+  .bg-glow-success {
+    background: radial-gradient(ellipse at center, rgba(22, 163, 74, 0.15) 0%, transparent 70%);
+  }
+  .bg-glow-warning {
+    background: radial-gradient(ellipse at center, rgba(217, 119, 6, 0.12) 0%, transparent 70%);
+  }
+  .bg-glow-danger {
+    background: radial-gradient(ellipse at center, rgba(220, 38, 38, 0.12) 0%, transparent 70%);
+  }
+
+  /* ─── Status dot (Section 3.4: status dot pulses once on appear) ─── */
+  .status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 9999px;
+    flex-shrink: 0;
+  }
+  .status-dot-strong  { background-color: var(--color-success); box-shadow: 0 0 10px var(--color-success); }
+  .status-dot-average { background-color: var(--color-warning); box-shadow: 0 0 10px var(--color-warning); }
+  .status-dot-weak    { background-color: var(--color-danger);  box-shadow: 0 0 10px var(--color-danger);  }
+
+  /* ─── Terminal cursor (Section 3.2: AI Terminal) ─── */
+  .terminal-cursor {
+    display: inline-block;
+    width: 2px;
+    height: 1em;
+    background-color: var(--brand-primary);
+    animation: blink 1s step-end infinite;
+    vertical-align: text-bottom;
+    margin-left: 2px;
+    border-radius: 1px;
+  }
+
+  /* ─── Tag stagger animation (Section 3.5: 15ms stagger per tag) ─── */
+  .tag-animated {
+    animation: tag-in 0.2s ease-out both;
+  }
+
+  /* ─── Priority border strips (Section 3.6: left-border color strips) ─── */
+  .priority-high   { border-left: 3px solid var(--color-danger);  background-color: rgba(220, 38, 38, 0.04); }
+  .priority-medium { border-left: 3px solid var(--color-warning); background-color: rgba(217, 119, 6, 0.04); }
+  .priority-low    { border-left: 3px solid var(--surface-border-strong); background-color: transparent; }
+}
+
+/* =============================================
+   @THEME INLINE — Shadcn/Tailwind internal wiring
+   ============================================= */
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background:                var(--background);
+  --color-foreground:                var(--foreground);
+  --color-card:                      var(--card);
+  --color-card-foreground:           var(--card-foreground);
+  --color-popover:                   var(--popover);
+  --color-popover-foreground:        var(--popover-foreground);
+  --color-primary:                   var(--primary);
+  --color-primary-foreground:        var(--primary-foreground);
+  --color-secondary:                 var(--secondary);
+  --color-secondary-foreground:      var(--secondary-foreground);
+  --color-muted:                     var(--muted);
+  --color-muted-foreground:          var(--muted-foreground);
+  --color-accent:                    var(--accent);
+  --color-accent-foreground:         var(--accent-foreground);
+  --color-destructive:               var(--destructive);
+  --color-border:                    var(--border);
+  --color-input:                     var(--input);
+  --color-ring:                      var(--ring);
+  --color-chart-1:                   var(--chart-1);
+  --color-chart-2:                   var(--chart-2);
+  --color-chart-3:                   var(--chart-3);
+  --color-chart-4:                   var(--chart-4);
+  --color-chart-5:                   var(--chart-5);
+  --color-sidebar:                   var(--sidebar);
+  --color-sidebar-foreground:        var(--sidebar-foreground);
+  --color-sidebar-primary:           var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent:            var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border:            var(--sidebar-border);
+  --color-sidebar-ring:              var(--sidebar-ring);
+  --animate-shimmer-slide: shimmer-slide var(--speed) ease-in-out infinite alternate;
+  --animate-spin-around:   spin-around calc(var(--speed) * 2) infinite linear;
+}
+
+/* =============================================
+   VIEW TRANSITIONS — no flash on route change
+   ============================================= */
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation: none;
   mix-blend-mode: normal;
 }
 
-/* Custom dark scrollbar for terminal and other elements */
-.terminal-scrollbar::-webkit-scrollbar {
-  width: 8px;
-}
+/* =============================================
+   SCROLLBAR UTILITIES (preserved)
+   ============================================= */
 
-.terminal-scrollbar::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 4px;
-}
+/* Terminal dark scrollbar */
+.terminal-scrollbar::-webkit-scrollbar        { width: 8px; }
+.terminal-scrollbar::-webkit-scrollbar-track  { background: rgba(0,0,0,0.2); border-radius: 4px; }
+.terminal-scrollbar::-webkit-scrollbar-thumb  { background: rgba(255,255,255,0.1); border-radius: 4px; }
+.terminal-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+.terminal-scrollbar { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.1) rgba(0,0,0,0.2); }
 
-.terminal-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
-}
+/* Compact custom scrollbar */
+.custom-scrollbar::-webkit-scrollbar         { width: 6px; height: 6px; }
+.custom-scrollbar::-webkit-scrollbar-track   { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb   { background: rgba(100,100,100,0.3); border-radius: 3px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(100,100,100,0.5); }
+.custom-scrollbar { scrollbar-width: thin; scrollbar-color: rgba(100,100,100,0.3) transparent; }
 
-.terminal-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-/* For Firefox */
-.terminal-scrollbar {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.1) rgba(0, 0, 0, 0.2);
-}
-
-/* Custom scrollbar for tracker Kanban board */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(100, 100, 100, 0.3);
-  border-radius: 3px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(100, 100, 100, 0.5);
-}
-
-/* For Firefox */
-.custom-scrollbar {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(100, 100, 100, 0.3) transparent;
-}
-
-/* Dark themed scrollbar for lists */
-.dark-scrollbar::-webkit-scrollbar {
-  width: 6px;
-}
-
-.dark-scrollbar::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 9999px;
-}
-
-.dark-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(55, 65, 81, 0.8);
-  border-radius: 9999px;
-}
-
-.dark-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(75, 85, 99, 0.9);
-}
-
-/* For Firefox */
-.dark-scrollbar {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(55, 65, 81, 0.8) rgba(0, 0, 0, 0.3);
-}
-
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation: none;
-  mix-blend-mode: normal;
-}
+/* Dark list scrollbar */
+.dark-scrollbar::-webkit-scrollbar        { width: 6px; }
+.dark-scrollbar::-webkit-scrollbar-track  { background: rgba(0,0,0,0.3); border-radius: 9999px; }
+.dark-scrollbar::-webkit-scrollbar-thumb  { background: rgba(55,65,81,0.8); border-radius: 9999px; }
+.dark-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(75,85,99,0.9); }
+.dark-scrollbar { scrollbar-width: thin; scrollbar-color: rgba(55,65,81,0.8) rgba(0,0,0,0.3); }

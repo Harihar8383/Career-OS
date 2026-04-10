@@ -88,7 +88,13 @@ const MatcherInputView = () => {
   }
 
   if (isLoading) {
-    return <MatcherPolling statusMessage={statusMessage} />;
+    return (
+      <MatcherPolling
+        statusMessage={statusMessage}
+        status={status}
+        onCancel={resetMatcher}
+      />
+    );
   }
 
   return (
@@ -219,10 +225,10 @@ const MatcherResultView = () => {
       <div className="max-w-7xl mx-auto px-4 mb-6">
         <button
           onClick={handleBack}
-          className="flex items-center gap-2 text-slate-400 hover:text-white transition group"
+          className="flex items-center gap-2 text-text-mid hover:text-text-high transition-colors duration-150 group font-dm-sans text-sm"
         >
-          <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
-          Back
+          <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform duration-150" />
+          {window.history.length > 2 ? '← Back' : '← Back to Matcher'}
         </button>
       </div>
 
@@ -243,7 +249,7 @@ export default function JDMatcherPage() {
   const activeTab = location.pathname.includes('history') ? 'history' : 'new';
 
   return (
-    <div className="w-full pb-20">
+    <div className="w-full pb-20 overflow-x-hidden">
       {/* Navigation Tabs (Only show on root or history pages, hide on results) */}
       {!location.pathname.includes('results') && (
         <div className="flex justify-center mb-8">

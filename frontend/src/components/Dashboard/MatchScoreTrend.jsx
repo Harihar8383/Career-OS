@@ -64,7 +64,11 @@ export default function MatchScoreTrend({ data = [] }) {
     );
   }
 
-  const sortedData = [...data].sort((a, b) => new Date(a.date) - new Date(b.date));
+  // Get up to the 10 most recent scores
+  const sortedData = [...data]
+    .sort((a, b) => new Date(a.date) - new Date(b.date))
+    .slice(-10);
+
   const chartData = sortedData.map((d, index) => {
     const currentDate = new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     const prevDate = index > 0 ? new Date(sortedData[index - 1].date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : null;

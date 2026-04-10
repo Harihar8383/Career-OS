@@ -31,6 +31,7 @@
   0% {
     transform: translateX(-150%) skewX(-12deg);
   }
+
   100% {
     transform: translateX(150%) skewX(-12deg);
   }
@@ -120,6 +121,45 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.87 0 0);
+
+  /* === JD Matcher New UX Tokens === */
+  /* === Brand === */
+  --brand-primary: #2934FF;
+  /* Main action color */
+  --brand-primary-hover: #1E27CC;
+  /* Hover/pressed state */
+  --brand-purple: #A855F7;
+  /* Secondary accent */
+  --brand-purple-dim: rgba(168, 85, 247, 0.1);
+
+  /* === Semantic === */
+  --color-success: #16A34A;
+  /* Matched, complete */
+  --color-success-dim: rgba(22, 163, 74, 0.1);
+  --color-warning: #D97706;
+  /* Borderline, weakly implied */
+  --color-warning-dim: rgba(217, 119, 6, 0.1);
+  --color-danger: #DC2626;
+  /* Missing, gaps, errors */
+  --color-danger-dim: rgba(220, 38, 38, 0.1);
+  --color-info: #2934FF;
+  /* = brand primary */
+  --color-info-dim: rgba(41, 52, 255, 0.08);
+
+  /* === Surface (Dark Mode — default) === */
+  --surface-base: #0A0B0D;
+  --surface-card: #111318;
+  --surface-overlay: rgba(255, 255, 255, 0.04);
+  --surface-border: rgba(255, 255, 255, 0.08);
+  --surface-border-strong: rgba(255, 255, 255, 0.15);
+
+  /* === Text === */
+  --text-high: #F4F4F5;
+  /* Primary readable text */
+  --text-mid: #A1A1AA;
+  /* Secondary, labels */
+  --text-low: #52525B;
+  /* Placeholders, disabled */
 }
 
 /* === Theme variables mapping === */
@@ -139,6 +179,31 @@
 
   --font-clash-display: "Clash Display", system-ui, sans-serif;
   --font-dm-sans: "DM Sans", system-ui, sans-serif;
+
+  /* JD Matcher Tokens Exported to Tailwind */
+  --color-brand-primary: var(--brand-primary);
+  --color-brand-primary-hover: var(--brand-primary-hover);
+  --color-brand-purple: var(--brand-purple);
+  --color-brand-purple-dim: var(--brand-purple-dim);
+
+  --color-success: var(--color-success);
+  --color-success-dim: var(--color-success-dim);
+  --color-warning: var(--color-warning);
+  --color-warning-dim: var(--color-warning-dim);
+  --color-danger: var(--color-danger);
+  --color-danger-dim: var(--color-danger-dim);
+  --color-info: var(--color-info);
+  --color-info-dim: var(--color-info-dim);
+
+  --color-surface-base: var(--surface-base);
+  --color-surface-card: var(--surface-card);
+  --color-surface-overlay: var(--surface-overlay);
+  --color-surface-border: var(--surface-border);
+  --color-surface-border-strong: var(--surface-border-strong);
+
+  --color-text-high: var(--text-high);
+  --color-text-mid: var(--text-mid);
+  --color-text-low: var(--text-low);
 }
 
 /* Optional: dark mode variant */

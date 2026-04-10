@@ -1,74 +1,86 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
 
-const ScoreGauge = ({ score = 0 }) => {
-    const safeScore = Math.min(Math.max(score, 0), 100);
+const ScoreGauge = React.memo(({ score = 0 }) => {
+  const safeScore = Math.min(Math.max(score, 0), 100);
+  const [hasAnimated, setHasAnimated] = useState(false);
 
-    // --- INCREASED SIZE ---
-    const width = 300;
-    const height = 160; // Slightly more than half of width for the text
-    const strokeWidth = 28;
-    const radius = 120; // 120 * 2 = 240, fits well within 300 width
+  // Motion values for counting up
+  const count = useMotionValue(0);
+  const rounded = useTransform(count, Math.round);
 
-    // Semi-circle logic:
-    // Circumference of full circle = 2 * PI * r
-    // Length of semi-circle arc = PI * r
-    const arcLength = Math.PI * radius;
+  // SVG Size Definitions
+  const width = 300;
+  const height = 160;
+  const strokeWidth = 28;
+  const radius = 120;
+  const arcLength = Math.PI * radius;
 
-    // Dash Offset calculation for "CSS Gauge":
-    // We want the stroke to cover 'score' percent of the semi-circle.
-    // strokeDasharray = "arcLength" (this sets the dash length to full curve)
-    // strokeDashoffset = arcLength - (arcLength * (score / 100))
-    // If score is 100, offset = 0 (full show).
-    // If score is 0, offset = arcLength (hidden).
-    const dashOffset = arcLength - (arcLength * (safeScore / 100));
+  useEffect(() => {
+    // Animate score from 0 to safeScore over 1.5s
+    const controls = animate(count, safeScore, {
+      duration: 1.5,
+      ease: "easeOut",
+      onComplete: () => setHasAnimated(true)
+    });
+    return () => controls.stop();
+  }, [safeScore, count]);
 
-    return (
-        <div className="flex flex-col items-center justify-center p-6">
-            <div className="relative flex flex-col items-center">
+  // Dash Offset mapping
+  const dashOffset = arcLength - (arcLength * (safeScore / 100));
 
-                {/* SVG Container */}
-                <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} className="overflow-visible">
-                    <defs>
-                        <linearGradient id="score-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                            <stop offset="0%" stopColor="#ef4444" />
-                            <stop offset="50%" stopColor="#eab308" />
-                            <stop offset="100%" stopColor="#22c55e" />
-                        </linearGradient>
-                    </defs>
+  return (
+    <div className="flex flex-col items-center justify-center p-6">
+      <div className="relative flex flex-col items-center">
 
-                    {/* Background Track (Full Semi-Circle) */}
-                    <path
-                        d={`M ${width / 2 - radius} ${height - 10} A ${radius} ${radius} 0 0 1 ${width / 2 + radius} ${height - 10}`}
-                        fill="none"
-                        stroke="var(--color-border-secondary)"
-                        strokeWidth={strokeWidth}
-                        strokeLinecap="round"
-                    />
+        {/* SVG Container */}
+        <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} className="overflow-visible">
+          <defs>
+            <linearGradient id="score-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="var(--color-danger)" />
+              <stop offset="50%" stopColor="var(--color-warning)" />
+              <stop offset="100%" stopColor="var(--color-success)" />
+            </linearGradient>
+          </defs>
 
-                    {/* Progress Arc */}
-                    <path
-                        d={`M ${width / 2 - radius} ${height - 10} A ${radius} ${radius} 0 0 1 ${width / 2 + radius} ${height - 10}`}
-                        fill="none"
-                        stroke="url(#score-gradient)"
-                        strokeWidth={strokeWidth}
-                        strokeLinecap="round"
-                        strokeDasharray={arcLength}
-                        strokeDashoffset={dashOffset}
-                        className="transition-all duration-1000 ease-out drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]"
-                    />
-                </svg>
+          {/* Background Track */}
+          <path
+            d={`M ${width / 2 - radius} ${height - 10} A ${radius} ${radius} 0 0 1 ${width / 2 + radius} ${height - 10}`}
+            fill="none"
+            stroke="var(--color-surface-border-strong)"
+            strokeWidth={strokeWidth}
+            strokeLinecap="round"
+          />
 
-                {/* Score Text Overlay (Positioned absolutely to center in the bottom) */}
-                <div className="absolute bottom-0 text-center transform translate-y-2">
-                    <p className="text-text-secondary text-sm font-bold uppercase tracking-widest mb-1">Match Score</p>
-                    <p className="text-7xl font-clash-display font-bold text-text-primary drop-shadow-[0_0_15px_rgba(255,255,255,0.15)]">
-                        {Math.round(safeScore)}%
-                    </p>
-                </div>
+          {/* Progress Arc */}
+          <motion.path
+            d={`M ${width / 2 - radius} ${height - 10} A ${radius} ${radius} 0 0 1 ${width / 2 + radius} ${height - 10}`}
+            fill="none"
+            stroke="url(#score-gradient)"
+            strokeWidth={strokeWidth}
+            strokeLinecap="round"
+            initial={{ strokeDashoffset: arcLength }}
+            animate={{ strokeDashoffset: dashOffset }}
+            transition={{ duration: 1.5, ease: "easeOut" }}
+            strokeDasharray={arcLength}
+            className="drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]"
+          />
+        </svg>
 
-            </div>
+        {/* Score Text Overlay */}
+        <div className="absolute bottom-0 text-center transform translate-y-2">
+          <p className="text-text-mid text-sm font-bold uppercase tracking-widest mb-1">Match Score</p>
+          <div className="flex items-end justify-center">
+            <motion.span className="text-7xl font-clash-display font-bold dark:text-text-high drop-shadow-[0_0_15px_rgba(255,255,255,0.15)]">
+              {rounded}
+            </motion.span>
+            <span className="text-4xl font-clash-display font-bold dark:text-text-high pb-1 ml-1">%</span>
+          </div>
         </div>
-    );
-};
+
+      </div>
+    </div>
+  );
+});
 
 export default ScoreGauge;

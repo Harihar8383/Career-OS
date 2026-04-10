@@ -1,192 +1,195 @@
 import React from 'react';
-import { AlertCircle, Check, ArrowRight, Copy, Zap, ShieldAlert } from 'lucide-react';
+import { AlertCircle, Check, ArrowRight, Copy, Zap, ShieldAlert, RefreshCw } from 'lucide-react';
 
 const PriorityBadge = ({ priority }) => {
-    // priority could be 'High', 'Medium', 'Low'
-    const color = priority === 'High' ? 'bg-red-500 shadow-red-500/50' : priority === 'Medium' ? 'bg-orange-500 shadow-orange-500/50' : 'bg-yellow-500 shadow-yellow-500/50';
-    return <div className={`w-2.5 h-2.5 rounded-full ${color} shadow-[0_0_10px_currentColor]`} />;
+  // priority could be 'High', 'Medium', 'Low'
+  const color = priority === 'High' ? 'bg-red-500 shadow-red-500/50' : priority === 'Medium' ? 'bg-orange-500 shadow-orange-500/50' : 'bg-yellow-500 shadow-yellow-500/50';
+  return <div className={`w-2.5 h-2.5 rounded-full ${color} shadow-[0_0_10px_currentColor]`} />;
 };
 
 const TopImprovements = ({ items = [] }) => (
-    <div className="col-span-1 lg:col-span-7 flex flex-col">
-        <h3 className="flex items-center gap-2 text-lg font-bold text-text-primary mb-4">
-            <span className="text-blue-400">⚡</span> Top Improvement Opportunities
-        </h3>
+  <div className="col-span-1 lg:col-span-7 flex flex-col">
+    <h3 className="flex items-center gap-2 text-lg font-bold text-text-primary mb-4">
+      <Zap size={18} className="text-brand-primary" aria-label="Top Improvements" /> Top Improvement Opportunities
+    </h3>
 
-        <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 terminal-scrollbar">
-            {items.map((item, idx) => (
-                <div key={idx} className="bg-bg-card border border-border-primary hover:border-blue-500/30 p-5 rounded-2xl flex items-start gap-5 transition-all duration-300 group shadow-sm hover:shadow-md">
-                    <div className="mt-1 font-mono text-text-secondary text-sm font-bold group-hover:text-blue-500 transition-colors w-6 text-center">0{idx + 1}</div>
-                    <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                            <PriorityBadge priority={item.priority} />
-                            <h4 className="text-text-primary font-bold text-lg leading-tight">{item.action}</h4>
-                        </div>
-                        <p className="text-text-secondary text-sm mb-4 leading-relaxed font-dm-sans">
-                            {item.why_it_matters}
-                        </p>
-                        <div className="flex items-center gap-2">
-                            <span className="px-2.5 py-1 bg-bg-dark/50 border border-border-secondary rounded-lg text-[10px] text-text-secondary font-bold uppercase tracking-wider backdrop-blur-sm">
-                                {item.where_to_apply || "General"}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            ))}
+    <div className="space-y-4 pr-2">
+      {items.map((item, idx) => (
+        <div key={idx} className="bg-bg-card border border-border-primary hover:border-brand-primary/30 p-5 rounded-2xl flex items-start gap-5 transition-all duration-300 group shadow-sm hover:shadow-md">
+          <div className="mt-1 font-mono text-text-secondary text-sm font-bold group-hover:text-brand-primary transition-colors w-6 text-center">0{idx + 1}</div>
+          <div className="flex-1">
+            <div className="flex items-center gap-3 mb-2">
+              <PriorityBadge priority={item.priority} />
+              <h4 className="text-text-primary font-bold text-lg leading-tight">{item.action}</h4>
+            </div>
+            <p className="text-text-secondary text-sm mb-4 leading-relaxed font-dm-sans">
+              {item.why_it_matters}
+            </p>
+            <div className="flex items-center gap-2">
+              <span className="px-2.5 py-1 bg-bg-dark/50 border border-border-secondary rounded-lg text-[10px] text-text-secondary font-bold uppercase tracking-wider backdrop-blur-sm">
+                {item.where_to_apply || "General"}
+              </span>
+            </div>
+          </div>
         </div>
+      ))}
     </div>
+  </div>
 );
 
 const SkillValidator = ({ items = [] }) => (
-    <div className="col-span-1 lg:col-span-5 border border-border-primary bg-bg-card backdrop-blur-sm rounded-2xl p-6 shadow-lg flex flex-col">
-        <h3 className="flex items-center gap-2 text-lg font-bold text-text-primary mb-6">
-            <span className="text-purple-400">🛡️</span> Skill Evidence Validator
-        </h3>
+  <div className="col-span-1 lg:col-span-5 border border-border-primary bg-bg-card backdrop-blur-sm rounded-2xl p-6 shadow-lg flex flex-col">
+    <h3 className="flex items-center gap-2 text-lg font-bold text-text-primary mb-6">
+      <ShieldAlert size={18} className="text-purple-400" aria-label="Skill Validator" /> Skill Evidence Validator
+    </h3>
 
-        <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 terminal-scrollbar">
-            {items.map((item, idx) => (
-                <div key={idx} className="bg-bg-dark/50 rounded-xl p-4 border border-border-secondary hover:border-border-primary transition-colors">
-                    <div className="flex justify-between items-center mb-2">
-                        <span className="text-text-primary font-bold">{item.skill}</span>
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded border uppercase tracking-wider ${item.status === 'Proven' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
-                            item.status === 'Verified' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
-                                'bg-red-500/10 text-red-400 border-red-500/20'
-                            }`}>
-                            {item.status}
-                        </span>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-text-secondary mb-2 font-mono">
-                        <span>Found in: {item.location || "Not found"}</span>
-                    </div>
-                    <p className={`text-xs leading-relaxed ${item.status === 'Proven' ? 'text-green-500/70' :
-                        item.status === 'Verified' ? 'text-blue-500/70' :
-                            'text-red-500/70'
-                        }`}>
-                        {item.evidence_strength}
-                    </p>
-                </div>
-            ))}
+    <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+      {items.map((item, idx) => (
+        <div key={idx} className="bg-bg-dark/50 rounded-xl p-4 border border-border-secondary hover:border-border-primary transition-colors">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-text-primary font-bold">{item.skill}</span>
+            <span className={`text-[10px] font-bold px-2 py-0.5 rounded border uppercase tracking-wider ${item.status === 'Proven' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
+              item.status === 'Verified' ? 'bg-brand-primary/10 text-[#8AA5FF] border-brand-primary/20' :
+                'bg-red-500/10 text-red-400 border-red-500/20'
+              }`}>
+              {item.status}
+            </span>
+          </div>
+          <div className="flex items-center gap-2 text-xs text-text-secondary mb-2 font-mono">
+            <span>Found in: {item.location || "Not found"}</span>
+          </div>
+          <p className={`text-xs leading-relaxed ${item.status === 'Proven' ? 'text-green-500/70' :
+            item.status === 'Verified' ? 'text-brand-primary/70' :
+              'text-red-500/70'
+            }`}>
+            {item.evidence_strength}
+          </p>
         </div>
-    </div >
+      ))}
+    </div>
+  </div >
 );
 
 const ExperienceOptimizer = ({ items = [] }) => {
-    if (items.length === 0) return null;
+  if (items.length === 0) return null;
 
-    // Just show first one for now as per design
-    const item = items[0];
-
-    return (
-        <div className="col-span-full mt-8 bg-bg-card backdrop-blur-md border border-border-primary rounded-2xl p-6 sm:p-8 relative overflow-hidden shadow-lg">
+  return (
+    <div className="col-span-full mt-8">
+      <h3 className="flex items-center gap-2 text-lg font-bold text-text-primary mb-6">
+        <RefreshCw size={18} className="text-orange-400" aria-label="Experience Optimizer" /> Experience Optimizer
+      </h3>
+      
+      <div className="space-y-6">
+        {items.map((item, idx) => (
+          <div key={idx} className="bg-bg-card backdrop-blur-md border border-border-primary rounded-2xl p-6 sm:p-8 relative overflow-hidden shadow-lg">
             <div className="absolute top-0 right-0 w-full h-1 bg-gradient-to-r from-orange-500/20 via-transparent to-transparent opacity-50" />
 
-            <h3 className="flex items-center gap-2 text-lg font-bold text-text-primary mb-6">
-                <span className="text-orange-400">🔄</span> Experience Optimizer
-            </h3>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative">
-                {/* Arrow in middle */}
-                <div className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-[#0A0A0A] rounded-full items-center justify-center border border-white/10 z-10 shadow-xl">
-                    <ArrowRight size={16} className="text-gray-400" />
-                </div>
+              {/* Arrow in middle */}
+              <div className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-bg-dark rounded-full items-center justify-center border border-white/10 z-10 shadow-xl">
+                <ArrowRight size={16} className="text-gray-400" />
+              </div>
 
-                {/* Original */}
-                <div className="bg-bg-dark p-6 rounded-xl border border-border-primary relative shadow-inner">
-                    <p className="text-xs font-bold text-red-400 uppercase tracking-widest mb-3">Your Resume</p>
-                    <p className="text-text-secondary font-dm-sans leading-relaxed italic opacity-80 pl-4 border-l-2 border-red-500/20">
-                        "{item.original_text}"
-                    </p>
-                </div>
+              {/* Original */}
+              <div className="bg-bg-dark p-6 rounded-xl border border-border-primary relative shadow-inner">
+                <p className="text-xs font-bold text-red-400 uppercase tracking-widest mb-3">Your Resume</p>
+                <p className="text-text-secondary font-dm-sans leading-relaxed italic opacity-80 pl-4 border-l-2 border-red-500/20">
+                  "{item.original_text}"
+                </p>
+              </div>
 
-                {/* Optimized */}
-                <div className="bg-gradient-to-br from-bg-dark to-bg-card p-6 rounded-xl border border-green-500/20 relative group hover:shadow-[0_0_30px_rgba(20,83,45,0.1)] transition-all">
-                    <p className="text-xs font-bold text-green-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-                        <Zap size={12} className="fill-green-400" /> Optimized for JD
-                    </p>
-                    <p className="text-text-primary font-dm-sans leading-relaxed pl-4 border-l-2 border-green-500">
-                        "{item.optimized_text}"
-                    </p>
+              {/* Optimized */}
+              <div className="bg-gradient-to-br from-bg-dark to-bg-card p-6 rounded-xl border border-green-500/20 relative group hover:shadow-[0_0_30px_rgba(20,83,45,0.1)] transition-all">
+                <p className="text-xs font-bold text-green-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                  <Zap size={12} className="fill-green-400" /> Optimized for JD
+                </p>
+                <p className="text-text-primary font-dm-sans leading-relaxed pl-4 border-l-2 border-green-500">
+                  "{item.optimized_text}"
+                </p>
 
-                    <button
-                        onClick={() => navigator.clipboard.writeText(item.optimized_text)}
-                        className="absolute bottom-4 right-4 flex items-center gap-2 px-3 py-1.5 bg-green-600/20 hover:bg-green-600 text-green-300 hover:text-white border border-green-500/30 rounded-lg text-xs font-bold transition-all opacity-0 group-hover:opacity-100 backdrop-blur-sm"
-                    >
-                        <Copy size={12} /> Copy Text
-                    </button>
-                </div>
+                <button
+                  onClick={() => navigator.clipboard.writeText(item.optimized_text)}
+                  className="absolute bottom-4 right-4 flex items-center gap-2 px-3 py-1.5 bg-green-600/20 hover:bg-green-600 text-green-300 hover:text-white border border-green-500/30 rounded-lg text-xs font-bold transition-all opacity-0 group-hover:opacity-100 backdrop-blur-sm"
+                >
+                  <Copy size={12} /> Copy Text
+                </button>
+              </div>
             </div>
-        </div>
-    );
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 const MissingSectionAlerts = ({ items = [] }) => {
-    if (!items || items.length === 0) return null;
+  if (!items || items.length === 0) return null;
 
-    return (
-        <div className="col-span-full mt-6 space-y-4">
-            {items.map((alert, idx) => (
-                <div key={idx} className="border-l-4 border-orange-500 bg-bg-card/90 backdrop-blur-sm p-6 rounded-r-2xl relative overflow-hidden group shadow-md border-y border-r border-border-primary">
-                    <div className="absolute inset-0 bg-gradient-to-r from-orange-500/5 to-transparent opacity-50" />
+  return (
+    <div className="col-span-full mt-6 space-y-4">
+      {items.map((alert, idx) => (
+        <div key={idx} className="border-l-4 border-orange-500 bg-bg-card/90 backdrop-blur-sm p-6 rounded-r-2xl relative overflow-hidden group shadow-md border-y border-r border-border-primary">
+          <div className="absolute inset-0 bg-gradient-to-r from-orange-500/5 to-transparent opacity-50" />
 
-                    <div className="relative z-10">
-                        <div className="flex items-start gap-4">
-                            <ShieldAlert className="text-orange-500 flex-shrink-0 mt-1" size={24} />
-                            <div>
-                                <h4 className="flex items-center gap-2 text-xl font-bold text-text-primary mb-1 font-clash-display">
-                                    Missing Section Alert: <span className="text-orange-400">{alert.section_name}</span>
-                                </h4>
-                                <p className="text-text-secondary mb-6 font-dm-sans">{alert.message}</p>
+          <div className="relative z-10">
+            <div className="flex items-start gap-4">
+              <ShieldAlert className="text-orange-500 flex-shrink-0 mt-1" size={24} />
+              <div>
+                <h4 className="flex items-center gap-2 text-xl font-bold text-text-primary mb-1 font-clash-display">
+                  Missing Section Alert: <span className="text-orange-400">{alert.section_name}</span>
+                </h4>
+                <p className="text-text-secondary mb-6 font-dm-sans">{alert.message}</p>
 
-                                {alert.suggestion_template && (
-                                    <div className="bg-bg-dark/50 p-5 rounded-xl border border-border-primary relative group/code hover:border-border-secondary transition-colors">
-                                        <p className="font-mono text-sm text-blue-400 mb-2 font-bold">{alert.suggestion_template.title}</p>
-                                        <p className="font-dm-sans text-sm text-text-secondary italic border-l-2 border-border-secondary pl-4 py-1">
-                                            {alert.suggestion_template.description}
-                                        </p>
-                                        <button
-                                            className="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors p-2 hover:bg-white/5 rounded-lg"
-                                            onClick={() => navigator.clipboard.writeText(`${alert.suggestion_template.title}\n${alert.suggestion_template.description}`)}
-                                        >
-                                            <Copy size={16} />
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            ))}
+                {alert.suggestion_template && (
+                  <div className="bg-bg-dark/50 p-5 rounded-xl border border-border-primary relative group/code hover:border-border-secondary transition-colors">
+                    <p className="font-mono text-sm text-brand-primary mb-2 font-bold">{alert.suggestion_template.title}</p>
+                    <p className="font-dm-sans text-sm text-text-secondary italic border-l-2 border-border-secondary pl-4 py-1">
+                      {alert.suggestion_template.description}
+                    </p>
+                    <button
+                      className="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors p-2 hover:bg-text-primary/5 rounded-lg"
+                      onClick={() => navigator.clipboard.writeText(`${alert.suggestion_template.title}\n${alert.suggestion_template.description}`)}
+                    >
+                      <Copy size={16} />
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
-    )
+      ))}
+    </div>
+  )
 }
 
 const ActionableTodoList = ({ data = {} }) => {
-    const {
-        top_improvements = [],
-        skill_evidence_validator = [],
-        experience_optimizer = [],
-        missing_section_alerts = []
-    } = data;
+  const {
+    top_improvements = [],
+    skill_evidence_validator = [],
+    experience_optimizer = [],
+    missing_section_alerts = []
+  } = data;
 
-    return (
-        <div className="w-full">
-            <div className="border-l-4 border-[#2934FF] pl-6 mb-8">
-                <h2 className="text-3xl font-clash-display font-bold text-text-primary">
-                    Actionable To-Do List
-                </h2>
-                <p className="text-text-secondary text-sm mt-1">
-                    Your step-by-step optimization plan.
-                </p>
-            </div>
+  return (
+    <div className="w-full">
+      <div className="border-l-4 border-brand-primary pl-6 mb-8">
+        <h2 className="text-3xl font-clash-display font-bold text-text-primary">
+          Actionable To-Do List
+        </h2>
+        <p className="text-text-secondary text-sm mt-1">
+          Your step-by-step optimization plan.
+        </p>
+      </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                <TopImprovements items={top_improvements} />
-                <SkillValidator items={skill_evidence_validator} />
-                <ExperienceOptimizer items={experience_optimizer} />
-                <MissingSectionAlerts items={missing_section_alerts} />
-            </div>
-        </div>
-    );
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <TopImprovements items={top_improvements} />
+        <SkillValidator items={skill_evidence_validator} />
+        <ExperienceOptimizer items={experience_optimizer} />
+        <MissingSectionAlerts items={missing_section_alerts} />
+      </div>
+    </div>
+  );
 };
 
 export default ActionableTodoList;

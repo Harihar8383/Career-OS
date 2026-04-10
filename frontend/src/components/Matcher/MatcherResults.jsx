@@ -1,14 +1,15 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, Suspense, lazy } from 'react';
 import { motion } from 'framer-motion';
 import JdMatcherHeader from './Report/JdMatcherHeader';
 import SectionBreakdown from './Report/SectionBreakdown';
 import KeywordGapReport from './Report/KeywordGapReport';
-import ActionableTodoList from './Report/ActionableTodoList';
-import BulletFeedback from './Report/BulletFeedback';
-import confetti from 'canvas-confetti';
 import { Bookmark, BookmarkCheck } from 'lucide-react';
 import { useAuth } from '@clerk/clerk-react';
 import { useToast } from '../ui/Toast';
+import { Skeleton } from '../ui/Skeleton';
+
+const ActionableTodoList = lazy(() => import('./Report/ActionableTodoList'));
+const BulletFeedback = lazy(() => import('./Report/BulletFeedback'));
 
 export const MatcherResults = ({ results, onReset }) => {
   const containerRef = useRef(null);
@@ -65,36 +66,38 @@ export const MatcherResults = ({ results, onReset }) => {
   useEffect(() => {
     // Only fire confetti if score is high (e.g., >= 80)
     if (results && results.match_score >= 80) {
-      const end = Date.now() + 2 * 1000; // 2 seconds
-      const colors = [
-        "#2934FF", // Design System Blue
+      import('canvas-confetti').then((module) => {
+        const confetti = module.default;
+        const end = Date.now() + 2 * 1000; // 2 seconds
+        const colors = [
+          "#2934FF", // Design System Blue
+          "#eec304ff"
+        ];
+        const frame = () => {
+          if (Date.now() > end) return;
 
-        "#ffffff"
-      ];
-      const frame = () => {
-        if (Date.now() > end) return;
+          confetti({
+            particleCount: 2,
+            angle: 60,
+            spread: 55,
+            startVelocity: 60,
+            origin: { x: 0, y: 0.5 },
+            colors: colors,
+          });
+          confetti({
+            particleCount: 2,
+            angle: 120,
+            spread: 55,
+            startVelocity: 60,
+            origin: { x: 1, y: 0.5 },
+            colors: colors,
+          });
 
-        confetti({
-          particleCount: 2,
-          angle: 60,
-          spread: 55,
-          startVelocity: 60,
-          origin: { x: 0, y: 0.5 },
-          colors: colors,
-        });
-        confetti({
-          particleCount: 2,
-          angle: 120,
-          spread: 55,
-          startVelocity: 60,
-          origin: { x: 1, y: 0.5 },
-          colors: colors,
-        });
+          requestAnimationFrame(frame);
+        };
 
-        requestAnimationFrame(frame);
-      };
-
-      frame();
+        frame();
+      }).catch(console.error);
     }
   }, [results]);
 
@@ -139,7 +142,9 @@ export const MatcherResults = ({ results, onReset }) => {
         viewport={{ once: true }}
         transition={{ delay: 0.4 }}
       >
-        <ActionableTodoList data={results.actionable_todos} />
+        <Suspense fallback={<Skeleton className="h-[400px] w-full rounded-3xl" />}>
+          <ActionableTodoList data={results.actionable_todos} />
+        </Suspense>
       </motion.div>
 
       {/* 5. Bullet Point Feedback */}
@@ -149,7 +154,9 @@ export const MatcherResults = ({ results, onReset }) => {
         viewport={{ once: true }}
         transition={{ delay: 0.5 }}
       >
-        <BulletFeedback bullets={results.bullet_feedback} />
+        <Suspense fallback={<Skeleton className="h-[300px] w-full rounded-2xl" />}>
+          <BulletFeedback bullets={results.bullet_feedback} />
+        </Suspense>
       </motion.div>
 
       {/* Action Buttons */}
@@ -159,8 +166,8 @@ export const MatcherResults = ({ results, onReset }) => {
           onClick={handleSaveToTracker}
           disabled={isSaved || isSaving}
           className={`flex items-center gap-2 px-6 py-3.5 rounded-xl transition-all duration-300 font-bold border shadow-lg backdrop-blur-sm ${isSaved
-            ? 'bg-blue-500/20 text-blue-400 border-blue-500/30 cursor-default'
-            : 'bg-bg-card hover:bg-blue-500/10 text-text-primary border-border-primary hover:border-blue-500/30 hover:scale-105'
+            ? 'bg-brand-primary/20 text-[#8AA5FF] border-brand-primary/30 cursor-default'
+            : 'bg-bg-card hover:bg-brand-primary/10 text-text-primary border-border-primary hover:border-brand-primary/30 hover:scale-105'
             } ${isSaving ? 'opacity-50 cursor-wait' : ''}`}
         >
           {isSaved ? (

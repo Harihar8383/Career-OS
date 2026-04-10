@@ -1,6 +1,6 @@
 import React from 'react';
 import ScoreGauge from '../ScoreGauge';
-import { FileText, Building2 } from 'lucide-react';
+import { FileText, Building2, Briefcase, AlertTriangle, CheckCircle2, XCircle } from 'lucide-react';
 
 const JdMatcherHeader = ({ data }) => {
     const {
@@ -22,7 +22,7 @@ const JdMatcherHeader = ({ data }) => {
     const getVerdictStyle = (v) => {
         if (v.includes("Likely Filtered") || v.includes("Weak")) return "bg-red-500/10 text-red-400 border-red-500/30 shadow-[0_0_15px_rgba(239,68,68,0.2)]";
         if (v.includes("Borderline")) return "bg-orange-500/10 text-orange-400 border-orange-500/30 shadow-[0_0_15px_rgba(249,115,22,0.2)]";
-        if (v.includes("Competitive") || v.includes("Strong")) return "bg-[#2934FF]/10 text-[#8AA5FF] border-[#2934FF]/30 shadow-[0_0_15px_rgba(41,52,255,0.3)]";
+        if (v.includes("Competitive") || v.includes("Strong")) return "bg-brand-primary/10 text-[#8AA5FF] border-brand-primary/30 shadow-[0_0_15px_var(--color-brand-primary)]";
         return "bg-bg-dark/5 text-text-secondary border-border-primary";
     };
 
@@ -30,7 +30,7 @@ const JdMatcherHeader = ({ data }) => {
         <div className="w-full bg-bg-card/60 backdrop-blur-2xl rounded-2xl border border-border-primary shadow-xl dark:shadow-2xl overflow-hidden flex flex-col md:flex-row min-h-[320px] transition-all duration-300">
 
             {/* LEFT PANEL: Score & Metrics (Darker bg) */}
-            <div className="md:w-[40%] bg-bg-dark/80 relative p-8 flex flex-col items-center justify-center text-center border-b md:border-b-0 md:border-r border-border-primary">
+            <div className="md:w-[40%] dark:bg-surface-base relative p-8 flex flex-col items-center justify-center text-center border-b md:border-b-0 md:border-r border-border-primary">
                 {/* Gauge */}
                 <div className="scale-90 mb-4">
                     <ScoreGauge score={match_score} />
@@ -38,9 +38,9 @@ const JdMatcherHeader = ({ data }) => {
 
                 {/* Verdict Badge */}
                 <div className={`mt-[-20px] mb-6 px-6 py-2 rounded-full border text-sm font-bold uppercase tracking-widest flex items-center gap-2 ${getVerdictStyle(verdict)}`}>
-                    {verdict.includes("Borderline") && <span>⚠️</span>}
-                    {verdict.includes("Competitive") && <span>✅</span>}
-                    {verdict.includes("Filtered") && <span>❌</span>}
+                    {verdict.includes("Borderline") && <AlertTriangle size={14} />}
+                    {verdict.includes("Competitive") && <CheckCircle2 size={14} />}
+                    {verdict.includes("Filtered") && <XCircle size={14} />}
                     {verdict}
                 </div>
 
@@ -50,7 +50,7 @@ const JdMatcherHeader = ({ data }) => {
                         {header_summary}
                     </h3>
                     <p className="text-text-secondary text-sm italic font-dm-sans px-4 leading-relaxed">
-                        "{emotional_line}"
+                        {emotional_line}
                     </p>
                 </div>
             </div>
@@ -59,7 +59,7 @@ const JdMatcherHeader = ({ data }) => {
             <div className="md:w-[60%] p-10 flex flex-col justify-center relative bg-gradient-to-br from-bg-card/50 to-transparent">
 
                 {/* Background Glow */}
-                <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 blur-[80px] pointer-events-none" />
+                <div className="absolute top-0 right-0 w-64 h-64 bg-brand-primary/5 blur-[80px] pointer-events-none" />
 
                 {/* Job Title & Company */}
                 <div className="mb-8 relative z-10">
@@ -78,17 +78,17 @@ const JdMatcherHeader = ({ data }) => {
                 {/* Tags Row */}
                 <div className="flex flex-wrap gap-3 mb-12 relative z-10">
                     <span className="px-4 py-2 bg-text-primary/5 text-text-secondary text-xs font-bold rounded-xl border border-border-primary flex items-center gap-2 backdrop-blur-md">
-                        <BriefcaseIcon size={14} /> {experience_level}
+                        <Briefcase size={14} /> {experience_level}
                     </span>
                     {top_skills.map((skill, idx) => (
-                        <span key={idx} className="px-4 py-2 bg-blue-500/10 text-blue-200 text-xs font-bold rounded-xl border border-blue-500/20 uppercase backdrop-blur-md">
+                        <span key={idx} className="px-4 py-2 bg-brand-primary/10 text-[#8AA5FF] text-xs font-bold rounded-xl border border-brand-primary/20 uppercase backdrop-blur-md">
                             {skill}
                         </span>
                     ))}
                 </div>
 
                 {/* File Info Footer */}
-                <div className="absolute bottom-6 right-8 flex items-center gap-3 text-xs text-text-secondary font-mono">
+                <div className="mt-auto pt-4 flex items-center gap-3 text-xs text-text-secondary font-mono opacity-60">
                     <FileText size={14} />
                     <span>{data.meta?.fileName || "resume.pdf"}</span>
                     <span>•</span>
@@ -100,13 +100,5 @@ const JdMatcherHeader = ({ data }) => {
         </div>
     );
 };
-
-// Helper Icon
-const BriefcaseIcon = ({ size }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-    </svg>
-);
 
 export default JdMatcherHeader;
